@@ -103,6 +103,8 @@ int yylex(void)
         return TYPE;
     else if (lexem == "record")
         return RECORD;
+    else if (lexem == "routine")
+        return ROUTINE;
     else if (token_name == "integer literals") {
         int yylval = 0;
         for (int i = 0; i < lexem.size(); yylval = yylval * 10 + lexem[i] - '0', i++);
