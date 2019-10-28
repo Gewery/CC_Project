@@ -4,7 +4,10 @@
     void yyerror(const char *s);
 %}
 
-%token NUMBER VAR IS IDENTIFIER END IN REVERSE WHILE FOR FOREACH FROM LOOP IF THEN ELSE TRUE FALSE
+%token VAR IS IDENTIFIER END IN REVERSE TYPE RECORD
+%token WHILE FOR FOREACH FROM LOOP IF THEN ELSE
+$token INTEGER REAL BOOLEAN
+%token TRUE FALSE INTEGER_LITERAL REAL_LITERAL
 
 %start compilation_unit
 
@@ -34,7 +37,7 @@ InitialValue
     ;
 
 TypeDeclaration
-    : type IDENTIFIER IS Type
+    : TYPE IDENTIFIER IS Type
     ;
 
 RoutineDeclaration
@@ -64,9 +67,9 @@ Type
     ;
 
 PrimitiveType
-    : integer
-    | real
-    | boolean
+    : INTEGER
+    | REAL
+    | BOOLEAN
     ;
 
 RecordType
@@ -223,7 +226,7 @@ Summand
     : Primary
     | ( Expression )
     ;
-
+// TODO
 Primary
     : IntegralLiteral
     | RealLiteral
