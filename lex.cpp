@@ -79,8 +79,6 @@ int yylex(void)
         return WHILE;
     else if (lexem == "for")
         return FOR;
-    else if (lexem == "foreach")
-        return FOREACH;
     else if (lexem == "from")
         return FROM;
     else if (lexem == "loop")
