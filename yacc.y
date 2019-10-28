@@ -4,10 +4,20 @@
     void yyerror(const char *s);
 %}
 
-%token VAR IS IDENTIFIER END IN REVERSE TYPE RECORD
-%token WHILE FOR FOREACH FROM LOOP IF THEN ELSE
-$token INTEGER REAL BOOLEAN
-%token TRUE FALSE INTEGER_LITERAL REAL_LITERAL
+%token VAR IDENTIFIER IS TYPE INTEGER
+%token REAL BOOLEAN ARRAY RECORD END
+%token INTEGER_LITERAL, REAL_LITERAL
+%token ROUTINE WHILE LOOP FOR IN
+%token REVERSE IF THEN ELSE AND
+%token OR XOR TRUE FALSE NOT
+%token "<" "<=" ">" ">=" "=" "/="
+
+%nonassoc ".." 
+
+%left "+" "-" OR
+%left "*" "/" "%" AND
+
+%right "=" ":="
 
 %start compilation_unit
 
@@ -28,7 +38,6 @@ SimpleDeclaration
 VariableDeclaration
     : VAR IDENTIFIER ":" Type InitialValue
     | VAR IDENTIFIER IS Expression
-    | VariableDeclaration
     ;
 
 InitialValue
@@ -38,25 +47,6 @@ InitialValue
 
 TypeDeclaration
     : TYPE IDENTIFIER IS Type
-    ;
-
-RoutineDeclaration
-    : routine IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration
-    ;
-
-Parameters
-    : "(" ParameterDeclaration ")"
-    |
-    ;
-
-ParameterDeclaration
-    : IDENTIFIER ":" Type
-    | "," ParameterDeclaration
-    ;
-
-TypeInRoutineDeclaration:
-    : ":" Type
-    |
     ;
 
 Type
@@ -72,21 +62,39 @@ PrimitiveType
     | BOOLEAN
     ;
 
-RecordType
-    : record VariableDeclarationInRecordType END
+ArrayType
+    : ARRAY "[" Expression "]" Type
     ;
 
-VariableDeclarationInRecordType
-    : VariableDeclaration VariableDeclarationInRecordType
+RecordType
+    : RECORD VariableDeclarations END
+    ;
+
+VariableDeclarations
+    : VariableDeclaration VariableDeclarations
     |
     ;
 
-ArrayType
-    : array ExpressionInArrayType Type
+RoutineDeclaration
+    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration
     ;
 
-ExpressionInArrayType
-    : Expression ExpressionInArrayType
+Parameters
+    : "(" ParameterDeclaration ParametersDeclaration ")"
+    |
+    ;
+
+ParameterDeclaration
+    : IDENTIFIER ":" Type
+    ;
+
+ParametersDeclaration
+    : "," ParameterDeclaration ParametersDeclaration
+    |
+    ;
+
+TypeInRoutineDeclaration
+    : ":" Type
     |
     ;
 
@@ -94,7 +102,6 @@ BodyInRoutineDeclaration
     : IS Body END
     |
     ;
-
 
 Body
     : SimpleDeclaration Body
@@ -107,12 +114,11 @@ Statement
     | RoutineCall
     | WhileLoop
     | ForLoop
-    | ForeachLoop
     | IfStatement
     ;
 
 Assignment
-    : ModifiablePrimary ":" "=" Expression
+    : ModifiablePrimary ":=" Expression
     ;
 
 RoutineCall
@@ -120,34 +126,30 @@ RoutineCall
     ;
 
 ExpressionInRoutineCall
-    : "(" Expression MultipleExpressionInRoutineCall ")"
+    : "(" Expression ExpressionsInRoutineCall ")"
     |
     ;
 
-MultipleExpressionInRoutineCall
-    : "," Expression
+ExpressionsInRoutineCall
+    : "," Expression ExpressionInRoutineCall
     |
     ;
 
 WhileLoop
-    : WHILE Expression loop Body END
+    : WHILE Expression LOOP Body END
     ;
 
 ForLoop
-    : FOR IDENTIFIER Range loop Body END
+    : FOR IDENTIFIER IN Reverse Range LOOP Body END
     ;
 
 Range
-    : IN ReverseInRange Expression ".""." Expression
+    : Expression .. Expression
     ;
 
-ReverseInRange
+Reverse
     : REVERSE
     |
-    ;
-
-ForeachLoop
-    : FOREACH IDENTIFIER FROM ModifiablePrimary LOOP Body END
     ;
 
 IfStatement
@@ -160,85 +162,92 @@ ElseInIfStatement
     ;
 
 Expression
-    : Relation { ( and | or | xor ) Relation }
+    : Relation MultipleRelationsInExpression
     ;
 
-RelationInExpression
-    : LogicalOperators Relation RelationInExpression
-    :
+MultipleRelationsInExpression
+    : LogicalOperator Relation MultipleRelationsInExpression
+    |
     ;
 
-LogicalOperators
-    : and
-    | or
-    | xor
+LogicalOperator
+    : AND
+    | OR
+    | XOR
     ;
 
 Relation
-    : Simple SimpleInRelation
+    : Simple ComparisonInRelation
     ;
 
-SimpleInRelation
-    : RelationalOperators Simple
+ComparisonInRelation
+    : ComparisonOperator Simple
     |
     ;
 
-RelationalOperators
-    : <
-    | <=
-    | >
-    | >=
-    | =
-    | /=
+ComparisonOperator
+    : "<"
+    | "<="
+    | ">"
+    | ">="
+    | "="
+    | "/="
     ;
 
 Simple
-    : Factor FactorInSimple
+    : Factor Factors
     ;
 
-FactorInSimple
-    : SimpleOperators Factor
+Factors
+    : SimpleOperator Factor Factors
     |
     ;
 
-SimpleOperators
-    : *
-    | /
-    | %
+SimpleOperator
+    : "*"
+    | "/"
+    | "%"
     ;
 
 Factor
-    : Summand SummandInFactor
+    : Summand Summands
     ;
 
-SummandInFactor
-    : FactorOperators Summand
+Summands
+    : Sign Summand Summands
     |
     ;
 
-FactorOperators
-    : +
-    | -
-    ;
-
-// TODO
 Summand
     : Primary
-    | ( Expression )
+    | "(" Expression ")"
     ;
-// TODO
+
 Primary
-    : IntegralLiteral
-    | RealLiteral
+    : INTEGER_LITERAL
+    | Sign INTEGER_LITERAL
+    | NOT INTEGER_LITERAL
+    | REAL_LITERAL
+    | Sign REAL_LITERAL
     | TRUE
     | FALSE
     | ModifiablePrimary
+    | RoutineCall
     ;
 
-// TODO
+Sign
+    : "+"
+    | "-"
+    ;
+
 ModifiablePrimary
-    : IDENTIFIER { . IDENTIFIER | [ Expression ]
-    | ( Expression { , Expression } ) ]
+    : IDENTIFIER Identifiers
+    ;
+
+Identifiers
+    : "." IDENTIFIER Identifiers
+    | "[" Expression "]" Identifiers
+    |
     ;
 
 %%
@@ -261,4 +270,3 @@ void yyerror(char const *s){
 	fflush(stdout);
 	printf("\n%*s\n%*s\n", column, "^", column, s);
 }
-
