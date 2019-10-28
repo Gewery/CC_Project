@@ -4,7 +4,7 @@
     void yyerror(const char *s);
 %}
 
-%token NUMBER VAR IS IDENTIFIER END IN REVERSE WHILE FOR FOREACH FROM LOOP IF THEN ELSE
+%token NUMBER VAR IS IDENTIFIER END IN REVERSE WHILE FOR FOREACH FROM LOOP IF THEN ELSE TRUE FALSE
 
 %start compilation_unit
 
@@ -227,8 +227,8 @@ Summand
 Primary
     : IntegralLiteral
     | RealLiteral
-    | true
-    | false
+    | TRUE
+    | FALSE
     | ModifiablePrimary
     ;
 
