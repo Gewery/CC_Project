@@ -7,11 +7,11 @@
 
 %token VAR IDENTIFIER IS TYPE INTEGER
 %token REAL BOOLEAN ARRAY RECORD END
-%token INTEGER_LITERAL, REAL_LITERAL
+%token INTEGER_LITERAL REAL_LITERAL
 %token ROUTINE WHILE LOOP FOR IN
 %token REVERSE IF THEN ELSE AND
 %token OR XOR TRUE FALSE NOT
-%token "<" "<=" ">" ">=" "=" "/="
+%token "<" "<=" ">" ">=" "=" "/=" ";"
 
 %nonassoc ".." 
 
