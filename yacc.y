@@ -5,25 +5,43 @@
     void yyerror(const char *s);
 %}
 
-%token VAR IDENTIFIER IS TYPE INTEGER
-%token REAL BOOLEAN ARRAY RECORD END
-%token INTEGER_LITERAL REAL_LITERAL
-%token ROUTINE WHILE LOOP FOR IN
-%token REVERSE IF THEN ELSE AND
-%token OR XOR TRUE FALSE NOT
-%token "<" "<=" ">" ">=" "=" "/=" ";"
+// ======== TOKENS ========
 
-%nonassoc ".." 
+%token DECLARATION_SEPARATOR
 
-%left "+" "-" OR
-%left "*" "/" "%" AND
+%token VAR IS END IN REVERSE WHILE
+%token FOR FROM LOOP IF THEN ELSE
+%token REAL BOOLEAN INTEGER TYPE
+%token RECORD ROUTINE
 
-%right "=" ":="
+%token TRUE FALSE
+
+%token PLUS MINUS MULT DIV REMAINDER
+%token NOT AND OR XOR
+%token EQ NOT_EQ GREATER GREATER_EQ LESS LESS_EQ
+%token ASSIGN
+
+%token DOT RANGER COLON COMMA
+%token PARENTHESES_L PARENTHESES_R
+%token BRACKETS_L BRACKETS_R
+
+%token IDENTIFIER
+
+// ======== OPERATOR PRECEDENCE ========
+
+%nonassoc RANGER
+
+%left AND OR
+%left PLUS MISNUS
+%left MULT DIV REMAINDER
+
+%right EQ ASSIGN
 
 %start Program
 
 %%
-// rules
+
+// ======== RULES ========
 
 Program
     : SimpleDeclaration Program                     //{ $$ = Program($1, NULL, $2); root = $$; }
@@ -37,7 +55,7 @@ SimpleDeclaration
     ;
 
 VariableDeclaration
-    : VAR IDENTIFIER ":" Type InitialValue          //{ $$ = SimpleDeclaration($2, $4, $5, NULL); }
+    : VAR IDENTIFIER COLON Type InitialValue        //{ $$ = SimpleDeclaration($2, $4, $5, NULL); }
     | VAR IDENTIFIER IS Expression                  //{ $$ = SimpleDeclaration($2, NULL, NULL, $4); }
     ;
 
@@ -64,7 +82,7 @@ PrimitiveType
     ;
 
 ArrayType
-    : ARRAY "[" Expression "]" Type                 //{ $$ = ArrayType($3, $5); }
+    : ARRAY BRACKETS_L Expression BRACKETS_R Type   //{ $$ = ArrayType($3, $5); }
     ;
 
 RecordType
@@ -81,21 +99,21 @@ RoutineDeclaration
     ;
 
 Parameters
-    : "(" ParameterDeclaration ParametersDeclaration ")"     //{ $$ = Parameters($2, $3); }
+    : PARENTHESES_L ParameterDeclaration ParametersDeclaration PARENTHESES_R    //{ $$ = Parameters($2, $3); }
     |
     ;
 
 ParameterDeclaration
-    : IDENTIFIER ":" Type                                   //{ $$ = ParameterDeclaration($1, $3); }
+    : IDENTIFIER COLON Type                                   //{ $$ = ParameterDeclaration($1, $3); }
     ;
 
 ParametersDeclaration
-    : "," ParameterDeclaration ParametersDeclaration        //{ $$ = ParametersDeclaration($2, $3); }
+    : COMMA ParameterDeclaration ParametersDeclaration        //{ $$ = ParametersDeclaration($2, $3); }
     |
     ;
 
 TypeInRoutineDeclaration
-    : ":" Type                                      //{ $$ = TypeInRoutineDeclaration($2); }
+    : COLON Type                                      //{ $$ = TypeInRoutineDeclaration($2); }
     |
     ;
 
@@ -119,7 +137,7 @@ Statement
     ;
 
 Assignment
-    : ModifiablePrimary ":=" Expression             //{ $$ = Assignment($1, $3); }
+    : ModifiablePrimary ASSIGN Expression             //{ $$ = Assignment($1, $3); }
     ;
 
 RoutineCall
@@ -127,12 +145,12 @@ RoutineCall
     ;
 
 ExpressionInRoutineCall
-    : "(" Expression ExpressionsInRoutineCall ")"   //{ $$ = ExpressionInRoutineCall($2, $3); }
+    : PARENTHESES_L Expression ExpressionsInRoutineCall PARENTHESES_R   //{ $$ = ExpressionInRoutineCall($2, $3); }
     |
     ;
 
 ExpressionsInRoutineCall
-    : "," Expression ExpressionInRoutineCall        //{ $$ = ExpressionsInRoutineCall($2, $3); }
+    : COMMA Expression ExpressionInRoutineCall        //{ $$ = ExpressionsInRoutineCall($2, $3); }
     |
     ;
 
@@ -145,7 +163,7 @@ ForLoop
     ;
 
 Range
-    : Expression .. Expression                      //{ $$ = Range($1, $3); }
+    : Expression RANGER Expression                      //{ $$ = Range($1, $3); }
     ;
 
 Reverse
@@ -187,12 +205,12 @@ ComparisonInRelation
     ;
 
 ComparisonOperator
-    : "<"                                           //{ $$ = ComparisonOperator("<"); }
-    | "<="                                          //{ $$ = ComparisonOperator("<="); }
-    | ">"                                           //{ $$ = ComparisonOperator(">"); }
-    | ">="                                          //{ $$ = ComparisonOperator(">="); }
-    | "="                                           //{ $$ = ComparisonOperator("="); }
-    | "/="                                          //{ $$ = ComparisonOperator("/="); }
+    : LESS                                           //{ $$ = ComparisonOperator(LESS); }
+    | LESS_EQ                                          //{ $$ = ComparisonOperator(LESS_EQ); }
+    | GREATER                                           //{ $$ = ComparisonOperator(GREATER); }
+    | GREATER_EQ                                          //{ $$ = ComparisonOperator(GREATER_EQ); }
+    | EQ                                           //{ $$ = ComparisonOperator(EQ); }
+    | NOT_EQ                                          //{ $$ = ComparisonOperator(NOT_EQ); }
     ;
 
 Simple
@@ -205,9 +223,9 @@ Factors
     ;
 
 SimpleOperator
-    : "*"                                            //{ $$ = SimpleOperator("*"); }
-    | "/"                                            //{ $$ = SimpleOperator("/"); }
-    | "%"                                            //{ $$ = SimpleOperator("%"); }
+    : MULT                                           //{ $$ = SimpleOperator("*"); }
+    | DIV                                            //{ $$ = SimpleOperator("/"); }
+    | REMAINDER                                      //{ $$ = SimpleOperator("%"); }
     ;
 
 Factor
@@ -221,7 +239,7 @@ Summands
 
 Summand
     : Primary                                       //{ $$ = Summand($1, NULL); }
-    | "(" Expression ")"                            //{ $$ = Summand(NULL, $2); }
+    | PARENTHESES_L Expression PARENTHESES_R                           //{ $$ = Summand(NULL, $2); }
     ;
 
 //TODO
@@ -238,17 +256,17 @@ Primary
     ;
 
 Sign
-    : "+"                                            //{ $$ = Sign("+"); }
-    | "-"                                            //{ $$ = Sign("-"); }
+    : PLUS                                           //{ $$ = Sign("+"); }
+    | MUNUS                                          //{ $$ = Sign("-"); }
     ;
 
 ModifiablePrimary
-    : IDENTIFIER Identifiers                        //{ $$ = Summand($1, $2); }
+    : IDENTIFIER Identifiers                         //{ $$ = Summand($1, $2); }
     ;
 
 Identifiers
-    : "." IDENTIFIER Identifiers                    //{ $$ = Summand($2, NULL, $3); }
-    | "[" Expression "]" Identifiers                //{ $$ = Summand(NULL, $2, $4); }
+    : DOT IDENTIFIER Identifiers                     //{ $$ = Summand($2, NULL, $3); }
+    | BRACKETS_L Expression BRACKETS_R Identifiers   //{ $$ = Summand(NULL, $2, $4); }
     |
     ;
 
