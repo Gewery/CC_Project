@@ -1,6 +1,7 @@
 %{
     #include <stdio.h>
     #include "AST.h"
+    #include "lex.cpp"
     int yylex();
     void yyerror(const char *s);
 %}
@@ -12,7 +13,7 @@
 %token VAR IS END IN REVERSE WHILE
 %token FOR FROM LOOP IF THEN ELSE
 %token REAL BOOLEAN INTEGER TYPE
-%token RECORD ROUTINE
+%token RECORD ROUTINE ARRAY
 
 %token TRUE FALSE
 
@@ -25,14 +26,14 @@
 %token PARENTHESES_L PARENTHESES_R
 %token BRACKETS_L BRACKETS_R
 
-%token IDENTIFIER
+%token IDENTIFIER INTEGER_LITERAL REAL_LITERAL
 
 // ======== OPERATOR PRECEDENCE ========
 
 %nonassoc RANGER
 
 %left AND OR
-%left PLUS MISNUS
+%left PLUS MINUS
 %left MULT DIV REMAINDER
 
 %right EQ ASSIGN
@@ -55,12 +56,12 @@ SimpleDeclaration
     ;
 
 VariableDeclaration
-    : VAR IDENTIFIER COLON Type InitialValue        //{ $$ = SimpleDeclaration($2, $4, $5, NULL); }
-    | VAR IDENTIFIER IS Expression                  //{ $$ = SimpleDeclaration($2, NULL, NULL, $4); }
+    : VAR IDENTIFIER COLON Type InitialValue        //{ $$ = VariableDeclaration($2, $4, $5, NULL); }
+    | VAR IDENTIFIER IS Expression                  //{ $$ = VariableDeclaration($2, NULL, NULL, $4); }
     ;
 
 InitialValue
-    : IS Expression                                 //{ $$ = SimpleDeclaration($2); }
+    : IS Expression                                 //{ $$ = InitialValue($2); }
     |
     ;
 
@@ -69,10 +70,10 @@ TypeDeclaration
     ;
 
 Type
-    : PrimitiveType                                 //{ $$ = TypeDeclaration($1, NULL, NULL, NULL); }
-    | ArrayType                                     //{ $$ = TypeDeclaration(NULL, $1, NULL, NULL); }
-    | RecordType                                    //{ $$ = TypeDeclaration(NULL, NULL, $1, NULL); }
-    | IDENTIFIER                                    //{ $$ = TypeDeclaration(NULL, NULL, NULL, $1); }
+    : PrimitiveType                                 //{ $$ = Type($1, NULL, NULL, NULL); }
+    | ArrayType                                     //{ $$ = Type(NULL, $1, NULL, NULL); }
+    | RecordType                                    //{ $$ = Type(NULL, NULL, $1, NULL); }
+    | IDENTIFIER                                    //{ $$ = Type(NULL, NULL, NULL, $1); }
     ;
 
 PrimitiveType
@@ -239,7 +240,7 @@ Summands
 
 Summand
     : Primary                                       //{ $$ = Summand($1, NULL); }
-    | PARENTHESES_L Expression PARENTHESES_R                           //{ $$ = Summand(NULL, $2); }
+    | PARENTHESES_L Expression PARENTHESES_R        //{ $$ = Summand(NULL, $2); }
     ;
 
 //TODO
@@ -252,21 +253,20 @@ Primary
     | TRUE
     | FALSE
     | ModifiablePrimary
-    | RoutineCall
     ;
 
 Sign
     : PLUS                                           //{ $$ = Sign("+"); }
-    | MUNUS                                          //{ $$ = Sign("-"); }
+    | MINUS                                          //{ $$ = Sign("-"); }
     ;
 
 ModifiablePrimary
-    : IDENTIFIER Identifiers                         //{ $$ = Summand($1, $2); }
+    : IDENTIFIER Identifiers                         //{ $$ = ModifiablePrimary($1, $2); }
     ;
 
 Identifiers
-    : DOT IDENTIFIER Identifiers                     //{ $$ = Summand($2, NULL, $3); }
-    | BRACKETS_L Expression BRACKETS_R Identifiers   //{ $$ = Summand(NULL, $2, $4); }
+    : DOT IDENTIFIER Identifiers                     //{ $$ = Identifiers($2, NULL, $3); }
+    | BRACKETS_L Expression BRACKETS_R Identifiers   //{ $$ = Identifiers(NULL, $2, $4); }
     |
     ;
 

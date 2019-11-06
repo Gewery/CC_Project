@@ -1,6 +1,11 @@
 #ifndef CC_PROJECT_AST_H
 #define CC_PROJECT_AST_H
 
+#include <string>
+
+using namespace std;
+
+
 struct Program {
     struct SimpleDeclaration* SimpleDeclaration;
     struct RoutineDeclaration* RoutineDeclaration;

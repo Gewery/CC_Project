@@ -5,7 +5,6 @@
 #include <string>
 #include <regex>
 #include <iostream>
-#include "fb1-5.tab.h"
 
 using namespace std;
 
@@ -76,6 +75,7 @@ int yylex(void)
         else if (lexem == "integer") return INTEGER;
         else if (lexem == "type")    return TYPE;
         else if (lexem == "record")  return RECORD;
+        else if (lexem == "array")  return ARRAY;
         else if (lexem == "routine") return ROUTINE;
     }
     else if (token_name == "boolean_literals") {
