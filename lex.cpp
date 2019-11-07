@@ -20,25 +20,25 @@ void read_file() {
     while (getline(cin, st))
         source += st + "\n";
 
-    regex_tokens.push_back(t_regex_pair("declaration_separators", "^\\s*([;\\n])([\\s\\S]*)"));
-    regex_tokens.push_back(t_regex_pair("keywords", "^\\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|type|record|routine)(?![a-zA-Z0-9_])([\\s\\S]*)"));
-    regex_tokens.push_back(t_regex_pair("boolean_literals", "^\\s*(false|true)(?![a-zA-Z0-9_])([\\s\\S]*)"));
-    regex_tokens.push_back(t_regex_pair("operators", "^\\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\\/])=?|(?:[\\*\\+\\-=%]))([\\s\\S]*)"));
-    regex_tokens.push_back(t_regex_pair("punctuators", "^\\s*(\\.{1,2}|[\\()\\[\\]:,])([\\s\\S]*)"));
-    regex_tokens.push_back(t_regex_pair("identifiers", "^\\s*([a-zA-Z_][a-zA-Z0-9_]*)([\\s\\S]*)"));
-    regex_tokens.push_back(t_regex_pair("floating_literals", "^\\s*([0-9]+\\.(?:[0-9])*|\\.[0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)"));
-    regex_tokens.push_back(t_regex_pair("integer_literals", "^\\s*([0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("declaration_separators", "^\\s*([;\\n])([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("keywords", "^\\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|type|record|routine)(?![a-zA-Z0-9_])([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("boolean_literals", "^\\s*(false|true)(?![a-zA-Z0-9_])([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("operators", "^\\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\\/])=?|(?:[\\*\\+\\-=%]))([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("punctuators", "^\\s*(\\.{1,2}|[\\()\\[\\]:,])([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("identifiers", "^\\s*([a-zA-Z_][a-zA-Z0-9_]*)([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("floating_literals", "^\\s*([0-9]+\\.(?:[0-9])*|\\.[0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair("integer_literals", "^\\s*([0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)"));
 }
 
-pair<string, pair<string, string>> find_next_token(std::string input_string) {
+pair<string, pair<string, string> > find_next_token(std::string input_string) {
   smatch match;
   for (const auto& regex_token: regex_tokens) {
     if (regex_match(input_string, match, regex_token.second)) {
       cout << match[1].str() << " | " << regex_token.first << std::endl;
-      return {match[2].str(), {match[1].str(), regex_token.first}};
+      return make_pair(match[2].str(), make_pair(match[1].str(), regex_token.first));
     }
   }
-  return {string(), {"", ""}};
+  return make_pair(string(), make_pair("", ""));
 }
 
 int yylex(void)
