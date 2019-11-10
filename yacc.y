@@ -1,7 +1,6 @@
 %{
     #include <stdio.h>
     #include "AST.h"
-    #include "lex.cpp"
     int yylex();
     void yyerror(const char *s);
 %}
