@@ -7,9 +7,13 @@ using namespace std;
 
 
 struct Program {
+    struct Declaration* Declaration;
+    struct Program* Program;
+};
+
+struct Declaration {
     struct SimpleDeclaration* SimpleDeclaration;
     struct RoutineDeclaration* RoutineDeclaration;
-    struct Program* Program;
 };
 
 struct SimpleDeclaration {

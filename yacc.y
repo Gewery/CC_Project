@@ -45,9 +45,15 @@
 // ======== RULES ========
 
 Program
-    : SimpleDeclaration Program                     //{ $$ = Program($1, NULL, $2); root = $$; }
-    | RoutineDeclaration Program                    //{ $$ = Program(NULL, $1, $2); root = $$; }
-    |
+    : Declaration DECLARATION_SEPARATOR Program     { $$ = Program($1, $2); root = $$; }
+    | DECLARATION_SEPARATOR Program                 { $$ = $1; }
+    | Declaration                                   { $$ = Program($1, NULL); root = $$; }
+    |                                               { $$ = Program(NULL, NULL); root = $$; }
+    ;
+
+Declaration
+    : SimpleDeclaration                             { $$ = Declaration($1, NULL); }
+    | RoutineDeclaration                            { $$ = Declaration(NULL, $1); }
     ;
 
 SimpleDeclaration
