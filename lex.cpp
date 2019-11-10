@@ -15,8 +15,12 @@ static int seeneof = 0;
 int column = 0;
 string source;
 vector<pair<string, regex> > regex_tokens;
+bool flag = 0;
 
 void read_file() {
+	if (flag)
+		return;
+	flag = 1;
     string st;
     while (getline(cin, st))
         source += st + "\n";
@@ -52,6 +56,7 @@ pair<string, pair<string, string> > find_next_token(string input_string) {
 
 extern int yylex(void)
 {
+	read_file();
     if (!yyin)
         yyin = stdin;
     if (seeneof)
