@@ -12,6 +12,7 @@ using namespace std;
 extern void yyerror(const char *);
 FILE *yyin;
 static int seeneof = 0;
+int column = 0;
 string source;
 vector<pair<string, regex> > regex_tokens;
 
