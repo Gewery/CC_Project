@@ -3,6 +3,7 @@
     #include "AST.h"
     int yylex();
     void yyerror(const char *s);
+    Program *root;
 %}
 
 // ======== TOKENS ========
@@ -286,6 +287,7 @@ extern int column;
 
 int main(int argc, char **argv){
     yyparse();
+    if (root != nullptr) root->printTree();
     return 0;
 }
 
