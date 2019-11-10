@@ -11,9 +11,7 @@ using namespace std;
 FILE *yyin;
 static int seeneof = 0;
 string source;
-
-typedef std::pair<std::string, std::regex> t_regex_pair;
-std::vector<t_regex_pair> regex_tokens;
+vector<pair<string, regex>> regex_tokens;
 
 void read_file() {
     string st;
@@ -30,11 +28,11 @@ void read_file() {
     regex_tokens.push_back(make_pair("integer_literals", "^\\s*([0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)"));
 }
 
-pair<string, pair<string, string> > find_next_token(std::string input_string) {
+pair<string, pair<string, string> > find_next_token(string input_string) {
   smatch match;
   for (const auto& regex_token: regex_tokens) {
     if (regex_match(input_string, match, regex_token.second)) {
-      cout << match[1].str() << " | " << regex_token.first << std::endl;
+      cout << match[1].str() << " | " << regex_token.first << endl;
       return make_pair(match[2].str(), make_pair(match[1].str(), regex_token.first));
     }
   }
