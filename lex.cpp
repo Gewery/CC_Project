@@ -140,9 +140,8 @@ extern int yylex(void)
         }
         return REAL_LITERAL;
     }
-    else {
-        yyerror("Mystery character\n");
-    }
+    yyerror("Mystery character\n");
+    return 0
 }
 //
 //int main()
