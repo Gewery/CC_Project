@@ -20,14 +20,22 @@ void read_file() {
     while (getline(cin, st))
         source += st + "\n";
 
-    regex_tokens.push_back(make_pair("declaration_separators", "^\\s*([;\\n])([\\s\\S]*)"));
-    regex_tokens.push_back(make_pair("keywords", "^\\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|type|record|routine)(?![a-zA-Z0-9_])([\\s\\S]*)"));
-    regex_tokens.push_back(make_pair("boolean_literals", "^\\s*(false|true)(?![a-zA-Z0-9_])([\\s\\S]*)"));
-    regex_tokens.push_back(make_pair("operators", "^\\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\\/])=?|(?:[\\*\\+\\-=%]))([\\s\\S]*)"));
-    regex_tokens.push_back(make_pair("punctuators", "^\\s*(\\.{1,2}|[\\()\\[\\]:,])([\\s\\S]*)"));
-    regex_tokens.push_back(make_pair("identifiers", "^\\s*([a-zA-Z_][a-zA-Z0-9_]*)([\\s\\S]*)"));
-    regex_tokens.push_back(make_pair("floating_literals", "^\\s*([0-9]+\\.(?:[0-9])*|\\.[0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)"));
-    regex_tokens.push_back(make_pair("integer_literals", "^\\s*([0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)"));
+    regex_tokens.push_back(make_pair(string("declaration_separators"),
+            regex("^\\s*([;\\n])([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(string("keywords"),
+            regex("^\\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|type|record|routine)(?![a-zA-Z0-9_])([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(string("boolean_literals"),
+            regex("^\\s*(false|true)(?![a-zA-Z0-9_])([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(string("operators"),
+            regex("^\\s*((?:not|and|x?or)(?![a-zA-Z0-9_])|(?:[:><\\/])=?|(?:[\\*\\+\\-=%]))([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(string("punctuators"),
+            regex("^\\s*(\\.{1,2}|[\\()\\[\\]:,])([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(string("identifiers"),
+            regex("^\\s*([a-zA-Z_][a-zA-Z0-9_]*)([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(string("floating_literals"),
+            regex("^\\s*([0-9]+\\.(?:[0-9])*|\\.[0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(string("integer_literals"),
+            regex("^\\s*([0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)")));
 }
 
 pair<string, pair<string, string> > find_next_token(string input_string) {
