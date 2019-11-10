@@ -68,7 +68,11 @@ extern int yylex(void)
     string token_name = res.second.second;
 
     //TOKENS
-    if (token_name == "declaration_separators") {
+    if (lexem.size() == 0) {
+    	seeneof = 1;
+    	return 0;
+    }
+    else if (token_name == "declaration_separators") {
         return DECLARATION_SEPARATOR;
     }
     else if (token_name == "keywords") {
