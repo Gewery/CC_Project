@@ -141,7 +141,7 @@ extern int yylex(void)
         return REAL_LITERAL;
     }
     yyerror("Mystery character\n");
-    return 0
+    return 0;
 }
 //
 //int main()
