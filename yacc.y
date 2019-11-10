@@ -45,15 +45,15 @@
 // ======== RULES ========
 
 Program
-    : Declaration DECLARATION_SEPARATOR Program     { $$ = Program($1, $2); root = $$; }
-    | DECLARATION_SEPARATOR Program                 { $$ = $1; }
-    | Declaration                                   { $$ = Program($1, NULL); root = $$; }
-    |                                               { $$ = Program(NULL, NULL); root = $$; }
+    : Declaration DECLARATION_SEPARATOR Program     //{ $$ = Program($1, $2); root = $$; }
+    | DECLARATION_SEPARATOR Program                 //{ $$ = $1; }
+    | Declaration                                  // { $$ = Program($1, NULL); root = $$; }
+    |                                              // { $$ = Program(NULL, NULL); root = $$; }
     ;
 
 Declaration
-    : SimpleDeclaration                             { $$ = Declaration($1, NULL); }
-    | RoutineDeclaration                            { $$ = Declaration(NULL, $1); }
+    : SimpleDeclaration                             //{ $$ = Declaration($1, NULL); }
+    | RoutineDeclaration                           // { $$ = Declaration(NULL, $1); }
     ;
 
 SimpleDeclaration
@@ -289,8 +289,6 @@ int main(int argc, char **argv){
     yyparse();
     return 0;
 }
-
-
 
 void yyerror(char const *s){
 	fflush(stdout);

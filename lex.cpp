@@ -5,13 +5,15 @@
 #include <string>
 #include <regex>
 #include <iostream>
+#include "yacc.hpp"
 
 using namespace std;
 
+extern void yyerror(const char *);
 FILE *yyin;
 static int seeneof = 0;
 string source;
-vector<pair<string, regex>> regex_tokens;
+vector<pair<string, regex> > regex_tokens;
 
 void read_file() {
     string st;
@@ -39,7 +41,7 @@ pair<string, pair<string, string> > find_next_token(string input_string) {
   return make_pair(string(), make_pair("", ""));
 }
 
-int yylex(void)
+extern int yylex(void)
 {
     if (!yyin)
         yyin = stdin;
@@ -139,17 +141,17 @@ int yylex(void)
         return REAL_LITERAL;
     }
     else {
-        yyerror("Mystery character %c\n", c);
+        yyerror("Mystery character\n");
     }
 }
-
-int main()
-{
-    yyin = fopen("input.txt", "r");
-    int res = 1;
-    while (res != 0)
-    {
-        res = yylex();
-        cout << res << " next ";
-    }
-}
+//
+//int main()
+//{
+//    yyin = fopen("input.txt", "r");
+//    int res = 1;
+//    while (res != 0)
+//    {
+//        res = yylex();
+//        cout << res << " next ";
+//    }
+//}
