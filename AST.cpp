@@ -35,117 +35,31 @@ struct Node {
     }
 };
 
-struct Program : Node {
-    const char *nodeName = "Program";
+struct ParametersDeclaration {
+    struct ParameterDeclaration *parameterdeclaration;
+    struct ParametersDeclaration *parametersdeclaration;
 
-    struct Declaration *declaration;
-    struct Program *program;
-
-    Program(Declaration *declaration, Program *program) :
-            declaration(declaration),
-            program(program) {
-        this->children = {program, declaration};  // todo: nuzhno `Declaration` obyavlyat vishe, ili vinesti cod v cpp
-    }
+    ParametersDeclaration(ParameterDeclaration *parameterdeclaration, ParametersDeclaration *parametersdeclaration) :
+            parameterdeclaration(parameterdeclaration),
+            parametersdeclaration(parametersdeclaration) {}
 };
 
-struct Declaration : Node {
-    const char *nodeName = "Declaration";
-
-    struct SimpleDeclaration *simpledeclaration;
-    struct RoutineDeclaration *routinedeclaration;
-
-    Declaration(SimpleDeclaration *simpledeclaration, RoutineDeclaration *routinedeclaration) :
-            simpledeclaration(simpledeclaration),
-            routinedeclaration(routinedeclaration) {
-        this->children = {simpledeclaration, routinedeclaration};
-    }
-};
-
-struct SimpleDeclaration {
-    struct VariableDeclaration *variabledeclaration;
-    struct TypeDeclaration *typedeclaration;
-
-    SimpleDeclaration(VariableDeclaration *variabledeclaration, TypeDeclaration *typedeclaration) :
-            variabledeclaration(variabledeclaration),
-            typedeclaration(typedeclaration) {}
-};
-
-struct VariableDeclaration {
-    string name;
-    struct Type *type;
-    struct InitialValue *initialvalue;
-    struct Expression *expression;
-
-    VariableDeclaration(string name, Type *type, InitialValue *initialvalue, Expression *expression) :
-            name(name),
-            type(type),
-            initialvalue(initialvalue),
-            expression(expression) {}
-};
-
-struct InitialValue {
-    struct Expression *expression;
-
-    InitialValue(Expression *expression) :
-            expression(expression) {}
-};
-
-struct TypeDeclaration {
+struct ParameterDeclaration {
     string name;
     struct Type *type;
 
-    TypeDeclaration(string name, Type *type) :
+    ParameterDeclaration(string name, Type *type) :
             name(name),
             type(type) {}
 };
 
-struct Type {
-    struct PrimitiveType *primitivetype;
-    struct ArrayType *arraytype;
-    struct RecordType *recordtype;
-    string name;
+struct Parameters {
+    struct ParameterDeclaration *parameterdeclaration;
+    struct ParametersDeclaration *parametersdeclaration;
 
-    Type(PrimitiveType *primitivetype, ArrayType *arraytype, RecordType *recordtype, string name) :
-            primitivetype(primitivetype),
-            arraytype(arraytype),
-            recordtype(recordtype),
-            name(name) {}
-};
-
-struct PrimitiveType {
-    bool isint;
-    bool isreal;
-    bool isboolean;
-
-    PrimitiveType(bool isint, bool isreal, bool isboolean) :
-            isint(isint),
-            isreal(isreal),
-            isboolean(isboolean) {}
-};
-
-struct ArrayType {
-    struct Expression *expression;
-    struct Type *type;
-
-    ArrayType(Expression *expression, Type *type) :
-            expression(expression),
-            type(type) {}
-};
-
-struct RecordType {
-    struct VariableDeclarations *variabledeclarations;
-
-    RecordType(VariableDeclarations *variabledeclarations) :
-            variabledeclarations(variabledeclarations) {}
-};
-
-struct VariableDeclarations {
-    struct VariableDeclaration *variabledeclaration;
-    struct VariableDeclarations *variabledeclarations;
-
-    VariableDeclarations(VariableDeclaration *variabledeclaration, VariableDeclarations *variabledeclarations) :
-            variabledeclaration(variabledeclaration),
-            variabledeclarations(variabledeclarations) {}
+    Parameters(ParameterDeclaration *parameterdeclaration, ParametersDeclaration *parametersdeclaration) :
+            parameterdeclaration(parameterdeclaration),
+            parametersdeclaration(parametersdeclaration) {}
 };
 
 struct RoutineDeclaration {
@@ -162,31 +76,120 @@ struct RoutineDeclaration {
             bodyinroutinedeclaration(bodyinroutinedeclaration) {}
 };
 
-struct Parameters {
-    struct ParameterDeclaration *parameterdeclaration;
-    struct ParametersDeclaration *parametersdeclaration;
+struct VariableDeclarations {
+    struct VariableDeclaration *variabledeclaration;
+    struct VariableDeclarations *variabledeclarations;
 
-    Parameters(ParameterDeclaration *parameterdeclaration, ParametersDeclaration *parametersdeclaration) :
-            parameterdeclaration(parameterdeclaration),
-            parametersdeclaration(parametersdeclaration) {}
+    VariableDeclarations(VariableDeclaration *variabledeclaration, VariableDeclarations *variabledeclarations) :
+            variabledeclaration(variabledeclaration),
+            variabledeclarations(variabledeclarations) {}
 };
 
-struct ParameterDeclaration {
+
+struct RecordType {
+    struct VariableDeclarations *variabledeclarations;
+
+    RecordType(VariableDeclarations *variabledeclarations) :
+            variabledeclarations(variabledeclarations) {}
+};
+
+struct ArrayType {
+    struct Expression *expression;
+    struct Type *type;
+
+    ArrayType(Expression *expression, Type *type) :
+            expression(expression),
+            type(type) {}
+};
+
+struct PrimitiveType {
+    bool isint;
+    bool isreal;
+    bool isboolean;
+
+    PrimitiveType(bool isint, bool isreal, bool isboolean) :
+            isint(isint),
+            isreal(isreal),
+            isboolean(isboolean) {}
+};
+
+struct Type {
+    struct PrimitiveType *primitivetype;
+    struct ArrayType *arraytype;
+    struct RecordType *recordtype;
+    string name;
+
+    Type(PrimitiveType *primitivetype, ArrayType *arraytype, RecordType *recordtype, string name) :
+            primitivetype(primitivetype),
+            arraytype(arraytype),
+            recordtype(recordtype),
+            name(name) {}
+};
+
+struct TypeDeclaration {
     string name;
     struct Type *type;
 
-    ParameterDeclaration(string name, Type *type) :
+    TypeDeclaration(string name, Type *type) :
             name(name),
             type(type) {}
 };
 
-struct ParametersDeclaration {
-    struct ParameterDeclaration *parameterdeclaration;
-    struct ParametersDeclaration *parametersdeclaration;
+struct InitialValue {
+    struct Expression *expression;
 
-    ParametersDeclaration(ParameterDeclaration *parameterdeclaration, ParametersDeclaration *parametersdeclaration) :
-            parameterdeclaration(parameterdeclaration),
-            parametersdeclaration(parametersdeclaration) {}
+    InitialValue(Expression *expression) :
+            expression(expression) {}
+};
+
+struct VariableDeclaration {
+    string name;
+    struct Type *type;
+    struct InitialValue *initialvalue;
+    struct Expression *expression;
+
+    VariableDeclaration(string name, Type *type, InitialValue *initialvalue, Expression *expression) :
+            name(name),
+            type(type),
+            initialvalue(initialvalue),
+            expression(expression) {}
+};
+
+struct SimpleDeclaration {
+    struct VariableDeclaration *variabledeclaration;
+    struct TypeDeclaration *typedeclaration;
+
+    SimpleDeclaration(VariableDeclaration *variabledeclaration, TypeDeclaration *typedeclaration) :
+            variabledeclaration(variabledeclaration),
+            typedeclaration(typedeclaration) {}
+};
+
+struct Declaration : Node {
+    const char *nodeName = "Declaration";
+
+    struct SimpleDeclaration *simpledeclaration;
+    struct RoutineDeclaration *routinedeclaration;
+
+    Declaration(SimpleDeclaration *simpledeclaration, RoutineDeclaration *routinedeclaration) :
+            simpledeclaration(simpledeclaration),
+            routinedeclaration(routinedeclaration) {
+        // this->children.push_back(simpledeclaration);
+        this->children.push_back((Node*)(routinedeclaration));
+    }
+};
+
+struct Program : Node {
+    const char *nodeName = "Program";
+
+    struct Declaration *declaration;
+    struct Program *program;
+
+    Program(Declaration *declaration, Program *program) :
+            declaration(declaration),
+            program(program) {
+        // this->children.push_back(program);
+        // this->children.push_back(declaration);  // todo: nuzhno `Declaration` obyavlyat vishe, ili vinesti cod v cpp
+    }
 };
 
 struct TypeInRoutineDeclaration {
