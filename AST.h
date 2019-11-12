@@ -230,6 +230,76 @@ struct Relation {
 
 struct ComparisonInRelation {
     struct ComparisonOperator *comparisonoperator;
+    ComparisonInRelation(ComparisonOperator *comparisonoperator);
 };
 
+
+struct ComparisonOperator {
+    string op;
+    ComparisonOperator(string op);
+};
+
+struct Simple {
+    struct Factor* factor;
+    struct Factors* factors;
+    Simple(Factor* factor, Factors* factors);
+};
+
+struct Factors {
+    struct SimpleOperator* simpleOperator;
+    struct Factor* factor;
+    struct Factors* factors;
+    Factors(SimpleOperator* simpleOperator, Factor* factor, Factors* factors);
+};
+
+struct SimpleOperator {
+    string op;
+    SimpleOperator(string op);
+};
+
+struct Factor {
+    struct Summand* summand;
+    struct Summands* summands;
+    Factor(Summand* summand, Summands* summands);
+};
+
+struct Summands {
+    struct Sign* sign;
+    struct Summand* summand;
+    struct Summands* summands;
+    Summands(Sign* sign, Summand* summand, Summands* summands);
+};
+
+struct Summand {
+    struct Primary* primary;
+    struct Expression* expression;
+    Summand(Primary* primary, Expression* expression);
+};
+
+
+struct Primary {
+    string type;
+    float value;
+    string sign;
+    struct ModifiablePrimary* modifiablePrimary;
+    Primary(string type, float value,  string sign, struct ModifiablePrimary* modifiablePrimary);
+};
+
+struct Sign {
+    string op;
+    Sign(string op);
+};
+
+struct ModifiablePrimary {
+    string name;
+    struct Identifiers* identifiers;
+    ModifiablePrimary(string name, struct Identifiers* identifiers);
+};
+
+struct Identifiers {
+    string name;
+    struct Expression* expression;
+    struct Identifiers* identifiers;
+    Identifiers(string name, struct Expression* expression, struct Identifiers* identifiers);
+};
 #endif //CC_PROJECT_AST_H

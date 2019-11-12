@@ -1,12 +1,13 @@
 %{
     #include <stdio.h>
     #include "AST.h"
+    #include <string>
     int yylex();
     void yyerror(const char *s);
     Program *root;
 %}
 %union {
-    char *string;
+    char *str;
     char character;
     int integer;
     float float_value;
@@ -45,6 +46,17 @@
     struct LogicalOperator *LogicalOperator;
     struct Relation *Relation;
     struct ComparisonInRelation *ComparisonInRelation;
+    struct ComparisonOperator *ComparisonOperator;
+    struct Simple *Simple;
+    struct Factors *Factors;
+    struct SimpleOperator *SimpleOperator;
+    struct Factor *Factor;
+    struct Summands *Summands;
+    struct Summand *Summand;
+    struct Primary *Primary;
+    struct Sign *Sign;
+    struct ModifiablePrimary *ModifiablePrimary;
+    struct Identifiers *Identifiers;
 }
 
 // ======== TOKENS ========
@@ -69,6 +81,8 @@
 
 %token IDENTIFIER INTEGER_LITERAL REAL_LITERAL
 
+%type  <float_value> INTEGER_LITERAL REAL_LITERAL TRUE FALSE
+%type  <str> IDENTIFIER LESS LESS_EQ EQ NOT_EQ GREATER GREATER_EQ NOT
 %type  <Program> Program
 %type  <Declaration> Declaration
 %type  <SimpleDeclaration> SimpleDeclaration
@@ -103,6 +117,17 @@
 %type  <LogicalOperator> LogicalOperator
 %type  <Relation> Relation
 %type  <ComparisonInRelation> ComparisonInRelation
+%type  <ComparisonOperator> ComparisonOperator
+%type  <Simple> Simple
+%type  <Factors> Factors
+%type  <SimpleOperator> SimpleOperator
+%type  <Factor> Factor
+%type  <Summands> Summands
+%type  <Summand> Summand
+%type  <Primary> Primary
+%type  <Sign> Sign
+%type  <ModifiablePrimary> ModifiablePrimary
+%type  <Identifiers> Identifiers
 
 // ======== OPERATOR PRECEDENCE ========
 
@@ -144,7 +169,7 @@ VariableDeclaration
 
 InitialValue
     : IS Expression                                 { $$ = InitialValue($2); }
-    |
+    |                                               { $$ = InitialValue(NULL); }
     ;
 
 TypeDeclaration
@@ -174,7 +199,7 @@ RecordType
 
 VariableDeclarations
     : VariableDeclaration VariableDeclarations      { $$ = VariableDeclarations($1, $2); }
-    |
+    |                                               { $$ = VariableDeclarations(NULL, NULL); }
     ;
 
 RoutineDeclaration
@@ -183,7 +208,7 @@ RoutineDeclaration
 
 Parameters
     : PARENTHESES_L ParameterDeclaration ParametersDeclaration PARENTHESES_R    { $$ = Parameters($2, $3); }
-    |
+    |                                                                           { $$ = Parameters(NULL, NULL); }
     ;
 
 ParameterDeclaration
@@ -192,23 +217,23 @@ ParameterDeclaration
 
 ParametersDeclaration
     : COMMA ParameterDeclaration ParametersDeclaration        { $$ = ParametersDeclaration($2, $3); }
-    |
+    |                                                         { $$ = ParametersDeclaration(NULL, NULL); }
     ;
 
 TypeInRoutineDeclaration
     : COLON Type                                      { $$ = TypeInRoutineDeclaration($2); }
-    |
+    |                                                 { $$ = TypeInRoutineDeclaration(NULL); }
     ;
 
 BodyInRoutineDeclaration
     : IS Body END                                   { $$ = BodyInRoutineDeclaration($2); }
-    |
+    |                                               { $$ = BodyInRoutineDeclaration(NULL); }
     ;
 
 Body
     : SimpleDeclaration Body                        { $$ = Body($1, NULL, $2); }
     | Statement Body                                { $$ = Body(NULL, $1, $2); }
-    |
+    |                                               { $$ = Body(NULL, NULL, NULL); }
     ;
 
 Statement
@@ -229,12 +254,12 @@ RoutineCall
 
 ExpressionInRoutineCall
     : PARENTHESES_L Expression ExpressionsInRoutineCall PARENTHESES_R   { $$ = ExpressionInRoutineCall($2, $3); }
-    |
+    |                                                                   { $$ = ExpressionInRoutineCall(NULL, NULL); }
     ;
 
 ExpressionsInRoutineCall
     : COMMA Expression ExpressionInRoutineCall        { $$ = ExpressionsInRoutineCall($2, $3); }
-    |
+    |                                                 { $$ = ExpressionsInRoutineCall(NULL, NULL); }
     ;
 
 WhileLoop
@@ -251,7 +276,7 @@ Range
 
 Reverse
     : REVERSE                                       { $$ = Reverse(true); }
-    |
+    |                                               { $$ = Reverse(false); }
     ;
 
 IfStatement
@@ -260,7 +285,7 @@ IfStatement
 
 ElseInIfStatement
     : ELSE Body                                     { $$ = IfStatement($2); }
-    |
+    |                                               { $$ = IfStatement(NULL); }
     ;
 
 Expression
@@ -269,7 +294,7 @@ Expression
 
 MultipleRelationsInExpression
     : LogicalOperator Relation MultipleRelationsInExpression    { $$ = MultipleRelationsInExpression($1, $2, $3); }
-    |
+    |                                                           { $$ = MultipleRelationsInExpression(NULL, NULL, NULL); }
     ;
 
 LogicalOperator
@@ -284,13 +309,13 @@ Relation
 
 ComparisonInRelation
     : ComparisonOperator Simple                     { $$ = ComparisonInRelation($1, $2); }
-    |
+    |                                               { $$ = ComparisonInRelation(NULL, NULL); }
     ;
 
 ComparisonOperator
     : LESS                                           { $$ = ComparisonOperator(LESS); }
-    | LESS_EQ                                          { $$ = ComparisonOperator(LESS_EQ); }
-    | GREATER                                           { $$ = ComparisonOperator(GREATER); }
+    | LESS_EQ                                        { $$ = ComparisonOperator(LESS_EQ); }
+    | GREATER                                        { $$ = ComparisonOperator(GREATER); }
     | GREATER_EQ                                          { $$ = ComparisonOperator(GREATER_EQ); }
     | EQ                                           { $$ = ComparisonOperator(EQ); }
     | NOT_EQ                                          { $$ = ComparisonOperator(NOT_EQ); }
@@ -302,7 +327,7 @@ Simple
 
 Factors
     : SimpleOperator Factor Factors                 { $$ = Factors($1, $2, $3); }
-    |
+    |                                               { $$ = Factors(NULL, NULL, NULL); }
     ;
 
 SimpleOperator
@@ -325,16 +350,16 @@ Summand
     | PARENTHESES_L Expression PARENTHESES_R        { $$ = Summand(NULL, $2); }
     ;
 
-//TODO
+
 Primary
-    : INTEGER_LITERAL
-    | Sign INTEGER_LITERAL
-    | NOT INTEGER_LITERAL
-    | REAL_LITERAL
-    | Sign REAL_LITERAL
-    | TRUE
-    | FALSE
-    | ModifiablePrimary
+    : INTEGER_LITERAL                               { $$ = Primary("int", $1, "",  NULL); }
+    | Sign INTEGER_LITERAL                          { $$ = Primary("int", $2, $1, NULL); }
+    | NOT INTEGER_LITERAL                           { $$ = Primary("int", $2, $1, NULL); }
+    | REAL_LITERAL                                  { $$ = Primary("real", $1, "", NULL); }
+    | Sign REAL_LITERAL                             { $$ = Primary("real", $2, $1, NULL); }
+    | TRUE                                          { $$ = Primary("bool", $1, "", NULL); }
+    | FALSE                                         { $$ = Primary("bool", $1, "", NULL); }
+    | ModifiablePrimary                             { $$ = Primary("", $1, "", NULL); }
     ;
 
 Sign
@@ -349,7 +374,7 @@ ModifiablePrimary
 Identifiers
     : DOT IDENTIFIER Identifiers                     { $$ = Identifiers($2, NULL, $3); }
     | BRACKETS_L Expression BRACKETS_R Identifiers   { $$ = Identifiers(NULL, $2, $4); }
-    |
+    |                                                { $$ = Identifiers(NULL, NULL, NULL); }
     ;
 
 %%
