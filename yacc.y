@@ -342,7 +342,7 @@ Factor
 
 Summands
     : Sign Summand Summands                         { $$ = new Summands($1, $2, $3); }
-    |
+    |                                               { $$ = new Summands(NULL, NULL, NULL); }
     ;
 
 Summand
@@ -359,7 +359,7 @@ Primary
     | Sign REAL_LITERAL                             { $$ = new Primary("real", $2, false, NULL, NULL); }
     | TRUE                                          { $$ = new Primary("bool", $1, false, NULL, NULL); }
     | FALSE                                         { $$ = new Primary("bool", $1, false, NULL, NULL); }
-    | ModifiablePrimary                             { $$ = new Primary("", NULL, false, NULL, $1); }
+    | ModifiablePrimary                             { $$ = new Primary("", 0, false, NULL, $1); }
     ;
 
 Sign
