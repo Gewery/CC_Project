@@ -361,6 +361,117 @@ struct Relation {
 
 struct ComparisonInRelation {
     struct ComparisonOperator *comparisonoperator;
+    struct Simple *simple;
+
+    ComparisonInRelation(ComparisonOperator *comparisonoperator, Simple *simple) :
+            comparisonoperator(comparisonoperator),
+            simple(simple) {}
+};
+
+
+struct ComparisonOperator {
+    string op;
+
+    ComparisonOperator(string op) :
+            op(op) {}
+};
+
+struct Simple {
+    struct Factor *factor;
+    struct Factors *factors;
+
+    Simple(Factor *factor, Factors *factors) :
+            factor(factor),
+            factors(factors) {}
+};
+
+struct Factors {
+    struct SimpleOperator *simpleOperator;
+    struct Factor *factor;
+    struct Factors *factors;
+
+    Factors(SimpleOperator *simpleOperator, Factor *factor, Factors *factors) :
+            simpleOperator(simpleOperator),
+            factor(factor),
+            factors(factors) {}
+};
+
+struct SimpleOperator {
+    string op;
+
+    SimpleOperator(string op) :
+            op(op) {}
+};
+
+struct Factor {
+    struct Summand *summand;
+    struct Summands *summands;
+
+    Factor(Summand *summand, Summands *summands) :
+            summand(summand),
+            summands(summands) {}
+};
+
+struct Summands {
+    struct Sign *sign;
+    struct Summand *summand;
+    struct Summands *summands;
+
+    Summands(Sign *sign, Summand *summand, Summands *summands) :
+            sign(sign),
+            summand(summand),
+            summands(summands) {}
+};
+
+struct Summand {
+    struct Primary *primary;
+    struct Expression *expression;
+
+    Summand(Primary *primary, Expression *expression) :
+            primary(primary),
+            expression(expression) {}
+};
+
+
+struct Primary {
+    string type;
+    float value;
+    bool isNot;
+    struct Sign *sign;
+    struct ModifiablePrimary *modifiablePrimary;
+
+    Primary(string type, float value, bool isNot, struct Sign *sign, struct ModifiablePrimary *modifiablePrimary) :
+            type(type),
+            value(value),
+            isNot(isNot),
+            sign(sign),
+            modifiablePrimary(modifiablePrimary) {}
+};
+
+struct Sign {
+    string op;
+
+    Sign(string op) :
+            op(op) {}
+};
+
+struct ModifiablePrimary {
+    string name;
+    struct Identifiers *identifiers;
+
+    ModifiablePrimary(string name, struct Identifiers *identifiers) :
+            name(name),
+            identifiers(identifiers) {}
+};
+
+struct Identifiers {
+    string name;
+    struct Expression *expression;
+    struct Identifiers *identifiers;
+
+    Identifiers(string name, struct Expression *expression, struct Identifiers *identifiers) :
+            expression(expression),
+            identifiers(identifiers) {}
 };
 
 #endif //CC_PROJECT_AST_H
