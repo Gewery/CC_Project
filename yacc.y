@@ -121,208 +121,208 @@
 // ======== RULES ========
 
 Program
-    : Declaration DECLARATION_SEPARATOR Program     //{ $$ = Program($1, $2); root = $$; }
-    | DECLARATION_SEPARATOR Program                 //{ $$ = $1; }
-    | Declaration                                  // { $$ = Program($1, NULL); root = $$; }
-    |                                              // { $$ = Program(NULL, NULL); root = $$; }
+    : Declaration DECLARATION_SEPARATOR Program     { $$ = Program($1, $3); root = $$; }
+    | DECLARATION_SEPARATOR Program                 { $$ = $2; }
+    | Declaration                                  { $$ = Program($1, NULL); root = $$; }
+    |                                              { $$ = Program(NULL, NULL); root = $$; }
     ;
 
 Declaration
-    : SimpleDeclaration                             //{ $$ = Declaration($1, NULL); }
-    | RoutineDeclaration                           // { $$ = Declaration(NULL, $1); }
+    : SimpleDeclaration                             { $$ = Declaration($1, NULL); }
+    | RoutineDeclaration                           { $$ = Declaration(NULL, $1); }
     ;
 
 SimpleDeclaration
-    : VariableDeclaration                           //{ $$ = SimpleDeclaration($1, NULL); }
-    | TypeDeclaration                               //{ $$ = SimpleDeclaration(NULL, $1); }
+    : VariableDeclaration                           { $$ = SimpleDeclaration($1, NULL); }
+    | TypeDeclaration                               { $$ = SimpleDeclaration(NULL, $1); }
     ;
 
 VariableDeclaration
-    : VAR IDENTIFIER COLON Type InitialValue        //{ $$ = VariableDeclaration($2, $4, $5, NULL); }
-    | VAR IDENTIFIER IS Expression                  //{ $$ = VariableDeclaration($2, NULL, NULL, $4); }
+    : VAR IDENTIFIER COLON Type InitialValue        { $$ = VariableDeclaration($2, $4, $5, NULL); }
+    | VAR IDENTIFIER IS Expression                  { $$ = VariableDeclaration($2, NULL, NULL, $4); }
     ;
 
 InitialValue
-    : IS Expression                                 //{ $$ = InitialValue($2); }
+    : IS Expression                                 { $$ = InitialValue($2); }
     |
     ;
 
 TypeDeclaration
-    : TYPE IDENTIFIER IS Type                       //{ $$ = TypeDeclaration($2, $4); }
+    : TYPE IDENTIFIER IS Type                       { $$ = TypeDeclaration($2, $4); }
     ;
 
 Type
-    : PrimitiveType                                 //{ $$ = Type($1, NULL, NULL, NULL); }
-    | ArrayType                                     //{ $$ = Type(NULL, $1, NULL, NULL); }
-    | RecordType                                    //{ $$ = Type(NULL, NULL, $1, NULL); }
-    | IDENTIFIER                                    //{ $$ = Type(NULL, NULL, NULL, $1); }
+    : PrimitiveType                                 { $$ = Type($1, NULL, NULL, NULL); }
+    | ArrayType                                     { $$ = Type(NULL, $1, NULL, NULL); }
+    | RecordType                                    { $$ = Type(NULL, NULL, $1, NULL); }
+    | IDENTIFIER                                    { $$ = Type(NULL, NULL, NULL, $1); }
     ;
 
 PrimitiveType
-    : INTEGER                                       //{ $$ = PrimitiveType(true, false, false); }
-    | REAL                                          //{ $$ = PrimitiveType(false, true, false); }
-    | BOOLEAN                                       //{ $$ = PrimitiveType(false, false, true); }
+    : INTEGER                                       { $$ = PrimitiveType(true, false, false); }
+    | REAL                                          { $$ = PrimitiveType(false, true, false); }
+    | BOOLEAN                                       { $$ = PrimitiveType(false, false, true); }
     ;
 
 ArrayType
-    : ARRAY BRACKETS_L Expression BRACKETS_R Type   //{ $$ = ArrayType($3, $5); }
+    : ARRAY BRACKETS_L Expression BRACKETS_R Type   { $$ = ArrayType($3, $5); }
     ;
 
 RecordType
-    : RECORD VariableDeclarations END               //{ $$ = RecordType($2); }
+    : RECORD VariableDeclarations END               { $$ = RecordType($2); }
     ;
 
 VariableDeclarations
-    : VariableDeclaration VariableDeclarations      //{ $$ = VariableDeclarations($1, $2); }
+    : VariableDeclaration VariableDeclarations      { $$ = VariableDeclarations($1, $2); }
     |
     ;
 
 RoutineDeclaration
-    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration   //{ $$ = RoutineDeclaration($2, $3, $4, $5); }
+    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration   { $$ = RoutineDeclaration($2, $3, $4, $5); }
     ;
 
 Parameters
-    : PARENTHESES_L ParameterDeclaration ParametersDeclaration PARENTHESES_R    //{ $$ = Parameters($2, $3); }
+    : PARENTHESES_L ParameterDeclaration ParametersDeclaration PARENTHESES_R    { $$ = Parameters($2, $3); }
     |
     ;
 
 ParameterDeclaration
-    : IDENTIFIER COLON Type                                   //{ $$ = ParameterDeclaration($1, $3); }
+    : IDENTIFIER COLON Type                                   { $$ = ParameterDeclaration($1, $3); }
     ;
 
 ParametersDeclaration
-    : COMMA ParameterDeclaration ParametersDeclaration        //{ $$ = ParametersDeclaration($2, $3); }
+    : COMMA ParameterDeclaration ParametersDeclaration        { $$ = ParametersDeclaration($2, $3); }
     |
     ;
 
 TypeInRoutineDeclaration
-    : COLON Type                                      //{ $$ = TypeInRoutineDeclaration($2); }
+    : COLON Type                                      { $$ = TypeInRoutineDeclaration($2); }
     |
     ;
 
 BodyInRoutineDeclaration
-    : IS Body END                                   //{ $$ = BodyInRoutineDeclaration($2); }
+    : IS Body END                                   { $$ = BodyInRoutineDeclaration($2); }
     |
     ;
 
 Body
-    : SimpleDeclaration Body                        //{ $$ = Body($1, NULL, $2); }
-    | Statement Body                                //{ $$ = Body(NULL, $1, $2); }
+    : SimpleDeclaration Body                        { $$ = Body($1, NULL, $2); }
+    | Statement Body                                { $$ = Body(NULL, $1, $2); }
     |
     ;
 
 Statement
-    : Assignment                                    //{ $$ = Statement($1, NULL, NULL, NULL, NULL); }
-    | RoutineCall                                   //{ $$ = Statement(NULL, $1, NULL, NULL, NULL); }
-    | WhileLoop                                     //{ $$ = Statement(NULL, NULL, $1, NULL, NULL); }
-    | ForLoop                                       //{ $$ = Statement(NULL, NULL, NULL, $1, NULL); }
-    | IfStatement                                   //{ $$ = Statement(NULL, NULL, NULL, NULL, $1); }
+    : Assignment                                    { $$ = Statement($1, NULL, NULL, NULL, NULL); }
+    | RoutineCall                                   { $$ = Statement(NULL, $1, NULL, NULL, NULL); }
+    | WhileLoop                                     { $$ = Statement(NULL, NULL, $1, NULL, NULL); }
+    | ForLoop                                       { $$ = Statement(NULL, NULL, NULL, $1, NULL); }
+    | IfStatement                                   { $$ = Statement(NULL, NULL, NULL, NULL, $1); }
     ;
 
 Assignment
-    : ModifiablePrimary ASSIGN Expression             //{ $$ = Assignment($1, $3); }
+    : ModifiablePrimary ASSIGN Expression             { $$ = Assignment($1, $3); }
     ;
 
 RoutineCall
-    : IDENTIFIER ExpressionInRoutineCall            //{ $$ = RoutineCall($1, $2); }
+    : IDENTIFIER ExpressionInRoutineCall            { $$ = RoutineCall($1, $2); }
     ;
 
 ExpressionInRoutineCall
-    : PARENTHESES_L Expression ExpressionsInRoutineCall PARENTHESES_R   //{ $$ = ExpressionInRoutineCall($2, $3); }
+    : PARENTHESES_L Expression ExpressionsInRoutineCall PARENTHESES_R   { $$ = ExpressionInRoutineCall($2, $3); }
     |
     ;
 
 ExpressionsInRoutineCall
-    : COMMA Expression ExpressionInRoutineCall        //{ $$ = ExpressionsInRoutineCall($2, $3); }
+    : COMMA Expression ExpressionInRoutineCall        { $$ = ExpressionsInRoutineCall($2, $3); }
     |
     ;
 
 WhileLoop
-    : WHILE Expression LOOP Body END                //{ $$ = WhileLoop($2, $4); }
+    : WHILE Expression LOOP Body END                { $$ = WhileLoop($2, $4); }
     ;
 
 ForLoop
-    : FOR IDENTIFIER IN Reverse Range LOOP Body END //{ $$ = ForLoop($2, $4, $5, $7); }
+    : FOR IDENTIFIER IN Reverse Range LOOP Body END { $$ = ForLoop($2, $4, $5, $7); }
     ;
 
 Range
-    : Expression RANGER Expression                      //{ $$ = Range($1, $3); }
+    : Expression RANGER Expression                      { $$ = Range($1, $3); }
     ;
 
 Reverse
-    : REVERSE                                       //{ $$ = Reverse(true); }
+    : REVERSE                                       { $$ = Reverse(true); }
     |
     ;
 
 IfStatement
-    : IF Expression THEN Body ElseInIfStatement END //{ $$ = IfStatement($2, $4, $5); }
+    : IF Expression THEN Body ElseInIfStatement END { $$ = IfStatement($2, $4, $5); }
     ;
 
 ElseInIfStatement
-    : ELSE Body                                     //{ $$ = IfStatement($2); }
+    : ELSE Body                                     { $$ = IfStatement($2); }
     |
     ;
 
 Expression
-    : Relation MultipleRelationsInExpression        //{ $$ = Expression($1, $2); }
+    : Relation MultipleRelationsInExpression        { $$ = Expression($1, $2); }
     ;
 
 MultipleRelationsInExpression
-    : LogicalOperator Relation MultipleRelationsInExpression    //{ $$ = MultipleRelationsInExpression($1, $2, $3); }
+    : LogicalOperator Relation MultipleRelationsInExpression    { $$ = MultipleRelationsInExpression($1, $2, $3); }
     |
     ;
 
 LogicalOperator
-    : AND                                           //{ $$ = LogicalOperator("and"); }
-    | OR                                            //{ $$ = LogicalOperator("or"); }
-    | XOR                                           //{ $$ = LogicalOperator("xor"); }
+    : AND                                           { $$ = LogicalOperator("and"); }
+    | OR                                            { $$ = LogicalOperator("or"); }
+    | XOR                                           { $$ = LogicalOperator("xor"); }
     ;
 
 Relation
-    : Simple ComparisonInRelation                   //{ $$ = Relation($1, $2); }
+    : Simple ComparisonInRelation                   { $$ = Relation($1, $2); }
     ;
 
 ComparisonInRelation
-    : ComparisonOperator Simple                     //{ $$ = ComparisonInRelation($1, $2); }
+    : ComparisonOperator Simple                     { $$ = ComparisonInRelation($1, $2); }
     |
     ;
 
 ComparisonOperator
-    : LESS                                           //{ $$ = ComparisonOperator(LESS); }
-    | LESS_EQ                                          //{ $$ = ComparisonOperator(LESS_EQ); }
-    | GREATER                                           //{ $$ = ComparisonOperator(GREATER); }
-    | GREATER_EQ                                          //{ $$ = ComparisonOperator(GREATER_EQ); }
-    | EQ                                           //{ $$ = ComparisonOperator(EQ); }
-    | NOT_EQ                                          //{ $$ = ComparisonOperator(NOT_EQ); }
+    : LESS                                           { $$ = ComparisonOperator(LESS); }
+    | LESS_EQ                                          { $$ = ComparisonOperator(LESS_EQ); }
+    | GREATER                                           { $$ = ComparisonOperator(GREATER); }
+    | GREATER_EQ                                          { $$ = ComparisonOperator(GREATER_EQ); }
+    | EQ                                           { $$ = ComparisonOperator(EQ); }
+    | NOT_EQ                                          { $$ = ComparisonOperator(NOT_EQ); }
     ;
 
 Simple
-    : Factor Factors                                //{ $$ = Simple($1, $2); }
+    : Factor Factors                                { $$ = Simple($1, $2); }
     ;
 
 Factors
-    : SimpleOperator Factor Factors                 //{ $$ = Factors($1, $2, $3); }
+    : SimpleOperator Factor Factors                 { $$ = Factors($1, $2, $3); }
     |
     ;
 
 SimpleOperator
-    : MULT                                           //{ $$ = SimpleOperator("*"); }
-    | DIV                                            //{ $$ = SimpleOperator("/"); }
-    | REMAINDER                                      //{ $$ = SimpleOperator("%"); }
+    : MULT                                           { $$ = SimpleOperator("*"); }
+    | DIV                                            { $$ = SimpleOperator("/"); }
+    | REMAINDER                                      { $$ = SimpleOperator("%"); }
     ;
 
 Factor
-    : Summand Summands                               //{ $$ = Factor($1, $2); }
+    : Summand Summands                               { $$ = Factor($1, $2); }
     ;
 
 Summands
-    : Sign Summand Summands                         //{ $$ = Summands($1, $2, $3); }
+    : Sign Summand Summands                         { $$ = Summands($1, $2, $3); }
     |
     ;
 
 Summand
-    : Primary                                       //{ $$ = Summand($1, NULL); }
-    | PARENTHESES_L Expression PARENTHESES_R        //{ $$ = Summand(NULL, $2); }
+    : Primary                                       { $$ = Summand($1, NULL); }
+    | PARENTHESES_L Expression PARENTHESES_R        { $$ = Summand(NULL, $2); }
     ;
 
 //TODO
@@ -338,17 +338,17 @@ Primary
     ;
 
 Sign
-    : PLUS                                           //{ $$ = Sign("+"); }
-    | MINUS                                          //{ $$ = Sign("-"); }
+    : PLUS                                           { $$ = Sign("+"); }
+    | MINUS                                          { $$ = Sign("-"); }
     ;
 
 ModifiablePrimary
-    : IDENTIFIER Identifiers                         //{ $$ = ModifiablePrimary($1, $2); }
+    : IDENTIFIER Identifiers                         { $$ = ModifiablePrimary($1, $2); }
     ;
 
 Identifiers
-    : DOT IDENTIFIER Identifiers                     //{ $$ = Identifiers($2, NULL, $3); }
-    | BRACKETS_L Expression BRACKETS_R Identifiers   //{ $$ = Identifiers(NULL, $2, $4); }
+    : DOT IDENTIFIER Identifiers                     { $$ = Identifiers($2, NULL, $3); }
+    | BRACKETS_L Expression BRACKETS_R Identifiers   { $$ = Identifiers(NULL, $2, $4); }
     |
     ;
 
