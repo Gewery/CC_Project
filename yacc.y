@@ -5,6 +5,47 @@
     void yyerror(const char *s);
     Program *root;
 %}
+%union {
+    char *string;
+    char character;
+    int integer;
+    float float_value;
+
+    struct Program *Program;
+    struct Declaration *Declaration;
+    struct SimpleDeclaration *SimpleDeclaration;
+    struct VariableDeclaration *VariableDeclaration;
+    struct InitialValue *InitialValue;
+    struct TypeDeclaration *TypeDeclaration;
+    struct Type *Type;
+    struct PrimitiveType *PrimitiveType;
+    struct ArrayType *ArrayType;
+    struct RecordType *RecordType;
+    struct VariableDeclarations *VariableDeclarations;
+    struct RoutineDeclaration *RoutineDeclaration;
+    struct Parameters *Parameters;
+    struct ParameterDeclaration *ParameterDeclaration;
+    struct ParametersDeclaration *ParametersDeclaration;
+    struct TypeInRoutineDeclaration *TypeInRoutineDeclaration;
+    struct BodyInRoutineDeclaration *BodyInRoutineDeclaration;
+    struct Body *Body;
+    struct Statement *Statement;
+    struct Assignment *Assignment;
+    struct RoutineCall *RoutineCall;
+    struct ExpressionInRoutineCall *ExpressionInRoutineCall;
+    struct ExpressionsInRoutineCall *ExpressionsInRoutineCall;
+    struct WhileLoop *WhileLoop;
+    struct ForLoop *ForLoop;
+    struct Range *Range;
+    struct Reverse *Reverse;
+    struct IfStatement *IfStatement;
+    struct ElseInIfStatement *ElseInIfStatement;
+    struct Expression *Expression;
+    struct MultipleRelationsInExpression *MultipleRelationsInExpression;
+    struct LogicalOperator *LogicalOperator;
+    struct Relation *Relation;
+    struct ComparisonInRelation *ComparisonInRelation;
+}
 
 // ======== TOKENS ========
 
@@ -27,6 +68,41 @@
 %token BRACKETS_L BRACKETS_R
 
 %token IDENTIFIER INTEGER_LITERAL REAL_LITERAL
+
+%type  <Program> Program
+%type  <Declaration> Declaration
+%type  <SimpleDeclaration> SimpleDeclaration
+%type  <VariableDeclaration> VariableDeclaration
+%type  <InitialValue> InitialValue
+%type  <TypeDeclaration> TypeDeclaration
+%type  <Type> Type
+%type  <PrimitiveType> PrimitiveType
+%type  <ArrayType> ArrayType
+%type  <RecordType> RecordType
+%type  <VariableDeclarations> VariableDeclarations
+%type  <RoutineDeclaration> RoutineDeclaration
+%type  <Parameters> Parameters
+%type  <ParameterDeclaration> ParameterDeclaration
+%type  <ParametersDeclaration> ParametersDeclaration
+%type  <TypeInRoutineDeclaration> TypeInRoutineDeclaration
+%type  <BodyInRoutineDeclaration> BodyInRoutineDeclaration
+%type  <Body> Body
+%type  <Statement> Statement
+%type  <Assignment> Assignment
+%type  <RoutineCall> RoutineCall
+%type  <ExpressionInRoutineCall> ExpressionInRoutineCall
+%type  <ExpressionsInRoutineCall> ExpressionsInRoutineCall
+%type  <WhileLoop> WhileLoop
+%type  <ForLoop> ForLoop
+%type  <Range> Range
+%type  <Reverse> Reverse
+%type  <IfStatement> IfStatement
+%type  <ElseInIfStatement> ElseInIfStatement
+%type  <Expression> Expression
+%type  <MultipleRelationsInExpression> MultipleRelationsInExpression
+%type  <LogicalOperator> LogicalOperator
+%type  <Relation> Relation
+%type  <ComparisonInRelation> ComparisonInRelation
 
 // ======== OPERATOR PRECEDENCE ========
 
