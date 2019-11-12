@@ -230,7 +230,8 @@ struct Relation {
 
 struct ComparisonInRelation {
     struct ComparisonOperator *comparisonoperator;
-    ComparisonInRelation(ComparisonOperator *comparisonoperator);
+    struct Simple *simple;
+    ComparisonInRelation(ComparisonOperator *comparisonoperator, Simple *simple);
 };
 
 
@@ -280,9 +281,10 @@ struct Summand {
 struct Primary {
     string type;
     float value;
-    string sign;
+    bool isNot;
+    struct Sign* sign;
     struct ModifiablePrimary* modifiablePrimary;
-    Primary(string type, float value,  string sign, struct ModifiablePrimary* modifiablePrimary);
+    Primary(string type, float value,  bool isNot, struct Sign* sign, struct ModifiablePrimary* modifiablePrimary);
 };
 
 struct Sign {
