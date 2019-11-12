@@ -470,6 +470,7 @@ struct Identifiers {
     struct Identifiers *identifiers;
 
     Identifiers(string name, struct Expression *expression, struct Identifiers *identifiers) :
+            name(name),
             expression(expression),
             identifiers(identifiers) {}
 };
