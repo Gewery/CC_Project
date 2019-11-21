@@ -7,22 +7,20 @@
 
 using namespace std;
 
-struct Node {
-    const char *nodeName = "DEFAULT_NODE_NAME_PLS_OVERRIDE";
-    vector<Node *> children;
-    virtual void printTree();
-    void _print(const string &prefix, bool isLast);
-};
+//struct Node {
+//    const char *nodeName = "DEFAULT_NODE_NAME_PLS_OVERRIDE";
+//    vector<Node *> children;
+//    virtual void printTree();
+//    void _print(const string &prefix, bool isLast);
+//};
 
-struct Program : Node {
-    const char *nodeName = "Program";
+struct Program {
     struct Declaration *declaration;
     struct Program *program;
     Program(Declaration *declaration, Program *program);
 };
 
-struct Declaration : Node {
-    const char *nodeName = "Declaration";
+struct Declaration {
     struct SimpleDeclaration *simpledeclaration;
     struct RoutineDeclaration *routinedeclaration;
     Declaration(SimpleDeclaration *simpledeclaration, RoutineDeclaration *routinedeclaration);
@@ -304,4 +302,51 @@ struct Identifiers {
     struct Identifiers* identifiers;
     Identifiers(string name, struct Expression* expression, struct Identifiers* identifiers);
 };
+
+void print_Program(Program *program, bool isLast);
+void print_Declaration(Declaration *declaration, bool isLast);
+void print_SimpleDeclaration(SimpleDeclaration *simpledeclaration, bool isLast);
+void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool isLast);
+void print_InitialValue(InitialValue *initialvalue, bool isLast);
+void print_TypeDeclaration(TypeDeclaration *typedeclaration, bool isLast);
+void print_Type(Type *type, bool isLast);
+void print_PrimitiveType(PrimitiveType *primitivetype, bool isLast);
+void print_ArrayType(ArrayType *arraytype, bool isLast);
+void print_RecordType(RecordType *recordtype, bool isLast);
+void print_VariableDeclarations(VariableDeclarations *variabledeclarations, bool isLast);
+void print_RoutineDeclaration(RoutineDeclaration *routinedeclaration, bool isLast);
+void print_Parameters(Parameters *parameters, bool isLast);
+void print_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, bool isLast);
+void print_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, bool isLast);
+void print_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration, bool isLast);
+void print_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, bool isLast);
+void print_Body(Body *body, bool isLast);
+void print_Statement(Statement *statement, bool isLast);
+void print_Assignment(Assignment *assignment, bool isLast);
+void print_RoutineCall(RoutineCall *routinecall, bool isLast);
+void print_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall, bool isLast);
+void print_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall, bool isLast);
+void print_WhileLoop(WhileLoop *whileloop, bool isLast);
+void print_ForLoop(ForLoop *forloop, bool isLast);
+void print_Range(Range *range, bool isLast);
+void print_Reverse(Reverse *reverse, bool isLast);
+void print_IfStatement(IfStatement *ifstatement, bool isLast);
+void print_ElseInIfStatement(ElseInIfStatement *elseinifstatement, bool isLast);
+void print_Expression(Expression *expression, bool isLast);
+void print_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression, bool isLast);
+void print_LogicalOperator(LogicalOperator *logicaloperator, bool isLast);
+void print_Relation(Relation *relation, bool isLast);
+void print_ComparisonInRelation(ComparisonInRelation *comparisoninrelation, bool isLast);
+void print_ComparisonOperator(ComparisonOperator *comparisonoperator, bool isLast);
+void print_Simple(Simple *simple, bool isLast);
+void print_Factors(Factors *factors, bool isLast);
+void print_SimpleOperator(SimpleOperator *simpleoperator, bool isLast);
+void print_Factor(Factor *factor, bool isLast);
+void print_Summands(Summands *summands, bool isLast);
+void print_Summand(Summand *summand, bool isLast);
+void print_Primary(Primary *primary, bool isLast);
+void print_Sign(Sign *sign, bool isLast);
+void print_ModifiablePrimary(ModifiablePrimary *modifiableprimary, bool isLast);
+void print_Identifiers(Identifiers *identifiers, bool isLast);
+
 #endif //CC_PROJECT_AST_H

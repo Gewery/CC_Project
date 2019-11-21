@@ -382,13 +382,14 @@ Identifiers
 //subroutines
 
 #include <stdio.h>
+#include "AST.h"
 
 extern char yytext[];
 extern int column;
 
 int main(int argc, char **argv){
     yyparse();
-    if (root != nullptr) root->printTree();
+    print_Program(root, 1);
     return 0;
 }
 
