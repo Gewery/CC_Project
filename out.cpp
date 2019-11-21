@@ -1,24 +1,3 @@
-string prefix;
-
-
-void add_spaces_to_prefix(int a) {
-    for (int i = 0; i < a; i++, prefix += ' ');
-}
-
-void rem_from_prefix(int a) {
-    for (int i = 0; i < a; i++, prefix.pop_back());
-}
-
-void print_bars(bool isLast) {
-    cout << " │\n";
-
-    if (isLast) cout << prefix + " └──";
-    else cout << prefix + " ├──";
-    
-    if (!isLast) prefix += " │";
-    else prefix += "  ";
-}
-
 void print_Program(Program *program, bool isLast) {
 if (!program) return;
 print_bars(isLast);
@@ -68,8 +47,9 @@ print_bars(isLast);
 cout << "VariableDeclaration";
 
 add_spaces_to_prefix(2 + 19);
-if (!variabledeclaration->type && !variabledeclaration->initialvalue && !variabledeclaration->expression) print_name;(variabledeclaration->name;, 1);
-else print_name;(variabledeclaration->name;, 0);
+if (!variabledeclaration->type && !variabledeclaration->initialvalue && !variabledeclaration->expression) cout << " |\n" + prefix + " !AUGUL!" << variabledeclaration->name; << "\n" + prefix;
+else  cout << " |\n" + prefix + " !AYGUL!" << variabledeclaration->name; << "\n" + prefix;
+
 if (!variabledeclaration->initialvalue && !variabledeclaration->expression) print_Type(variabledeclaration->type, 1);
 else print_Type(variabledeclaration->type, 0);
 if (!variabledeclaration->expression) print_InitialValue(variabledeclaration->initialvalue, 1);
@@ -98,8 +78,9 @@ print_bars(isLast);
 cout << "TypeDeclaration";
 
 add_spaces_to_prefix(2 + 15);
-if (!typedeclaration->type) print_name;(typedeclaration->name;, 1);
-else print_name;(typedeclaration->name;, 0);
+if (!typedeclaration->type) cout << " |\n" + prefix + " !AUGUL!" << typedeclaration->name; << "\n" + prefix;
+else  cout << " |\n" + prefix + " !AYGUL!" << typedeclaration->name; << "\n" + prefix;
+
 print_Type(typedeclaration->type, 0);
 rem_from_prefix(6 + 15);
 cout << "\n" + prefix;
@@ -118,7 +99,8 @@ if (!type->recordtype && !type->name;) print_ArrayType(type->arraytype, 1);
 else print_ArrayType(type->arraytype, 0);
 if (!type->name;) print_RecordType(type->recordtype, 1);
 else print_RecordType(type->recordtype, 0);
-print_name;(type->name;, 0);
+ cout << " |\n" + prefix + " !AYGUL!" << type->name; << "\n" + prefix;
+
 rem_from_prefix(6 + 4);
 cout << "\n" + prefix;
 }
@@ -130,11 +112,11 @@ print_bars(isLast);
 cout << "PrimitiveType";
 
 add_spaces_to_prefix(2 + 13);
-) cout << " |\n" + prefix + " !AYGUL!" << primitivetype << "\n" + prefix;
+) cout << " |\n" + prefix + " !AYGUL!" << primitivetype->isint; << "\n" + prefix;
 
-) cout << " |\n" + prefix + " !AYGUL!" << primitivetype << "\n" + prefix;
+) cout << " |\n" + prefix + " !AYGUL!" << primitivetype->isreal; << "\n" + prefix;
 
- cout << " |\n" + prefix + " !AYGUL!" << primitivetype << "\n" + prefix;
+ cout << " |\n" + prefix + " !AYGUL!" << primitivetype->isboolean; << "\n" + prefix;
 
 rem_from_prefix(6 + 13);
 cout << "\n" + prefix;
@@ -187,8 +169,9 @@ print_bars(isLast);
 cout << "RoutineDeclaration";
 
 add_spaces_to_prefix(2 + 18);
-if (!routinedeclaration->parameters && !routinedeclaration->typeinroutinedeclaration && !routinedeclaration->bodyinroutinedeclaration) print_name;(routinedeclaration->name;, 1);
-else print_name;(routinedeclaration->name;, 0);
+if (!routinedeclaration->parameters && !routinedeclaration->typeinroutinedeclaration && !routinedeclaration->bodyinroutinedeclaration) cout << " |\n" + prefix + " !AUGUL!" << routinedeclaration->name; << "\n" + prefix;
+else  cout << " |\n" + prefix + " !AYGUL!" << routinedeclaration->name; << "\n" + prefix;
+
 if (!routinedeclaration->typeinroutinedeclaration && !routinedeclaration->bodyinroutinedeclaration) print_Parameters(routinedeclaration->parameters, 1);
 else print_Parameters(routinedeclaration->parameters, 0);
 if (!routinedeclaration->bodyinroutinedeclaration) print_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, 1);
@@ -219,8 +202,9 @@ print_bars(isLast);
 cout << "ParameterDeclaration";
 
 add_spaces_to_prefix(2 + 20);
-if (!parameterdeclaration->type) print_name;(parameterdeclaration->name;, 1);
-else print_name;(parameterdeclaration->name;, 0);
+if (!parameterdeclaration->type) cout << " |\n" + prefix + " !AUGUL!" << parameterdeclaration->name; << "\n" + prefix;
+else  cout << " |\n" + prefix + " !AYGUL!" << parameterdeclaration->name; << "\n" + prefix;
+
 print_Type(parameterdeclaration->type, 0);
 rem_from_prefix(6 + 20);
 cout << "\n" + prefix;
@@ -321,8 +305,9 @@ print_bars(isLast);
 cout << "RoutineCall";
 
 add_spaces_to_prefix(2 + 11);
-if (!routinecall->expressioninroutinecall) print_name;(routinecall->name;, 1);
-else print_name;(routinecall->name;, 0);
+if (!routinecall->expressioninroutinecall) cout << " |\n" + prefix + " !AUGUL!" << routinecall->name; << "\n" + prefix;
+else  cout << " |\n" + prefix + " !AYGUL!" << routinecall->name; << "\n" + prefix;
+
 print_ExpressionInRoutineCall(routinecall->expressioninroutinecall, 0);
 rem_from_prefix(6 + 11);
 cout << "\n" + prefix;
@@ -377,8 +362,9 @@ print_bars(isLast);
 cout << "ForLoop";
 
 add_spaces_to_prefix(2 + 7);
-if (!forloop->reverse && !forloop->range && !forloop->body) print_name;(forloop->name;, 1);
-else print_name;(forloop->name;, 0);
+if (!forloop->reverse && !forloop->range && !forloop->body) cout << " |\n" + prefix + " !AUGUL!" << forloop->name; << "\n" + prefix;
+else  cout << " |\n" + prefix + " !AYGUL!" << forloop->name; << "\n" + prefix;
+
 if (!forloop->range && !forloop->body) print_Reverse(forloop->reverse, 1);
 else print_Reverse(forloop->reverse, 0);
 if (!forloop->body) print_Range(forloop->range, 1);
@@ -409,7 +395,7 @@ print_bars(isLast);
 cout << "Reverse";
 
 add_spaces_to_prefix(2 + 7);
- cout << " |\n" + prefix + " !AYGUL!" << reverse << "\n" + prefix;
+ cout << " |\n" + prefix + " !AYGUL!" << reverse->isreverse; << "\n" + prefix;
 
 rem_from_prefix(6 + 7);
 cout << "\n" + prefix;
@@ -480,7 +466,8 @@ print_bars(isLast);
 cout << "LogicalOperator";
 
 add_spaces_to_prefix(2 + 15);
-print_op;(logicaloperator->op;, 0);
+ cout << " |\n" + prefix + " !AYGUL!" << logicaloperator->op; << "\n" + prefix;
+
 rem_from_prefix(6 + 15);
 cout << "\n" + prefix;
 }
@@ -492,20 +479,3 @@ print_bars(isLast);
 cout << "Relation";
 
 add_spaces_to_prefix(2 + 8);
-if (!relation->comparisoninrelation) print_Simple(relation->simple, 1);
-else print_Simple(relation->simple, 0);
-print_ComparisonInRelation(relation->comparisoninrelation, 0);
-rem_from_prefix(6 + 8);
-cout << "\n" + prefix;
-}
-
-void print_ComparisonInRelation(ComparisonInRelation *comparisoninrelation, bool isLast) {
-if (!comparisoninrelation) return;
-print_bars(isLast);
-
-cout << "ComparisonInRelation";
-
-add_spaces_to_prefix(2 + 20);
-if (!comparisoninrelation->simple) print_ComparisonOperator(comparisoninrelation->comparisonoperator, 1);
-else print_ComparisonOperator(comparisoninrelation->comparisonoperator, 0);
-print_Simple(comparisoninrelation->simple, 0);
