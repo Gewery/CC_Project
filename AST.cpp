@@ -1,560 +1,481 @@
-#include "Tree.h"
+#ifndef CC_PROJECT_AST_H
+#define CC_PROJECT_AST_H
+
 #include <string>
+#include <vector>
+#include <iostream>
+#include "AST.h"
 
-extern void yyerror(char const *s);
+using namespace std;
 
-struct Program *Program(struct Declaration *Declaration,
-                        struct Program *Program) {
-    struct Program *node = malloc(sizeof(struct Program));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Declaration = Declaration;
-    node->Program = Program;
-    return node;
-}
+struct Node {
+    const char *nodeName = "DEFAULT_NODE_NAME_PLS_OVERRIDE";
+    vector<Node *> children;
 
-struct Declaration *Declaration(struct SimpleDeclaration *SimpleDeclaration,
-                                struct RoutineDeclaration *RoutineDeclaration) {
-    struct Declaration *node = malloc(sizeof(struct Declaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->SimpleDeclaration = SimpleDeclaration;
-    node->RoutineDeclaration = RoutineDeclaration;
-    return node;
-}
-
-struct SimpleDeclaration *SimpleDeclaration(struct VariableDeclaration *VariableDeclaration,
-                                            struct TypeDeclaration *TypeDeclaration) {
-    struct SimpleDeclaration *node = malloc(sizeof(struct SimpleDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->VariableDeclaration = VariableDeclaration;
-    node->TypeDeclaration = TypeDeclaration;
-    return node;
-}
-
-struct VariableDeclaration *VariableDeclaration(string name,
-                                                struct Type *Type,
-                                                struct InitialValue *InitialValue,
-                                                struct Expression *Expression) {
-    struct VariableDeclaration *node = malloc(sizeof(struct VariableDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->Type = Type;
-    node->InitialValue = InitialValue;
-    node->Expression = Expression;
-    return node;
-}
-
-struct InitialValue *InitialValue(struct Expression *Expression) {
-    struct InitialValue *node = malloc(sizeof(struct InitialValue));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Expression = Expression;
-    return node;
-}
-
-struct TypeDeclaration *TypeDeclaration(string name,
-                                        struct Type *Type) {
-    struct TypeDeclaration *node = malloc(sizeof(struct TypeDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->Type = Type;
-    return node;
-}
-
-struct Type *Type(struct PrimitiveType *PrimitiveType,
-                  struct ArrayType *ArrayType,
-                  struct RecordType *RecordType,
-                  string name) {
-    struct Type *node = malloc(sizeof(struct Type));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
+    virtual void printTree() {
+        this->_print("", true);
     }
 
-    node->PrimitiveType = PrimitiveType;
-    node->ArrayType = ArrayType;
-    node->RecordType = v;
-    node->name = name;
-    return node;
-}
+    void _print(const string &prefix, bool isLast) {
+        cout << prefix;
+        cout << (isLast ? "└──" : "├──");
+        cout << this->nodeName << endl;
 
-struct PrimitiveType *PrimitiveType(bool isInt, bool isReal, bool isBoolean) {
-    struct PrimitiveType *node = malloc(sizeof(struct PrimitiveType));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
+        // todo: ne rabotayet fffffffffff
+        // AST.h:29:42: error: cannot convert 'std::__cxx11::basic_string<char>::iterator' {aka '__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char> >'} to 'const char*'
+        //         str1.erase(std::remove(str1.begin(), str1.end(), ' '), str1.end());
+        //
+        //this->children.erase(remove(this->children.begin(), this->children.end(), nullptr), this->children.end());
+
+        for (auto const &child: this->children) {
+            child->_print(
+                    prefix + (isLast ? "    " : "│   "),
+                    children.back() == child);
+        }
     }
+};
 
-    node->isInt = isInt;
-    node->isReal = isReal;
-    node->isBoolean = isBoolean;
-    return node;
-}
+struct ParametersDeclaration {
+    struct ParameterDeclaration *parameterdeclaration;
+    struct ParametersDeclaration *parametersdeclaration;
 
-struct ArrayType *ArrayType(struct Expression *Expression,
-                            struct Type *Type) {
-    struct ArrayType *node = malloc(sizeof(struct ArrayType));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
+    ParametersDeclaration(ParameterDeclaration *parameterdeclaration, ParametersDeclaration *parametersdeclaration) :
+            parameterdeclaration(parameterdeclaration),
+            parametersdeclaration(parametersdeclaration) {}
+};
+
+struct ParameterDeclaration {
+    string name;
+    struct Type *type;
+
+    ParameterDeclaration(string name, Type *type) :
+            name(name),
+            type(type) {}
+};
+
+struct Parameters {
+    struct ParameterDeclaration *parameterdeclaration;
+    struct ParametersDeclaration *parametersdeclaration;
+
+    Parameters(ParameterDeclaration *parameterdeclaration, ParametersDeclaration *parametersdeclaration) :
+            parameterdeclaration(parameterdeclaration),
+            parametersdeclaration(parametersdeclaration) {}
+};
+
+struct RoutineDeclaration {
+    string name;
+    struct Parameters *parameters;
+    struct TypeInRoutineDeclaration *typeinroutinedeclaration;
+    struct BodyInRoutineDeclaration *bodyinroutinedeclaration;
+
+    RoutineDeclaration(string name, Parameters *parameters, TypeInRoutineDeclaration *typeinroutinedeclaration,
+                       BodyInRoutineDeclaration *bodyinroutinedeclaration) :
+            name(name),
+            parameters(parameters),
+            typeinroutinedeclaration(typeinroutinedeclaration),
+            bodyinroutinedeclaration(bodyinroutinedeclaration) {}
+};
+
+struct VariableDeclarations {
+    struct VariableDeclaration *variabledeclaration;
+    struct VariableDeclarations *variabledeclarations;
+
+    VariableDeclarations(VariableDeclaration *variabledeclaration, VariableDeclarations *variabledeclarations) :
+            variabledeclaration(variabledeclaration),
+            variabledeclarations(variabledeclarations) {}
+};
+
+
+struct RecordType {
+    struct VariableDeclarations *variabledeclarations;
+
+    RecordType(VariableDeclarations *variabledeclarations) :
+            variabledeclarations(variabledeclarations) {}
+};
+
+struct ArrayType {
+    struct Expression *expression;
+    struct Type *type;
+
+    ArrayType(Expression *expression, Type *type) :
+            expression(expression),
+            type(type) {}
+};
+
+struct PrimitiveType {
+    bool isint;
+    bool isreal;
+    bool isboolean;
+
+    PrimitiveType(bool isint, bool isreal, bool isboolean) :
+            isint(isint),
+            isreal(isreal),
+            isboolean(isboolean) {}
+};
+
+struct Type {
+    struct PrimitiveType *primitivetype;
+    struct ArrayType *arraytype;
+    struct RecordType *recordtype;
+    string name;
+
+    Type(PrimitiveType *primitivetype, ArrayType *arraytype, RecordType *recordtype, string name) :
+            primitivetype(primitivetype),
+            arraytype(arraytype),
+            recordtype(recordtype),
+            name(name) {}
+};
+
+struct TypeDeclaration {
+    string name;
+    struct Type *type;
+
+    TypeDeclaration(string name, Type *type) :
+            name(name),
+            type(type) {}
+};
+
+struct InitialValue {
+    struct Expression *expression;
+
+    InitialValue(Expression *expression) :
+            expression(expression) {}
+};
+
+struct VariableDeclaration {
+    string name;
+    struct Type *type;
+    struct InitialValue *initialvalue;
+    struct Expression *expression;
+
+    VariableDeclaration(string name, Type *type, InitialValue *initialvalue, Expression *expression) :
+            name(name),
+            type(type),
+            initialvalue(initialvalue),
+            expression(expression) {}
+};
+
+struct SimpleDeclaration {
+    struct VariableDeclaration *variabledeclaration;
+    struct TypeDeclaration *typedeclaration;
+
+    SimpleDeclaration(VariableDeclaration *variabledeclaration, TypeDeclaration *typedeclaration) :
+            variabledeclaration(variabledeclaration),
+            typedeclaration(typedeclaration) {}
+};
+
+struct Declaration : Node {
+    const char *nodeName = "Declaration";
+
+    struct SimpleDeclaration *simpledeclaration;
+    struct RoutineDeclaration *routinedeclaration;
+
+    Declaration(SimpleDeclaration *simpledeclaration, RoutineDeclaration *routinedeclaration) :
+            simpledeclaration(simpledeclaration),
+            routinedeclaration(routinedeclaration) {
+        // this->children.push_back(simpledeclaration);
+        this->children.push_back((Node*)(routinedeclaration));
     }
-    node->Expression = Expression;
-    node->Type = Type;
-    return node;
-}
+};
 
-struct RecordType *RecordType(struct VariableDeclarations *VariableDeclarations) {
-    struct RecordType *node = malloc(sizeof(struct RecordType));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
+struct Program : Node {
+    const char *nodeName = "Program";
+
+    struct Declaration *declaration;
+    struct Program *program;
+
+    Program(Declaration *declaration, Program *program) :
+            declaration(declaration),
+            program(program) {
+        // this->children.push_back(program);
+        // this->children.push_back(declaration);  // todo: nuzhno `Declaration` obyavlyat vishe, ili vinesti cod v cpp
     }
-    node->VariableDeclarations = VariableDeclarations;
-    return node;
-}
+};
 
-struct VariableDeclarations *VariableDeclarations(struct VariableDeclaration *VariableDeclaration,
-                                                  struct VariableDeclarations *VariableDeclarations) {
-    struct VariableDeclarations *node = malloc(sizeof(struct VariableDeclarations));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->VariableDeclaration = VariableDeclaration;
-    node->VariableDeclarations = VariableDeclarations;
-    return node;
-}
+struct TypeInRoutineDeclaration {
+    struct Type *type;
 
-struct RoutineDeclaration *RoutineDeclaration(string name,
-                                              struct Parameters *Parameters,
-                                              struct TypeInRoutineDeclaration *TypeInRoutineDeclaration,
-                                              struct BodyInRoutineDeclaration *BodyInRoutineDeclaration) {
-    struct RoutineDeclaration *node = malloc(sizeof(struct RoutineDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->Parameters = Parameters;
-    node->TypeInRoutineDeclaration = TypeInRoutineDeclaration;
-    node->BodyInRoutineDeclaration = BodyInRoutineDeclaration;
-    return node;
-}
+    TypeInRoutineDeclaration(Type *type) :
+            type(type) {}
+};
 
-struct Parameters *Parameters(struct ParameterDeclaration *ParameterDeclaration,
-                              struct ParametersDeclaration *ParametersDeclaration) {
-    struct Parameters *node = malloc(sizeof(struct Parameters));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->ParameterDeclaration = ParameterDeclaration;
-    node->ParametersDeclaration = ParametersDeclaration;
-    return node;
-}
+struct BodyInRoutineDeclaration {
+    struct Body *body;
 
-struct ParameterDeclaration *ParameterDeclaration(string name,
-                                                  struct Type *Type) {
-    struct ParameterDeclaration *node = malloc(sizeof(struct ParameterDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->Type = Type;
-    return node;
-}
+    BodyInRoutineDeclaration(Body *body) :
+            body(body) {}
+};
 
+struct Body {
+    struct SimpleDeclaration *simpledeclaration;
+    struct Statement *statement;
+    struct Body *body;
 
-struct ParametersDeclaration *ParametersDeclaration(struct ParameterDeclaration *ParameterDeclaration,
-                                                    struct ParametersDeclaration *ParametersDeclaration) {
-    struct ParametersDeclaration *node = malloc(sizeof(struct ParametersDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->ParameterDeclaration = ParameterDeclaration;
-    node->ParametersDeclaration = ParametersDeclaration;
-    return node;
-}
+    Body(SimpleDeclaration *simpledeclaration, Statement *statement, Body *body) :
+            simpledeclaration(simpledeclaration),
+            statement(statement),
+            body(body) {}
+};
 
-struct TypeInRoutineDeclaration *TypeInRoutineDeclaration(struct Type *Type) {
-    struct TypeInRoutineDeclaration *node = malloc(sizeof(struct TypeInRoutineDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Type = Type;
-    return node;
-}
+struct Statement {
+    struct Assignment *assignment;
+    struct RoutineCall *routinecall;
+    struct WhileLoop *whileloop;
+    struct ForLoop *forloop;
+    struct IfStatement *ifstatement;
 
-struct BodyInRoutineDeclaration *BodyInRoutineDeclaration(struct Body *Body) {
-    struct BodyInRoutineDeclaration *node = malloc(sizeof(struct BodyInRoutineDeclaration));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Body = Body;
-    return node;
-}
+    Statement(Assignment *assignment, RoutineCall *routinecall, WhileLoop *whileloop, ForLoop *forloop,
+              IfStatement *ifstatement) :
+            assignment(assignment),
+            routinecall(routinecall),
+            whileloop(whileloop),
+            forloop(forloop),
+            ifstatement(ifstatement) {}
+};
 
-struct Body *Body(struct SimpleDeclaration *SimpleDeclaration,
-                  struct Statement *Statement,
-                  struct Body *Body) {
-    struct Body *node = malloc(sizeof(struct Body));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->SimpleDeclaration = SimpleDeclaration;
-    node->Statement = Statement;
-    node->Body = Body;
-    return node;
-}
+struct Assignment {
+    struct ModifiablePrimary *modifiableprimary;
+    struct Expression *expression;
 
-struct Statement *Statement(struct Assignment *Assignment,
-                            struct RoutineCall *RoutineCall,
-                            struct WhileLoop *WhileLoop,
-                            struct ForLoop *ForLoop,
-                            struct IfStatement *IfStatement) {
-    struct Statement *node = malloc(sizeof(struct Statement));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Assignment = Assignment;
-    node->RoutineCall = RoutineCall;
-    node->WhileLoop = WhileLoop;
-    node->ForLoop = ForLoop;
-    node->IfStatement = IfStatement;
-    return node;
-}
+    Assignment(ModifiablePrimary *modifiableprimary, Expression *expression) :
+            modifiableprimary(modifiableprimary),
+            expression(expression) {}
+};
 
-struct Assignment *Assignment(struct ModifiablePrimary *ModifiablePrimary,
-                              struct Expression *Expression) {
-    struct Assignment *node = malloc(sizeof(struct Assignment));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->ModifiablePrimary = ModifiablePrimary;
-    node->Expression = Expression;
-    return node;
-}
+struct RoutineCall {
+    string name;
+    struct ExpressionInRoutineCall *expressioninroutinecall;
 
-struct RoutineCall *RoutineCall(string name,
-                                struct ExpressionInRoutineCall *ExpressionInRoutineCall) {
-    struct RoutineCall *node = malloc(sizeof(struct RoutineCall));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->ExpressionInRoutineCall = ExpressionInRoutineCall;
-    return node;
-}
+    RoutineCall(string name, ExpressionInRoutineCall *expressioninroutinecall) :
+            name(name),
+            expressioninroutinecall(expressioninroutinecall) {}
+};
 
+struct ExpressionInRoutineCall {
+    struct Expression *expression;
+    struct ExpressionsInRoutineCall *expressionsinroutinecall;
 
-struct ExpressionInRoutineCall *ExpressionInRoutineCall(struct Expression *Expression,
-                                                        struct ExpressionsInRoutineCall *ExpressionsInRoutineCall) {
-    struct ExpressionInRoutineCall *node = malloc(sizeof(struct ExpressionInRoutineCall));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Expression = Expression;
-    node->ExpressionsInRoutineCall = ExpressionsInRoutineCall;
-    return node;
-}
+    ExpressionInRoutineCall(Expression *expression, ExpressionsInRoutineCall *expressionsinroutinecall) :
+            expression(expression),
+            expressionsinroutinecall(expressionsinroutinecall) {}
+};
 
-struct ExpressionsInRoutineCall *ExpressionsInRoutineCall(struct Expression *Expression,
-                                                          struct ExpressionInRoutineCall *ExpressionInRoutineCall) {
-    struct ExpressionsInRoutineCall *node = malloc(sizeof(struct ExpressionsInRoutineCall));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Expression = Expression;
-    node->ExpressionInRoutineCall = ExpressionInRoutineCall;
-    return node;
-}
+struct ExpressionsInRoutineCall {
+    struct Expression *expression;
+    struct ExpressionInRoutineCall *expressioninroutinecall;
 
+    ExpressionsInRoutineCall(Expression *expression, ExpressionInRoutineCall *expressioninroutinecall) :
+            expression(expression),
+            expressioninroutinecall(expressioninroutinecall) {}
+};
 
-struct WhileLoop *WhileLoop(struct Expression *Expression,
-                            struct Body *Body) {
-    struct WhileLoop *node = malloc(sizeof(struct WhileLoop));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Expression = Expression;
-    node->Body = Body;
-    return node;
-}
+struct WhileLoop {
+    struct Expression *expression;
+    struct Body *body;
 
-struct ForLoop *ForLoop(string name,
-                        struct Reverse *Reverse,
-                        struct Range *Range,
-                        struct Body *Body) {
-    struct ForLoop *node = malloc(sizeof(struct ForLoop));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->Reverse = Reverse;
-    node->Range = Range;
-    node->Body = Body;
-    return node;
-}
+    WhileLoop(Expression *expression, Body *body) :
+            expression(expression),
+            body(body) {}
+};
 
-struct Range *Range(struct Expression *Expression1,
-                    struct Expression *Expression2) {
-    struct Range *node = malloc(sizeof(struct Range));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Expression = Expression1;
-    node->Expression2 = Expression2;
-    return node;
-}
+struct ForLoop {
+    string name;
+    struct Reverse *reverse;
+    struct Range *range;
+    struct Body *body;
 
-struct Reverse *Reverse(bool isReverse) {
-    struct Reverse *node = malloc(sizeof(struct Reverse));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->isReverse = isReverse;
-    return node;
-}
+    ForLoop(string name, Reverse *reverse, Range *range, Body *body) :
+            name(name),
+            reverse(reverse),
+            range(range),
+            body(body) {}
+};
 
-struct IfStatement *IfStatement(struct Expression *Expression1,
-                                struct Body *Body,
-                                struct ElseInIfStatement *ElseInIfStatement) {
-    struct IfStatement *node = malloc(sizeof(struct IfStatement));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Expression = Expression;
-    node->Body = Body;
-    node->ElseInIfStatement = ElseInIfStatement;
-    return node;
-}
+struct Range {
+    struct Expression *expression1;
+    struct Expression *expression2;
 
-struct ElseInIfStatement *ElseInIfStatement(struct Body *Body) {
-    struct ElseInIfStatement *node = malloc(sizeof(struct ElseInIfStatement));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Body = Body;
-    return node;
-}
+    Range(Expression *expression1, Expression *expression2) :
+            expression1(expression1),
+            expression2(expression2) {}
+};
 
-struct Expression *Expression(struct Relation *Relation,
-                              struct MultipleRelationsInExpression *MultipleRelationsInExpression) {
-    struct Expression *node = malloc(sizeof(struct Expression));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Relation = Relation;
-    node->MultipleRelationsInExpression = MultipleRelationsInExpression;
-    return node;
-}
+struct Reverse {
+    bool isreverse;
 
-struct MultipleRelationsInExpression *MultipleRelationsInExpression(struct LogicalOperator *LogicalOperator,
-                                                                    struct Relation *Relation,
-                                                                    struct MultipleRelationsInExpression *MultipleRelationsInExpression) {
-    struct MultipleRelationsInExpression *node = malloc(sizeof(struct MultipleRelationsInExpression));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->LogicalOperator = LogicalOperator;
-    node->Relation = Relation;
-    node->MultipleRelationsInExpression = MultipleRelationsInExpression;
-    return node;
-}
+    Reverse(bool isreverse) :
+            isreverse(isreverse) {}
+};
 
-struct LogicalOperator *LogicalOperator(string op) {
-    struct LogicalOperator *node = malloc(sizeof(struct LogicalOperator));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->op = op;
-    return node;
-}
+struct IfStatement {
+    struct Expression *expression1;
+    struct Body *body;
+    struct ElseInIfStatement *elseinifstatement;
 
-struct Relation *Relation(struct Simple *Simple,
-                          struct ComparisonInRelation *ComparisonInRelation) {
-    struct Relation *node = malloc(sizeof(struct Relation));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Simple = Simple;
-    node->ComparisonInRelation = ComparisonInRelation;
-    return node;
-}
+    IfStatement(Expression *expression1, Body *body, ElseInIfStatement *elseinifstatement) :
+            expression1(expression1),
+            body(body),
+            elseinifstatement(elseinifstatement) {}
+};
+
+struct ElseInIfStatement {
+    struct Body *body;
+
+    ElseInIfStatement(Body *body) :
+            body(body) {}
+};
+
+struct Expression {
+    struct Relation *relation;
+    struct MultipleRelationsInExpression *multiplerelationsinexpression;
+
+    Expression(Relation *relation, MultipleRelationsInExpression *multiplerelationsinexpression) :
+            relation(relation),
+            multiplerelationsinexpression(multiplerelationsinexpression) {}
+};
+
+struct MultipleRelationsInExpression {
+    struct LogicalOperator *logicaloperator;
+    struct Relation *relation;
+    struct MultipleRelationsInExpression *multiplerelationsinexpression;
+
+    MultipleRelationsInExpression(LogicalOperator *logicaloperator, Relation *relation,
+                                  MultipleRelationsInExpression *multiplerelationsinexpression) :
+            logicaloperator(logicaloperator),
+            relation(relation),
+            multiplerelationsinexpression(multiplerelationsinexpression) {}
+};
+
+struct LogicalOperator {
+    string op;
+
+    LogicalOperator(string op) :
+            op(op) {}
+};
+
+struct Relation {
+    struct Simple *simple;
+    struct ComparisonInRelation *comparisoninrelation;
+
+    Relation(Simple *simple, ComparisonInRelation *comparisoninrelation) :
+            simple(simple),
+            comparisoninrelation(comparisoninrelation) {}
+};
+
+struct ComparisonInRelation {
+    struct ComparisonOperator *comparisonoperator;
+    struct Simple *simple;
+
+    ComparisonInRelation(ComparisonOperator *comparisonoperator, Simple *simple) :
+            comparisonoperator(comparisonoperator),
+            simple(simple) {}
+};
 
 
-struct ComparisonInRelation *ComparisonInRelation(struct ComparisonOperator *ComparisonOperator,
-                                                  struct Simple *Simple) {
-    struct ComparisonInRelation *node = malloc(sizeof(struct ComparisonInRelation));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->ComparisonOperator = ComparisonOperator;
-    node->Simple = Simple;
-    return node;
-}
+struct ComparisonOperator {
+    string op;
 
-struct ComparisonOperator *ComparisonOperator(string op) {
-    struct ComparisonOperator *node = malloc(sizeof(struct ComparisonOperator));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->op = op;
-    return node;
-}
+    ComparisonOperator(string op) :
+            op(op) {}
+};
 
-struct Simple *Simple(struct Factor *Factor,
-                      struct Factors *Factors) {
-    struct Simple *node = malloc(sizeof(struct Simple));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Factor = Factor;
-    node->Factors = Factors;
-    return node;
-}
+struct Simple {
+    struct Factor *factor;
+    struct Factors *factors;
 
-struct Factors *Factors(struct SimpleOperator *SimpleOperator,
-                        struct Factor *Factor,
-                        struct Factors *Factors) {
-    struct Factors *node = malloc(sizeof(struct Factors));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->SimpleOperator = SimpleOperator;
-    node->Factor = Factor;
-    node->Factors = Factors;
-    return node;
-}
+    Simple(Factor *factor, Factors *factors) :
+            factor(factor),
+            factors(factors) {}
+};
 
-struct SimpleOperator *SimpleOperator(string op) {
-    struct SimpleOperator *node = malloc(sizeof(struct SimpleOperator));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->op = op;
-    return node;
-}
+struct Factors {
+    struct SimpleOperator *simpleOperator;
+    struct Factor *factor;
+    struct Factors *factors;
 
-struct Factor *Factor(struct Summand *Summand,
-                      struct Summands *Summands) {
-    struct Factor *node = malloc(sizeof(struct Factor));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Summand = Summand;
-    node->Summands = Summands;
-    return node;
-}
+    Factors(SimpleOperator *simpleOperator, Factor *factor, Factors *factors) :
+            simpleOperator(simpleOperator),
+            factor(factor),
+            factors(factors) {}
+};
+
+struct SimpleOperator {
+    string op;
+
+    SimpleOperator(string op) :
+            op(op) {}
+};
+
+struct Factor {
+    struct Summand *summand;
+    struct Summands *summands;
+
+    Factor(Summand *summand, Summands *summands) :
+            summand(summand),
+            summands(summands) {}
+};
+
+struct Summands {
+    struct Sign *sign;
+    struct Summand *summand;
+    struct Summands *summands;
+
+    Summands(Sign *sign, Summand *summand, Summands *summands) :
+            sign(sign),
+            summand(summand),
+            summands(summands) {}
+};
+
+struct Summand {
+    struct Primary *primary;
+    struct Expression *expression;
+
+    Summand(Primary *primary, Expression *expression) :
+            primary(primary),
+            expression(expression) {}
+};
 
 
-struct Summands *Summands(struct Sign *Sign,
-                          struct Summand *Summand,
-                          struct Summands *Summands) {
-    struct Summands *node = malloc(sizeof(struct Summands));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Sign = Sign;
-    node->Summand = Summand;
-    node->Summands = Summands;
-    return node;
-}
+struct Primary {
+    string type;
+    float value;
+    bool isNot;
+    struct Sign *sign;
+    struct ModifiablePrimary *modifiablePrimary;
 
-struct Summand *Summand(struct Primary *Primary,
-                        struct Expression *Expression) {
-    struct Summand *node = malloc(sizeof(struct Summand));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->Primary = Primary;
-    node->Expression = Expression;
-    return node;
-}
+    Primary(string type, float value, bool isNot, struct Sign *sign, struct ModifiablePrimary *modifiablePrimary) :
+            type(type),
+            value(value),
+            isNot(isNot),
+            sign(sign),
+            modifiablePrimary(modifiablePrimary) {}
+};
 
-//TODO Primary
+struct Sign {
+    string op;
 
-struct Sign *Sign(string op) {
-    struct Sign *node = malloc(sizeof(struct Sign));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->op = op;
-    return node;
-}
+    Sign(string op) :
+            op(op) {}
+};
 
-struct ModifiablePrimary *ModifiablePrimary(string name,
-                                            struct Identifiers *Identifiers) {
-    struct ModifiablePrimary *node = malloc(sizeof(struct ModifiablePrimary));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->Identifiers = Identifiers;
-    return node;
-}
+struct ModifiablePrimary {
+    string name;
+    struct Identifiers *identifiers;
 
-struct Identifiers *Identifiers(string name,
-                                struct Expression *Expression,
-                                struct Identifiers *Identifiers) {
-    struct Identifiers *node = malloc(sizeof(struct Identifiers));
-    if (!node) {
-        yyerror("out of space");
-        exit(0);
-    }
-    node->name = name;
-    node->Expression = Expression;
-    node->Identifiers = Identifiers;
-    return node;
-}
+    ModifiablePrimary(string name, struct Identifiers *identifiers) :
+            name(name),
+            identifiers(identifiers) {}
+};
 
+struct Identifiers {
+    string name;
+    struct Expression *expression;
+    struct Identifiers *identifiers;
 
+    Identifiers(string name, struct Expression *expression, struct Identifiers *identifiers) :
+            name(name),
+            expression(expression),
+            identifiers(identifiers) {}
+};
 
-
-
+#endif //CC_PROJECT_AST_H

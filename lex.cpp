@@ -158,7 +158,7 @@ extern int yylex(void)
         }
         return REAL_LITERAL;
     }
-    yyerror("Mystery character\n");
+    if (lexem != "\0") yyerror("Mystery character\n");
     return 0;
 }
 //
