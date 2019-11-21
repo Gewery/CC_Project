@@ -8,32 +8,92 @@
 
 using namespace std;
 
-struct Node {
-    const char *nodeName = "DEFAULT_NODE_NAME_PLS_OVERRIDE";
-    vector<Node *> children;
+// struct Node {
+//     const char *nodeName = "DEFAULT_NODE_NAME_PLS_OVERRIDE";
+//     vector<Node *> children;
 
-    virtual void printTree() {
-        this->_print("", true);
-    }
+//     virtual void printTree() {
+//         this->_print("", true);
+//     }
 
-    void _print(const string &prefix, bool isLast) {
-        cout << prefix;
-        cout << (isLast ? "└──" : "├──");
-        cout << this->nodeName << endl;
+//     void _print(const string &prefix, bool isLast) {
+//         cout << prefix;
+//         cout << (isLast ? "└──" : "├──");
+//         cout << this->nodeName << endl;
 
-        // todo: ne rabotayet fffffffffff
-        // AST.h:29:42: error: cannot convert 'std::__cxx11::basic_string<char>::iterator' {aka '__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char> >'} to 'const char*'
-        //         str1.erase(std::remove(str1.begin(), str1.end(), ' '), str1.end());
-        //
-        //this->children.erase(remove(this->children.begin(), this->children.end(), nullptr), this->children.end());
+//         // todo: ne rabotayet fffffffffff
+//         // AST.h:29:42: error: cannot convert 'std::__cxx11::basic_string<char>::iterator' {aka '__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char> >'} to 'const char*'
+//         //         str1.erase(std::remove(str1.begin(), str1.end(), ' '), str1.end());
+//         //
+//         //this->children.erase(remove(this->children.begin(), this->children.end(), nullptr), this->children.end());
 
-        for (auto const &child: this->children) {
-            child->_print(
-                    prefix + (isLast ? "    " : "│   "),
-                    children.back() == child);
-        }
-    }
-};
+//         for (auto const &child: this->children) {
+//             child->_print(
+//                     prefix + (isLast ? "    " : "│   "),
+//                     children.back() == child);
+//         }
+//     }
+// };
+
+string prefix;
+
+
+void add_spaces_to_prefix(int a) {
+    for (int i = 0; i < a; i++, prefix += ' ');
+}
+
+void rem_from_prefix(int a) {
+    for (int i = 0; i < a; i++, prefix.pop_back());
+}
+
+void print_bars(bool isLast) {
+    cout << " │\n";
+
+    if (isLast) cout << prefix + " └──";
+    else cout << prefix + " ├──";
+    
+    if (!isLast) prefix += " │";
+    else prefix += "  ";
+}
+
+void print_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, bool isLast) {
+    if (!parametersdeclaration)
+        return;
+
+    print_bars(isLast);
+
+    cout << "ParametersDeclaration";
+    
+    add_spaces_to_prefix(2 + 21);
+
+    if (!parametersdeclaration->parametersdeclaration) print_ParameterDeclaration(parametersdeclaration->parameterdeclaration, 1);
+    else print_ParameterDeclaration(parametersdeclaration->parameterdeclaration, 0);
+    print_ParametersDeclaration(parametersdeclaration->parametersdeclaration, 1);
+    
+    rem_from_prefix(4 + 21);
+    cout << "\n" + prefix;
+}
+
+void print_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, bool isLast) {
+    if (!parameterdeclaration)
+        return;
+
+    print_bars(isLast);
+
+    cout << "ParameterDeclaration";
+
+    add_spaces_to_prefix(2 + 20);
+    
+    cout << " │\n";
+    if (parameterdeclaration->type) cout << prefix + " ├──" << parameterdeclaration->name << "\n" + prefix;
+    else cout << prefix + " └──" << parameterdeclaration->name << "\n" + prefix;
+
+    //print_Type(parameterdeclaration->type);
+    
+    rem_from_prefix(6 + 20);
+    cout << "\n" + prefix;
+}
+
 
 struct ParametersDeclaration {
     struct ParameterDeclaration *parameterdeclaration;
