@@ -382,7 +382,6 @@ Identifiers
 //subroutines
 
 #include <stdio.h>
-#include "AST.h"
 
 extern char yytext[];
 extern int column;
