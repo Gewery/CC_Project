@@ -1,18 +1,8 @@
-#ifndef CC_PROJECT_AST_H
-#define CC_PROJECT_AST_H
-
 #include <string>
 #include <vector>
 #include <iostream>
 
 using namespace std;
-
-//struct Node {
-//    const char *nodeName = "DEFAULT_NODE_NAME_PLS_OVERRIDE";
-//    vector<Node *> children;
-//    virtual void printTree();
-//    void _print(const string &prefix, bool isLast);
-//};
 
 struct Program {
     struct Declaration *declaration;
@@ -190,10 +180,10 @@ struct Reverse {
 };
 
 struct IfStatement {
-    struct Expression *expression1;
+    struct Expression *expression;
     struct Body *body;
     struct ElseInIfStatement *elseinifstatement;
-    IfStatement(Expression *expression1, Body *body, ElseInIfStatement *elseinifstatement){};
+    IfStatement(Expression *expression, Body *body, ElseInIfStatement *elseinifstatement){};
 };
 
 struct ElseInIfStatement {
@@ -275,7 +265,6 @@ struct Summand {
     Summand(Primary* primary, Expression* expression){};
 };
 
-
 struct Primary {
     string type;
     float value;
@@ -349,4 +338,3 @@ void print_Sign(Sign *sign, bool isLast);
 void print_ModifiablePrimary(ModifiablePrimary *modifiableprimary, bool isLast);
 void print_Identifiers(Identifiers *identifiers, bool isLast);
 
-#endif //CC_PROJECT_AST_H

@@ -382,8 +382,8 @@ Identifiers
 //subroutines
 
 #include <stdio.h>
-#include "AST.h"
 
+//extern void print_Program(Program *program, bool isLast);
 extern char yytext[];
 extern int column;
 
