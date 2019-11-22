@@ -26,7 +26,16 @@ void print_bars(bool isLast) {
 
     if (!isLast) prefix += " │";
     else prefix += "  ";
+    return;
 }
+
+void print_margine(int number) {
+    printf("\n");
+    for (int i = 0; i < number; i++)
+        cout << "--";
+    return;
+}
+
 
 void print_Program(Program *program, bool isLast) {
     if (!program) return;
@@ -40,6 +49,7 @@ void print_Program(Program *program, bool isLast) {
     print_Program(program->program, 0);
     rem_from_prefix(6 + 7);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Declaration(Declaration *declaration, bool isLast) {
@@ -54,6 +64,7 @@ void print_Declaration(Declaration *declaration, bool isLast) {
     print_RoutineDeclaration(declaration->routinedeclaration, 0);
     rem_from_prefix(6 + 11);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_SimpleDeclaration(SimpleDeclaration *simpledeclaration, bool isLast) {
@@ -68,6 +79,7 @@ void print_SimpleDeclaration(SimpleDeclaration *simpledeclaration, bool isLast) 
     print_TypeDeclaration(simpledeclaration->typedeclaration, 0);
     rem_from_prefix(6 + 17);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool isLast) {
@@ -79,7 +91,7 @@ void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool is
     add_spaces_to_prefix(2 + 19);
     if (!variabledeclaration->type && !variabledeclaration->initialvalue && !variabledeclaration->expression)
         cout << " |\n" + prefix + " !AUGUL!" << variabledeclaration->name << "\n" + prefix;
-    else  cout << " |\n" + prefix + " !AYGUL!" << variabledeclaration->name << "\n" + prefix;
+    else cout << " |\n" + prefix + " !AYGUL!" << variabledeclaration->name << "\n" + prefix;
 
     if (!variabledeclaration->initialvalue && !variabledeclaration->expression)
         print_Type(variabledeclaration->type, 1);
@@ -89,6 +101,7 @@ void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool is
     print_Expression(variabledeclaration->expression, 0);
     rem_from_prefix(6 + 19);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_InitialValue(InitialValue *initialvalue, bool isLast) {
@@ -101,6 +114,7 @@ void print_InitialValue(InitialValue *initialvalue, bool isLast) {
     print_Expression(initialvalue->expression, 0);
     rem_from_prefix(6 + 12);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_TypeDeclaration(TypeDeclaration *typedeclaration, bool isLast) {
@@ -111,11 +125,12 @@ void print_TypeDeclaration(TypeDeclaration *typedeclaration, bool isLast) {
 
     add_spaces_to_prefix(2 + 15);
     if (!typedeclaration->type) cout << " |\n" + prefix + " !AUGUL!" << typedeclaration->name << "\n" + prefix;
-    else  cout << " |\n" + prefix + " !AYGUL!" << typedeclaration->name << "\n" + prefix;
+    else cout << " |\n" + prefix + " !AYGUL!" << typedeclaration->name << "\n" + prefix;
 
     print_Type(typedeclaration->type, 0);
     rem_from_prefix(6 + 15);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Type(Type *type, bool isLast) {
@@ -135,6 +150,7 @@ void print_Type(Type *type, bool isLast) {
 
     rem_from_prefix(6 + 4);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_PrimitiveType(PrimitiveType *primitivetype, bool isLast) {
@@ -152,6 +168,7 @@ void print_PrimitiveType(PrimitiveType *primitivetype, bool isLast) {
 
     rem_from_prefix(6 + 13);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_ArrayType(ArrayType *arraytype, bool isLast) {
@@ -166,6 +183,7 @@ void print_ArrayType(ArrayType *arraytype, bool isLast) {
     print_Type(arraytype->type, 0);
     rem_from_prefix(6 + 9);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_RecordType(RecordType *recordtype, bool isLast) {
@@ -178,6 +196,7 @@ void print_RecordType(RecordType *recordtype, bool isLast) {
     print_VariableDeclarations(recordtype->variabledeclarations, 0);
     rem_from_prefix(6 + 10);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_VariableDeclarations(VariableDeclarations *variabledeclarations, bool isLast) {
@@ -193,6 +212,7 @@ void print_VariableDeclarations(VariableDeclarations *variabledeclarations, bool
     print_VariableDeclarations(variabledeclarations->variabledeclarations, 0);
     rem_from_prefix(6 + 20);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_RoutineDeclaration(RoutineDeclaration *routinedeclaration, bool isLast) {
@@ -205,7 +225,7 @@ void print_RoutineDeclaration(RoutineDeclaration *routinedeclaration, bool isLas
     if (!routinedeclaration->parameters && !routinedeclaration->typeinroutinedeclaration &&
         !routinedeclaration->bodyinroutinedeclaration)
         cout << " |\n" + prefix + " !AUGUL!" << routinedeclaration->name << "\n" + prefix;
-    else  cout << " |\n" + prefix + " !AYGUL!" << routinedeclaration->name << "\n" + prefix;
+    else cout << " |\n" + prefix + " !AYGUL!" << routinedeclaration->name << "\n" + prefix;
 
     if (!routinedeclaration->typeinroutinedeclaration && !routinedeclaration->bodyinroutinedeclaration)
         print_Parameters(routinedeclaration->parameters, 1);
@@ -216,6 +236,7 @@ void print_RoutineDeclaration(RoutineDeclaration *routinedeclaration, bool isLas
     print_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, 0);
     rem_from_prefix(6 + 18);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Parameters(Parameters *parameters, bool isLast) {
@@ -230,6 +251,7 @@ void print_Parameters(Parameters *parameters, bool isLast) {
     print_ParametersDeclaration(parameters->parametersdeclaration, 0);
     rem_from_prefix(6 + 10);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, bool isLast) {
@@ -239,13 +261,15 @@ void print_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, bool
     cout << "ParameterDeclaration";
 
     add_spaces_to_prefix(2 + 20);
-    if (!parameterdeclaration->type) cout << " |\n" + prefix + " !AUGUL!" << parameterdeclaration->name << "\n" +
-                                                                                                           prefix;
-    else  cout << " |\n" + prefix + " !AYGUL!" << parameterdeclaration->name << "\n" + prefix;
+    if (!parameterdeclaration->type)
+        cout << " |\n" + prefix + " !AUGUL!" << parameterdeclaration->name << "\n" +
+                                                                              prefix;
+    else cout << " |\n" + prefix + " !AYGUL!" << parameterdeclaration->name << "\n" + prefix;
 
     print_Type(parameterdeclaration->type, 0);
     rem_from_prefix(6 + 20);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, bool isLast) {
@@ -261,6 +285,7 @@ void print_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, b
     print_ParametersDeclaration(parametersdeclaration->parametersdeclaration, 0);
     rem_from_prefix(6 + 21);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration, bool isLast) {
@@ -273,6 +298,7 @@ void print_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedecla
     print_Type(typeinroutinedeclaration->type, 0);
     rem_from_prefix(6 + 24);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, bool isLast) {
@@ -285,6 +311,7 @@ void print_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedecla
     print_Body(bodyinroutinedeclaration->body, 0);
     rem_from_prefix(6 + 24);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Body(Body *body, bool isLast) {
@@ -301,6 +328,7 @@ void print_Body(Body *body, bool isLast) {
     print_Body(body->body, 0);
     rem_from_prefix(6 + 4);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Statement(Statement *statement, bool isLast) {
@@ -324,6 +352,7 @@ void print_Statement(Statement *statement, bool isLast) {
     print_IfStatement(statement->ifstatement, 0);
     rem_from_prefix(6 + 9);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Assignment(Assignment *assignment, bool isLast) {
@@ -338,6 +367,7 @@ void print_Assignment(Assignment *assignment, bool isLast) {
     print_Expression(assignment->expression, 0);
     rem_from_prefix(6 + 10);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_RoutineCall(RoutineCall *routinecall, bool isLast) {
@@ -347,13 +377,15 @@ void print_RoutineCall(RoutineCall *routinecall, bool isLast) {
     cout << "RoutineCall";
 
     add_spaces_to_prefix(2 + 11);
-    if (!routinecall->expressioninroutinecall) cout << " |\n" + prefix + " !AUGUL!" << routinecall->name << "\n" +
-                                                                                                            prefix;
-    else  cout << " |\n" + prefix + " !AYGUL!" << routinecall->name << "\n" + prefix;
+    if (!routinecall->expressioninroutinecall)
+        cout << " |\n" + prefix + " !AUGUL!" << routinecall->name << "\n" +
+                                                                     prefix;
+    else cout << " |\n" + prefix + " !AYGUL!" << routinecall->name << "\n" + prefix;
 
     print_ExpressionInRoutineCall(routinecall->expressioninroutinecall, 0);
     rem_from_prefix(6 + 11);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall, bool isLast) {
@@ -368,6 +400,7 @@ void print_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinec
     print_ExpressionsInRoutineCall(expressioninroutinecall->expressionsinroutinecall, 0);
     rem_from_prefix(6 + 23);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall, bool isLast) {
@@ -382,6 +415,7 @@ void print_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinrouti
     print_ExpressionInRoutineCall(expressionsinroutinecall->expressioninroutinecall, 0);
     rem_from_prefix(6 + 24);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_WhileLoop(WhileLoop *whileloop, bool isLast) {
@@ -396,6 +430,7 @@ void print_WhileLoop(WhileLoop *whileloop, bool isLast) {
     print_Body(whileloop->body, 0);
     rem_from_prefix(6 + 9);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_ForLoop(ForLoop *forloop, bool isLast) {
@@ -407,7 +442,7 @@ void print_ForLoop(ForLoop *forloop, bool isLast) {
     add_spaces_to_prefix(2 + 7);
     if (!forloop->reverse && !forloop->range && !forloop->body)
         cout << " |\n" + prefix + " !AUGUL!" << forloop->name << "\n" + prefix;
-    else  cout << " |\n" + prefix + " !AYGUL!" << forloop->name << "\n" + prefix;
+    else cout << " |\n" + prefix + " !AYGUL!" << forloop->name << "\n" + prefix;
 
     if (!forloop->range && !forloop->body) print_Reverse(forloop->reverse, 1);
     else print_Reverse(forloop->reverse, 0);
@@ -416,6 +451,7 @@ void print_ForLoop(ForLoop *forloop, bool isLast) {
     print_Body(forloop->body, 0);
     rem_from_prefix(6 + 7);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Range(Range *range, bool isLast) {
@@ -430,6 +466,7 @@ void print_Range(Range *range, bool isLast) {
     print_Expression(range->expression1, 0);
     rem_from_prefix(6 + 5);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Reverse(Reverse *reverse, bool isLast) {
@@ -443,6 +480,7 @@ void print_Reverse(Reverse *reverse, bool isLast) {
 
     rem_from_prefix(6 + 7);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_IfStatement(IfStatement *ifstatement, bool isLast) {
@@ -459,6 +497,7 @@ void print_IfStatement(IfStatement *ifstatement, bool isLast) {
     print_ElseInIfStatement(ifstatement->elseinifstatement, 0);
     rem_from_prefix(6 + 11);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_ElseInIfStatement(ElseInIfStatement *elseinifstatement, bool isLast) {
@@ -471,6 +510,7 @@ void print_ElseInIfStatement(ElseInIfStatement *elseinifstatement, bool isLast) 
     print_Body(elseinifstatement->body, 0);
     rem_from_prefix(6 + 17);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Expression(Expression *expression, bool isLast) {
@@ -485,6 +525,7 @@ void print_Expression(Expression *expression, bool isLast) {
     print_MultipleRelationsInExpression(expression->multiplerelationsinexpression, 0);
     rem_from_prefix(6 + 10);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression, bool isLast) {
@@ -504,6 +545,7 @@ void print_MultipleRelationsInExpression(MultipleRelationsInExpression *multiple
     print_MultipleRelationsInExpression(multiplerelationsinexpression->multiplerelationsinexpression, 0);
     rem_from_prefix(6 + 29);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_LogicalOperator(LogicalOperator *logicaloperator, bool isLast) {
@@ -517,6 +559,7 @@ void print_LogicalOperator(LogicalOperator *logicaloperator, bool isLast) {
 
     rem_from_prefix(6 + 15);
     cout << "\n" + prefix;
+    return;
 }
 
 void print_Relation(Relation *relation, bool isLast) {
@@ -526,6 +569,211 @@ void print_Relation(Relation *relation, bool isLast) {
     cout << "Relation";
 
     add_spaces_to_prefix(2 + 8);
+    if (!relation->comparisoninrelation) print_Simple(relation->simple, 1);
+    else print_Simple(relation->simple, 0);
+    print_ComparisonInRelation(relation->comparisoninrelation, 0);
+    rem_from_prefix(6 + 8);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_ComparisonInRelation(ComparisonInRelation *comparisoninrelation, bool isLast) {
+    if (!comparisoninrelation) return;
+    print_bars(isLast);
+
+    cout << "ComparisonInRelation";
+
+    add_spaces_to_prefix(2 + 20);
+    if (!comparisoninrelation->simple) print_ComparisonOperator(comparisoninrelation->comparisonoperator, 1);
+    else print_ComparisonOperator(comparisoninrelation->comparisonoperator, 0);
+    print_Simple(comparisoninrelation->simple, 0);
+    rem_from_prefix(6 + 20);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_ComparisonOperator(ComparisonOperator *comparisonoperator, bool isLast) {
+    if (!comparisonoperator) return;
+    print_bars(isLast);
+
+    cout << "ComparisonOperator";
+
+    add_spaces_to_prefix(2 + 18);
+    cout << " |\n" + prefix + " !AYGUL!" << comparisonoperator->op << "\n" + prefix;
+
+    rem_from_prefix(6 + 18);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Simple(Simple *simple, bool isLast) {
+    if (!simple) return;
+    print_bars(isLast);
+
+    cout << "Simple";
+
+    add_spaces_to_prefix(2 + 6);
+    if (!simple->factors) print_Factor(simple->factor, 1);
+    else print_Factor(simple->factor, 0);
+    print_Factors(simple->factors, 0);
+    rem_from_prefix(6 + 6);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Factors(Factors *factors, bool isLast) {
+    if (!factors) return;
+    print_bars(isLast);
+
+    cout << "Factors";
+
+    add_spaces_to_prefix(2 + 7);
+    if (!factors->factor && !factors->factors) print_SimpleOperator(factors->simpleOperator, 1);
+    else print_SimpleOperator(factors->simpleOperator, 0);
+    if (!factors->factors) print_Factor(factors->factor, 1);
+    else print_Factor(factors->factor, 0);
+    print_Factors(factors->factors, 0);
+    rem_from_prefix(6 + 7);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_SimpleOperator(SimpleOperator *simpleoperator, bool isLast) {
+    if (!simpleoperator) return;
+    print_bars(isLast);
+
+    cout << "SimpleOperator";
+
+    add_spaces_to_prefix(2 + 14);
+    cout << " |\n" + prefix + " !AYGUL!" << simpleoperator->op << "\n" + prefix;
+
+    rem_from_prefix(6 + 14);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Factor(Factor *factor, bool isLast) {
+    if (!factor) return;
+    print_bars(isLast);
+
+    cout << "Factor";
+
+    add_spaces_to_prefix(2 + 6);
+    if (!factor->summands) print_Summand(factor->summand, 1);
+    else print_Summand(factor->summand, 0);
+    print_Summands(factor->summands, 0);
+    rem_from_prefix(6 + 6);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Summands(Summands *summands, bool isLast) {
+    if (!summands) return;
+    print_bars(isLast);
+
+    cout << "Summands";
+
+    add_spaces_to_prefix(2 + 8);
+    if (!summands->summand && !summands->summands) print_Sign(summands->sign , 1);
+    else print_Sign(summands->sign , 0);
+    if (!summands->summands) print_Summand(summands->summand , 1);
+    else print_Summand(summands->summand , 0);
+    print_Summands(summands->summands , 0);
+    rem_from_prefix(6 + 8);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Summand(Summand *summand, bool isLast) {
+    if (!summand) return;
+    print_bars(isLast);
+
+    cout << "Summand";
+
+    add_spaces_to_prefix(2 + 7);
+    if (!summand->expression) print_Primary(summand->primary, 1);
+    else print_Primary(summand->primary, 0);
+    print_Expression(summand->expression, 0);
+    rem_from_prefix(6 + 7);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Primary(Primary *primary, bool isLast) {
+    if (!primary) return;
+    print_bars(isLast);
+
+    cout << "Primary";
+
+    add_spaces_to_prefix(2 + 7);
+    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix + " !AUGUL!" << primary->type <<
+    "\n" + prefix;
+    else  cout << " |\n" + prefix + " !AYGUL!" << primary->type << "\n" + prefix;
+
+    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix + " !AUGUL!" << primary->value <<
+    "\n" + prefix;
+    else  cout << " |\n" + prefix + " !AYGUL!" << primary->value << "\n" + prefix;
+
+    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix + " !AUGUL!" << primary->isNot <<
+    "\n" + prefix;
+    else  cout << " |\n" + prefix + " !AYGUL!" << primary->isNot << "\n" + prefix;
+
+    if (!primary->modifiablePrimary) print_Sign(primary->sign , 1);
+    else print_Sign(primary->sign , 0);
+    print_ModifiablePrimary(primary->modifiablePrimary , 0);
+    rem_from_prefix(6 + 7);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Sign(Sign *sign, bool isLast) {
+    if (!sign) return;
+    print_bars(isLast);
+
+    cout << "Sign";
+
+    add_spaces_to_prefix(2 + 4);
+    cout << " |\n" + prefix + " !AYGUL!" << sign->op << "\n" + prefix;
+
+    rem_from_prefix(6 + 4);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_ModifiablePrimary(ModifiablePrimary *modifiableprimary, bool isLast) {
+    if (!modifiableprimary) return;
+    print_bars(isLast);
+
+    cout << "ModifiablePrimary";
+
+    add_spaces_to_prefix(2 + 17);
+    if (!modifiableprimary->identifiers) cout << " |\n" + prefix + " !AUGUL!" << modifiableprimary->name << "\n" +
+                                                                                                               prefix;
+    else  cout << " |\n" + prefix + " !AYGUL!" << modifiableprimary->name << "\n" + prefix;
+
+    print_Identifiers(modifiableprimary->identifiers, 0);
+    rem_from_prefix(6 + 17);
+    cout << "\n" + prefix;
+    return;
+}
+
+void print_Identifiers(Identifiers *identifiers, bool isLast) {
+    if (!identifiers) return;
+    print_bars(isLast);
+
+    cout << "Identifiers";
+
+    add_spaces_to_prefix(2 + 11);
+    if (!identifiers->expression && !identifiers->identifiers)
+        cout << " |\n" + prefix + " !AUGUL!" << identifiers->name << "\n" + prefix;
+    else  cout << " |\n" + prefix + " !AYGUL!" << identifiers->name << "\n" + prefix;
+
+    if (!identifiers->identifiers) print_Expression(identifiers->expression, 1);
+    else print_Expression(identifiers->expression, 0);
+    print_Identifiers(identifiers->identifiers, 0);
+    rem_from_prefix(6 + 11);
+    cout << "\n" + prefix;
+    return;
 }
 
 

@@ -338,3 +338,4 @@ void print_Sign(Sign *sign, bool isLast);
 void print_ModifiablePrimary(ModifiablePrimary *modifiableprimary, bool isLast);
 void print_Identifiers(Identifiers *identifiers, bool isLast);
 
+//void to_str_Program(int number, struct Program* program);
