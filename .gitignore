@@ -32,6 +32,7 @@
 *.app
 
 *.idea
+.vscode
 
 yacc.cpp
 yacc.hpp

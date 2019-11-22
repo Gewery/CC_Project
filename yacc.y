@@ -1,9 +1,18 @@
 %{
     #include <stdio.h>
-    #include "AST.h"
     #include <string>
+    #include "AST.h"
+    #include "lexems.h"
+
     int yylex();
     void yyerror(const char *s);
+    extern char yytext[];
+    extern int column;
+    extern string yyextra_string;
+    extern float yyextra_float;
+    extern int yyextra_int;
+
+    // extern void print_Program(Program *program, bool isLast);
     Program *root;
 %}
 %union {
@@ -163,8 +172,8 @@ SimpleDeclaration
     ;
 
 VariableDeclaration
-    : VAR IDENTIFIER COLON Type InitialValue        { $$ = new VariableDeclaration($2, $4, $5, NULL); }
-    | VAR IDENTIFIER IS Expression                  { $$ = new VariableDeclaration($2, NULL, NULL, $4); }
+    : VAR IDENTIFIER COLON Type InitialValue        { $$ = new VariableDeclaration(yyextra_string, $4, $5, NULL); }
+    | VAR IDENTIFIER IS Expression                  { $$ = new VariableDeclaration(yyextra_string, NULL, NULL, $4); }
     ;
 
 InitialValue
@@ -173,14 +182,14 @@ InitialValue
     ;
 
 TypeDeclaration
-    : TYPE IDENTIFIER IS Type                       { $$ = new TypeDeclaration($2, $4); }
+    : TYPE IDENTIFIER IS Type                       { $$ = new TypeDeclaration(yyextra_string, $4); }
     ;
 
 Type
     : PrimitiveType                                 { $$ = new Type($1, NULL, NULL, NULL); }
     | ArrayType                                     { $$ = new Type(NULL, $1, NULL, NULL); }
     | RecordType                                    { $$ = new Type(NULL, NULL, $1, NULL); }
-    | IDENTIFIER                                    { $$ = new Type(NULL, NULL, NULL, $1); }
+    | IDENTIFIER                                    { $$ = new Type(NULL, NULL, NULL, yyextra_string); }
     ;
 
 PrimitiveType
@@ -203,7 +212,7 @@ VariableDeclarations
     ;
 
 RoutineDeclaration
-    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration   { $$ = new RoutineDeclaration($2, $3, $4, $5); }
+    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration   { $$ = new RoutineDeclaration(yyextra_string, $3, $4, $5); }
     ;
 
 Parameters
@@ -212,7 +221,7 @@ Parameters
     ;
 
 ParameterDeclaration
-    : IDENTIFIER COLON Type                                   { $$ = new ParameterDeclaration($1, $3); }
+    : IDENTIFIER COLON Type                                   { $$ = new ParameterDeclaration(yyextra_string, $3); }
     ;
 
 ParametersDeclaration
@@ -249,7 +258,7 @@ Assignment
     ;
 
 RoutineCall
-    : IDENTIFIER ExpressionInRoutineCall            { $$ = new RoutineCall($1, $2); }
+    : IDENTIFIER ExpressionInRoutineCall            { $$ = new RoutineCall(yyextra_string, $2); }
     ;
 
 ExpressionInRoutineCall
@@ -267,7 +276,7 @@ WhileLoop
     ;
 
 ForLoop
-    : FOR IDENTIFIER IN Reverse Range LOOP Body END { $$ = new ForLoop($2, $4, $5, $7); }
+    : FOR IDENTIFIER IN Reverse Range LOOP Body END { $$ = new ForLoop(yyextra_string, $4, $5, $7); }
     ;
 
 Range
@@ -298,9 +307,9 @@ MultipleRelationsInExpression
     ;
 
 LogicalOperator
-    : AND                                           { $$ = new LogicalOperator("and"); }
-    | OR                                            { $$ = new LogicalOperator("or"); }
-    | XOR                                           { $$ = new LogicalOperator("xor"); }
+    : AND                                           { $$ = new LogicalOperator(Lexems::Operators::AND); }
+    | OR                                            { $$ = new LogicalOperator(Lexems::Operators::OR); }
+    | XOR                                           { $$ = new LogicalOperator(Lexems::Operators::XOR); }
     ;
 
 Relation
@@ -313,12 +322,12 @@ ComparisonInRelation
     ;
 
 ComparisonOperator
-    : LESS                                           { $$ = new ComparisonOperator($1); }
-    | LESS_EQ                                        { $$ = new ComparisonOperator($1); }
-    | GREATER                                        { $$ = new ComparisonOperator($1); }
-    | GREATER_EQ                                     { $$ = new ComparisonOperator($1); }
-    | EQ                                             { $$ = new ComparisonOperator($1); }
-    | NOT_EQ                                         { $$ = new ComparisonOperator($1); }
+    : LESS                                           { $$ = new ComparisonOperator(Lexems::Operators::LESS); }
+    | LESS_EQ                                        { $$ = new ComparisonOperator(Lexems::Operators::LESS_EQ); }
+    | GREATER                                        { $$ = new ComparisonOperator(Lexems::Operators::GREATER); }
+    | GREATER_EQ                                     { $$ = new ComparisonOperator(Lexems::Operators::GREATER_EQ); }
+    | EQ                                             { $$ = new ComparisonOperator(Lexems::Operators::EQ); }
+    | NOT_EQ                                         { $$ = new ComparisonOperator(Lexems::Operators::NOT_EQ); }
     ;
 
 Simple
@@ -331,9 +340,9 @@ Factors
     ;
 
 SimpleOperator
-    : MULT                                           { $$ = new SimpleOperator("*"); }
-    | DIV                                            { $$ = new SimpleOperator("/"); }
-    | REMAINDER                                      { $$ = new SimpleOperator("%"); }
+    : MULT                                           { $$ = new SimpleOperator(Lexems::Operators::MULT); }
+    | DIV                                            { $$ = new SimpleOperator(Lexems::Operators::DIV); }
+    | REMAINDER                                      { $$ = new SimpleOperator(Lexems::Operators::REMAINDER); }
     ;
 
 Factor
@@ -352,40 +361,32 @@ Summand
 
 
 Primary
-    : INTEGER_LITERAL                               { $$ = new Primary("int", $1, false, NULL,  NULL); }
-    | Sign INTEGER_LITERAL                          { $$ = new Primary("int", $2, false, $1, NULL); }
-    | NOT INTEGER_LITERAL                           { $$ = new Primary("int", $2, true, NULL, NULL); }
-    | REAL_LITERAL                                  { $$ = new Primary("real", $1, false, NULL, NULL); }
-    | Sign REAL_LITERAL                             { $$ = new Primary("real", $2, false, NULL, NULL); }
-    | TRUE                                          { $$ = new Primary("bool", $1, false, NULL, NULL); }
-    | FALSE                                         { $$ = new Primary("bool", $1, false, NULL, NULL); }
+    : INTEGER_LITERAL                               { $$ = new Primary(Lexems::Keywords::INTEGER, (float)yyextra_int, false, NULL,  NULL); }
+    | Sign INTEGER_LITERAL                          { $$ = new Primary(Lexems::Keywords::INTEGER, (float)yyextra_int, false, $1, NULL); }
+    | NOT INTEGER_LITERAL                           { $$ = new Primary(Lexems::Keywords::INTEGER, (float)yyextra_int, true, NULL, NULL); }
+    | REAL_LITERAL                                  { $$ = new Primary(Lexems::Keywords::REAL, yyextra_float, false, NULL, NULL); }
+    | Sign REAL_LITERAL                             { $$ = new Primary(Lexems::Keywords::REAL, yyextra_float, false, $1, NULL); }
+    | TRUE                                          { $$ = new Primary(Lexems::Keywords::BOOLEAN, (float)true, false, NULL, NULL); }
+    | FALSE                                         { $$ = new Primary(Lexems::Keywords::BOOLEAN, (float)false, false, NULL, NULL); }
     | ModifiablePrimary                             { $$ = new Primary("", 0, false, NULL, $1); }
     ;
 
 Sign
-    : PLUS                                           { $$ = new Sign("+"); }
-    | MINUS                                          { $$ = new Sign("-"); }
+    : PLUS                                           { $$ = new Sign(Lexems::Operators::PLUS); }
+    | MINUS                                          { $$ = new Sign(Lexems::Operators::MINUS); }
     ;
 
 ModifiablePrimary
-    : IDENTIFIER Identifiers                         { $$ = new ModifiablePrimary($1, $2); }
+    : IDENTIFIER Identifiers                         { $$ = new ModifiablePrimary(yyextra_string, $2); }
     ;
 
 Identifiers
-    : DOT IDENTIFIER Identifiers                     { $$ = new Identifiers($2, NULL, $3); }
+    : DOT IDENTIFIER Identifiers                     { $$ = new Identifiers(yyextra_string, NULL, $3); }
     | BRACKETS_L Expression BRACKETS_R Identifiers   { $$ = new Identifiers(NULL, $2, $4); }
     |                                                { $$ = new Identifiers(NULL, NULL, NULL); }
     ;
 
 %%
-
-//subroutines
-
-#include <stdio.h>
-
-//extern void print_Program(Program *program, bool isLast);
-extern char yytext[];
-extern int column;
 
 int main(int argc, char **argv){
     yyparse();
@@ -394,6 +395,6 @@ int main(int argc, char **argv){
 }
 
 void yyerror(char const *s){
-	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
+    fflush(stdout);
+    printf("\n%*s\n%*s\n", column, "^", column, s);
 }
