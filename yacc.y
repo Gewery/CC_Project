@@ -147,7 +147,7 @@
 
 Program
     : Declaration DECLARATION_SEPARATOR Program     { $$ = new Program($1, $3); root = $$; }
-    | DECLARATION_SEPARATOR Program                 { $$ = $2; }
+    | DECLARATION_SEPARATOR Program                 { $$ = $2; root = $$; }
     | Declaration                                   { $$ = new Program($1, NULL); root = $$; }
     |                                               { $$ = new Program(NULL, NULL); root = $$; }
     ;
@@ -382,6 +382,7 @@ Identifiers
 //subroutines
 
 #include <stdio.h>
+#include "AST.h"
 
 extern char yytext[];
 extern int column;
