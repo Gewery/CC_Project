@@ -27,25 +27,3 @@ struct Function {
         arguments = arguments_of_func;
     }
 };
-
-
-
-int main() {
-    unordered_map<string, Variable* > variables;
-    unordered_map<string, Function* > functions;
-    Variable *v1 = new Variable("int", 0, 5);
-    vector<Variable*> vect;
-    vect.push_back(v1);
-    Function *f1 = new Function("bool", 1, 1, vect);
-
-    variables["a"] = v1;
-    functions["main"] = f1;
-    for (auto x : variables)
-        cout << x.first << " " << x.second->type << endl;
-
-    for (auto x : functions)
-        cout << x.first << " " << x.second->arguments[0]->scope << endl;
-}
-
-
-

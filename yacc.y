@@ -389,7 +389,11 @@ Identifiers
 %%
 
 int main(int argc, char **argv){
+    cout << "Lexical Analyzer!\n";
+    cout << "======###========\n\n";
     yyparse();
+    cout << "\n\nAST\n";
+    cout << "======###========\n\n";
     print_Program(root, 1);
     return 0;
 }

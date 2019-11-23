@@ -4,11 +4,18 @@
 #include <string>
 #include <vector>
 #include <iostream>
+
+#include <math.h>
+#include <bits/stdc++.h>
 #include "AST.h"
+#include "SymbolTable.h"
+
 
 using namespace std;
 
 string prefix;
+unordered_map<string, Variable* > variables;
+unordered_map<string, Function* > functions;
 
 void add_spaces_to_prefix(int a) {
     for (int i = 0; i < a; i++, prefix += ' ');
@@ -40,7 +47,6 @@ void print_Program(Program *program, bool isLast) {
     if (!program) return;
     print_bars(isLast);
     cout << "Program";
-
     add_spaces_to_prefix(2 + 7);
     if (!program->program) print_Declaration(program->declaration, 1);
     else print_Declaration(program->declaration, 0);
@@ -87,8 +93,8 @@ void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool is
     cout << "VariableDeclaration";
 
     add_spaces_to_prefix(2 + 19);
+    check_variabledeclaration(variabledeclaration);
     cout << " |\n" + prefix  << variabledeclaration->name << "\n" + prefix;
-
     if (!variabledeclaration->initialvalue && !variabledeclaration->expression)
         print_Type(variabledeclaration->type, 1);
     else print_Type(variabledeclaration->type, 0);
@@ -755,6 +761,109 @@ void print_Identifiers(Identifiers *identifiers, bool isLast) {
     cout << "\n" + prefix;
     return;
 }
+
+
+auto check_primary(Primary *primary) {
+    string type;
+    float value;
+    bool isNot;
+    string sign;
+    struct result_with_sign {string type;  float value; bool isNot; string sign;};
+    if (!(primary->type).empty()) {
+        if (primary->sign) {
+            return result_with_sign {primary->type, primary->value, primary->isNot, primary->sign->op};
+        }
+        else {
+            return result_with_sign {primary->type, primary->value, primary->isNot, ""};
+        }
+    }
+    else {
+    }
+}
+
+auto check_summand(Summand *summand) {
+    if (summand->expression) {
+
+    }
+    else if (summand->primary) {
+        return check_primary(summand->primary);
+    }
+}
+
+auto check_factor(Factor *factor) {
+    if (factor->summand) {
+        return check_summand(factor->summand);
+    }
+    if (factor->summands) {
+
+    }
+}
+
+auto check_simple(Simple *simple) {
+    if (simple->factor) {
+        return check_factor(simple->factor);
+    }
+    if (simple->factors) {
+
+    }
+}
+
+
+auto check_relation(Relation *relation) {
+    if (relation->simple) {
+        return check_simple(relation->simple);
+    }
+    if (relation->comparisoninrelation) {
+
+    }
+}
+
+auto check_expression(Expression *expression) {
+    if (expression->relation) {
+        return check_relation(expression->relation);
+    }
+    if (expression->multiplerelationsinexpression) {
+
+    }
+}
+
+void check_variabledeclaration(VariableDeclaration *variabledeclaration) {
+    // getting type of var
+    string user_type;
+    float user_value = INFINITY;
+    if (variabledeclaration->type->arraytype) {
+
+    }
+    else if (variabledeclaration->type->primitivetype) {
+
+    }
+    else if (variabledeclaration->type->recordtype) {
+
+    }
+    else if (!(variabledeclaration->type->name).empty()) {
+        user_type = variabledeclaration->type->name;
+        transform(user_type.begin(), user_type.end(), user_type.begin(), ::tolower);
+
+    }
+    // getting initial value
+    if (variabledeclaration->initialvalue->expression) {
+        auto result = check_expression(variabledeclaration->initialvalue->expression);
+        if (result.type.compare(user_type) == 0) {
+            Variable *v1 = new Variable(result.type, 0, result.value);
+            cout << result.type << result.value;
+            vector<Variable*> vect;
+            vect.push_back(v1);
+            variables[result.type] = v1;
+        }
+        else {
+            cout << "\n\nType error!\n";
+            exit(0);
+        }
+    }
+
+
+}
+
 
 
 #endif //CC_PROJECT_AST_H

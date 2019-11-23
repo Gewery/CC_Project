@@ -1,1 +1,3 @@
-var VAR1 is 1 <= 2
+var a : Integer is 5
+var b: Boolean is true
+var c: Real is 3.0
