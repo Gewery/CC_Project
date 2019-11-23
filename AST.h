@@ -24,7 +24,7 @@ struct Declaration {
 struct SimpleDeclaration {
     struct VariableDeclaration *variabledeclaration;
     struct TypeDeclaration *typedeclaration;
-    SimpleDeclaration(VariableDeclaration *variabledeclaration, TypeDeclaration *typedeclaration):
+    SimpleDeclaration(VariableDeclaration *variabledeclaration, TypeDeclaration *typedeclaration) :
             variabledeclaration(variabledeclaration),
             typedeclaration(typedeclaration) {};
 };

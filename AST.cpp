@@ -25,6 +25,14 @@ void rem_from_prefix(int a) {
     for (int i = 0; i < a; i++, prefix.pop_back());
 }
 
+void add_to_symbol_table(auto result) {
+    Variable *v1 = new Variable(result.type, 0, result.value);
+    cout << result.type << result.value;
+    vector<Variable*> vect;
+    vect.push_back(v1);
+    variables[result.type] = v1;
+}
+
 void print_bars(bool isLast) {
     cout << " |" << "\n";
     if (isLast) cout << prefix + " └──";
@@ -74,7 +82,6 @@ void print_Declaration(Declaration *declaration, bool isLast) {
 void print_SimpleDeclaration(SimpleDeclaration *simpledeclaration, bool isLast) {
     if (!simpledeclaration) return;
     print_bars(isLast);
-
     cout << "SimpleDeclaration";
 
     add_spaces_to_prefix(2 + 17);
@@ -88,6 +95,7 @@ void print_SimpleDeclaration(SimpleDeclaration *simpledeclaration, bool isLast) 
 
 void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool isLast) {
     if (!variabledeclaration) return;
+
     print_bars(isLast);
 
     cout << "VariableDeclaration";
@@ -827,33 +835,45 @@ auto check_expression(Expression *expression) {
     }
 }
 
+string check_type(Type *type) {
+    string user_type;
+    if (type->arraytype) {
+
+    }
+    else if (type->primitivetype) {
+
+    }
+    else if (type->recordtype) {
+
+    }
+    else if (!(type->name).empty()) {
+        user_type = type->name;
+        transform(user_type.begin(), user_type.end(), user_type.begin(), ::tolower);
+        return user_type;
+    }
+}
+
 void check_variabledeclaration(VariableDeclaration *variabledeclaration) {
     // getting type of var
     string user_type;
     float user_value = INFINITY;
-    if (variabledeclaration->type->arraytype) {
-
+    cout << "123!!!";
+    if (variabledeclaration->type) {
+        user_type = check_type(variabledeclaration->type);
     }
-    else if (variabledeclaration->type->primitivetype) {
+    cout << "123!!!";
 
-    }
-    else if (variabledeclaration->type->recordtype) {
-
-    }
-    else if (!(variabledeclaration->type->name).empty()) {
-        user_type = variabledeclaration->type->name;
-        transform(user_type.begin(), user_type.end(), user_type.begin(), ::tolower);
-
-    }
     // getting initial value
     if (variabledeclaration->initialvalue->expression) {
         auto result = check_expression(variabledeclaration->initialvalue->expression);
         if (result.type.compare(user_type) == 0) {
-            Variable *v1 = new Variable(result.type, 0, result.value);
-            cout << result.type << result.value;
-            vector<Variable*> vect;
-            vect.push_back(v1);
-            variables[result.type] = v1;
+            add_to_symbol_table(result);
+        }
+        else if (result.type.compare("integer") == 0 && user_type.compare("real") == 0 ) {
+            add_to_symbol_table(result);
+        }
+        else if (result.type.compare("integer") == 0 && user_type.compare("boolean") == 0 ) {
+            add_to_symbol_table(result);
         }
         else {
             cout << "\n\nType error!\n";

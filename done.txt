@@ -1,0 +1,6 @@
+var a : Integer is 5
+var b: Boolean is true
+var c: Real is 3.0
+
+var a : Real is 4
+var b: Boolean is 0
