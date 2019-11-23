@@ -690,15 +690,15 @@ void print_Primary(Primary *primary, bool isLast) {
     cout << "Primary";
 
     add_spaces_to_prefix(2 + 7);
-    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix + " !AUGUL!" << primary->type <<
+    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix << primary->type <<
     "\n" + prefix;
     else  cout << " |\n" + prefix << primary->type << "\n" + prefix;
 
-    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix + " !AUGUL!" << primary->value <<
+    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix << primary->value <<
     "\n" + prefix;
     else  cout << " |\n" + prefix  << primary->value << "\n" + prefix;
 
-    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix + " !AUGUL!" << primary->isNot <<
+    if (!primary->sign && !primary->modifiablePrimary) cout << " |\n" + prefix << primary->isNot <<
     "\n" + prefix;
     else  cout << " |\n" + prefix << primary->isNot << "\n" + prefix;
 
