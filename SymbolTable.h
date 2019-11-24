@@ -1,6 +1,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+
+#include "AST.h"
 using namespace std;
 
 
@@ -27,3 +29,14 @@ struct Function {
         arguments = arguments_of_func;
     }
 };
+
+void check_variabledeclaration(VariableDeclaration *variabledeclaration);
+auto check_expression(Expression *expression);
+auto check_relation(Relation *relation);
+auto check_simple(Simple *simple);
+auto check_factor(Factor *factor);
+auto check_summand(Summand *summand);
+string check_type(Type *type);
+auto check_primary(Primary *primary);
+string check_modifiable_primary(ModifiablePrimary *modifiablePrimary);
+void check_assignment(Assignment *assignment);
