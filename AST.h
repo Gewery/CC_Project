@@ -444,5 +444,6 @@ auto check_relation(Relation *relation);
 auto check_simple(Simple *simple);
 auto check_factor(Factor *factor);
 auto check_summand(Summand *summand);
+string check_type(Type *type);
 auto check_primary(Primary *primary);
 //void to_str_Program(int number, struct Program* program);

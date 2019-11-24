@@ -1,1 +1,5 @@
-var a is 5
+var abc : Integer
+var ab : Integer
+
+var b: Boolean
+var c: Real

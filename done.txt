@@ -4,3 +4,9 @@ var c: Real is 3.0
 
 var a : Real is 4
 var b: Boolean is 0
+
+var ab : Integer
+
+var b: Boolean
+var c: Real
+

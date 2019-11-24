@@ -21,16 +21,19 @@ void add_spaces_to_prefix(int a) {
     for (int i = 0; i < a; i++, prefix += ' ');
 }
 
+bool isEqual(string str1, string str2) {
+    return str1.compare(str2) == 0;
+}
+
 void rem_from_prefix(int a) {
     for (int i = 0; i < a; i++, prefix.pop_back());
 }
 
-void add_to_symbol_table(auto result) {
+void add_to_symbol_table(string name, auto result) {
     Variable *v1 = new Variable(result.type, 0, result.value);
-    cout << result.type << result.value;
     vector<Variable*> vect;
     vect.push_back(v1);
-    variables[result.type] = v1;
+    variables[name] = v1;
 }
 
 void print_bars(bool isLast) {
@@ -61,6 +64,9 @@ void print_Program(Program *program, bool isLast) {
     print_Program(program->program, 0);
     rem_from_prefix(6 + 7);
     cout << "\n" + prefix;
+
+    for (auto x : variables)
+        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
     return;
 }
 
@@ -854,34 +860,54 @@ string check_type(Type *type) {
 }
 
 void check_variabledeclaration(VariableDeclaration *variabledeclaration) {
-    // getting type of var
+    // firstly, checking whether variable was already declared
+    for (auto x : variables) {
+        if (isEqual(x.first, variabledeclaration->name)) {
+            cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
+            exit(0);
+        }
+    }
+
     string user_type;
     float user_value = INFINITY;
-    cout << "123!!!";
+
+    //getting var type
     if (variabledeclaration->type) {
         user_type = check_type(variabledeclaration->type);
     }
-    cout << "123!!!";
+    else {
+        // type is setting by the value of expression
+    }
 
     // getting initial value
     if (variabledeclaration->initialvalue->expression) {
         auto result = check_expression(variabledeclaration->initialvalue->expression);
-        if (result.type.compare(user_type) == 0) {
-            add_to_symbol_table(result);
+        if (isEqual(result.type, user_type)) {
+            add_to_symbol_table(variabledeclaration->name, result);
         }
-        else if (result.type.compare("integer") == 0 && user_type.compare("real") == 0 ) {
-            add_to_symbol_table(result);
+        else if (isEqual(result.type, "integer") == 0 && isEqual(user_type, "real") == 0 ) {
+            add_to_symbol_table(variabledeclaration->name, result);
         }
-        else if (result.type.compare("integer") == 0 && user_type.compare("boolean") == 0 ) {
-            add_to_symbol_table(result);
+        else if (isEqual(result.type, "integer") == 0 && isEqual(user_type,"boolean") == 0 ) {
+            add_to_symbol_table(variabledeclaration->name, result);
         }
         else {
             cout << "\n\nType error!\n";
             exit(0);
         }
     }
-
-
+    // case of initialization without initial value
+    else {
+        struct result_with_sign {string type;  float value; bool isNot; string sign;};
+        // initial value for bool is false
+        if (isEqual(user_type, "boolean")) {
+            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""});
+        }
+        //initial value for float and int is INF
+        else {
+            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""});
+        }
+    }
 }
 
 
