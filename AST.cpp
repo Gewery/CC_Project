@@ -43,6 +43,7 @@ void print_margine(int number) {
 
 void print_Program(Program *program, bool isLast) {
     if (!program) return;
+    check_Program(program);
     print_bars(isLast);
     cout << "Program";
     add_spaces_to_prefix(2 + 7);
@@ -51,9 +52,6 @@ void print_Program(Program *program, bool isLast) {
     print_Program(program->program, 0);
     rem_from_prefix(6 + 7);
     cout << "\n" + prefix;
-
-//    for (auto x : variables)
-//        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
     return;
 }
 
@@ -87,13 +85,13 @@ void print_SimpleDeclaration(SimpleDeclaration *simpledeclaration, bool isLast) 
 }
 
 void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool isLast) {
-    if (!variabledeclaration) return;
+    if (!variabledeclaration) return;;
     print_bars(isLast);
 
     cout << "VariableDeclaration";
 
     add_spaces_to_prefix(2 + 19);
-    check_VariableDeclaration(variabledeclaration);
+//    check_VariableDeclaration(variabledeclaration);
     cout << " |\n" + prefix  << variabledeclaration->name << "\n" + prefix;
     if (!variabledeclaration->initialvalue && !variabledeclaration->expression)
         print_Type(variabledeclaration->type, 1);
@@ -355,7 +353,7 @@ void print_Assignment(Assignment *assignment, bool isLast) {
     print_bars(isLast);
 
     cout << "Assignment";
-    check_assignment(assignment);
+//    check_assignment(assignment);
     add_spaces_to_prefix(2 + 10);
     if (!assignment->expression) print_ModifiablePrimary(assignment->modifiableprimary, 1);
     else print_ModifiablePrimary(assignment->modifiableprimary, 0);

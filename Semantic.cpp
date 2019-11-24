@@ -179,7 +179,7 @@ string check_modifiable_primary(ModifiablePrimary *modifiablePrimary) {
     }
 }
 
-void check_assignment(Assignment *assignment) {
+void check_Assignment(Assignment *assignment) {
     string name;
     if (assignment->modifiableprimary) {
         name = check_modifiable_primary(assignment->modifiableprimary);
@@ -221,4 +221,6 @@ void check_Program(Program *program) {
     if (program->program) {
         check_Program(program->program);
     }
+    for (auto x : variables)
+        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 }
