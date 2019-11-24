@@ -382,8 +382,8 @@ ModifiablePrimary
 
 Identifiers
     : DOT IDENTIFIER Identifiers                     { $$ = new Identifiers(yyextra_string, NULL, $3); }
-    | BRACKETS_L Expression BRACKETS_R Identifiers   { $$ = new Identifiers(NULL, $2, $4); }
-    |                                                { $$ = new Identifiers(NULL, NULL, NULL); }
+    | BRACKETS_L Expression BRACKETS_R Identifiers   { $$ = new Identifiers("", $2, $4); }
+    |                                                { $$ = new Identifiers("", NULL, NULL); }
     ;
 
 %%

@@ -446,4 +446,7 @@ auto check_factor(Factor *factor);
 auto check_summand(Summand *summand);
 string check_type(Type *type);
 auto check_primary(Primary *primary);
+string check_modifiable_primary(ModifiablePrimary *modifiablePrimary);
+void check_assignment(Assignment *assignment);
+
 //void to_str_Program(int number, struct Program* program);

@@ -1,5 +1,1 @@
-var abc : Integer
-var ab : Integer
-
-var b: Boolean
-var c: Real
+var b : Boolean is 1

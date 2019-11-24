@@ -2,11 +2,15 @@ var a : Integer is 5
 var b: Boolean is true
 var c: Real is 3.0
 
-var a : Real is 4
-var b: Boolean is 0
 
-var ab : Integer
+var d : Real is 4
+var e: Boolean is 0
 
-var b: Boolean
-var c: Real
+var f : Integer
+var g: Boolean
+var i: Real
+
+// 1) checking if the var b is declared or not
+// 2) updating var value
+routine main is if true then b := 1 end end
 

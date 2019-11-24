@@ -30,10 +30,23 @@ void rem_from_prefix(int a) {
 }
 
 void add_to_symbol_table(string name, auto result) {
-    Variable *v1 = new Variable(result.type, 0, result.value);
+    float value = result.value;
+//    if (isEqual(result.sign, "-")) {
+//        value =  -1 * value;
+//    }
+    Variable *v1 = new Variable(result.type, 0, value);
     vector<Variable*> vect;
     vect.push_back(v1);
     variables[name] = v1;
+}
+
+bool is_record_in_table(string name) {
+    for (auto x : variables) {
+        if (isEqual(x.first, name)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void print_bars(bool isLast) {
@@ -101,7 +114,6 @@ void print_SimpleDeclaration(SimpleDeclaration *simpledeclaration, bool isLast) 
 
 void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool isLast) {
     if (!variabledeclaration) return;
-
     print_bars(isLast);
 
     cout << "VariableDeclaration";
@@ -369,7 +381,7 @@ void print_Assignment(Assignment *assignment, bool isLast) {
     print_bars(isLast);
 
     cout << "Assignment";
-
+    check_assignment(assignment);
     add_spaces_to_prefix(2 + 10);
     if (!assignment->expression) print_ModifiablePrimary(assignment->modifiableprimary, 1);
     else print_ModifiablePrimary(assignment->modifiableprimary, 0);
@@ -776,7 +788,7 @@ void print_Identifiers(Identifiers *identifiers, bool isLast) {
     return;
 }
 
-
+//TODO peredelat' na calculator no ostavit' structuru!!!
 auto check_primary(Primary *primary) {
     string type;
     float value;
@@ -794,7 +806,7 @@ auto check_primary(Primary *primary) {
     else {
     }
 }
-
+//TODO peredelat' na calculator!!!
 auto check_summand(Summand *summand) {
     if (summand->expression) {
 
@@ -803,7 +815,7 @@ auto check_summand(Summand *summand) {
         return check_primary(summand->primary);
     }
 }
-
+//TODO peredelat' na calculator!!!
 auto check_factor(Factor *factor) {
     if (factor->summand) {
         return check_summand(factor->summand);
@@ -812,7 +824,7 @@ auto check_factor(Factor *factor) {
 
     }
 }
-
+//TODO peredelat' na calculator!!!
 auto check_simple(Simple *simple) {
     if (simple->factor) {
         return check_factor(simple->factor);
@@ -822,7 +834,7 @@ auto check_simple(Simple *simple) {
     }
 }
 
-
+//TODO peredelat' na calculator!!!
 auto check_relation(Relation *relation) {
     if (relation->simple) {
         return check_simple(relation->simple);
@@ -832,6 +844,7 @@ auto check_relation(Relation *relation) {
     }
 }
 
+//TODO peredelat' na calculator!!!
 auto check_expression(Expression *expression) {
     if (expression->relation) {
         return check_relation(expression->relation);
@@ -860,6 +873,7 @@ string check_type(Type *type) {
 }
 
 void check_variabledeclaration(VariableDeclaration *variabledeclaration) {
+    cout << "YA TUT!";
     // firstly, checking whether variable was already declared
     for (auto x : variables) {
         if (isEqual(x.first, variabledeclaration->name)) {
@@ -885,10 +899,10 @@ void check_variabledeclaration(VariableDeclaration *variabledeclaration) {
         if (isEqual(result.type, user_type)) {
             add_to_symbol_table(variabledeclaration->name, result);
         }
-        else if (isEqual(result.type, "integer") == 0 && isEqual(user_type, "real") == 0 ) {
+        else if (isEqual(result.type, "integer") && isEqual(user_type, "real")) {
             add_to_symbol_table(variabledeclaration->name, result);
         }
-        else if (isEqual(result.type, "integer") == 0 && isEqual(user_type,"boolean") == 0 ) {
+        else if (isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)) {
             add_to_symbol_table(variabledeclaration->name, result);
         }
         else {
@@ -907,6 +921,32 @@ void check_variabledeclaration(VariableDeclaration *variabledeclaration) {
         else {
             add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""});
         }
+    }
+}
+
+string check_modifiable_primary(ModifiablePrimary *modifiablePrimary) {
+    if (!(modifiablePrimary->name).empty()) {
+        return modifiablePrimary->name;
+    }
+    if (modifiablePrimary->identifiers) {
+        //check identifiers
+    }
+}
+
+void check_assignment(Assignment *assignment) {
+    string name;
+    if (assignment->modifiableprimary) {
+        name = check_modifiable_primary(assignment->modifiableprimary);
+    }
+    if (assignment->expression) {
+        auto result = check_expression(assignment->expression);
+        add_to_symbol_table(name, result);
+    }
+
+    // check if modifiable primary was already declared or not
+    if (!is_record_in_table(name)){
+        cout << "\n\nVariable " << name << " was not declared!\n";
+        exit(0);
     }
 }
 
