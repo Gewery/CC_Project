@@ -93,7 +93,7 @@ void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool is
     cout << "VariableDeclaration";
 
     add_spaces_to_prefix(2 + 19);
-    check_variabledeclaration(variabledeclaration);
+    check_VariableDeclaration(variabledeclaration);
     cout << " |\n" + prefix  << variabledeclaration->name << "\n" + prefix;
     if (!variabledeclaration->initialvalue && !variabledeclaration->expression)
         print_Type(variabledeclaration->type, 1);

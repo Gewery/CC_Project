@@ -120,14 +120,12 @@ string check_type(Type *type) {
     }
 }
 
-void check_variabledeclaration(VariableDeclaration *variabledeclaration) {
+void check_VariableDeclaration(VariableDeclaration *variabledeclaration) {
     cout << "YA TUT!";
     // firstly, checking whether variable was already declared
-    for (auto x : variables) {
-        if (isEqual(x.first, variabledeclaration->name)) {
-            cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
-            exit(0);
-        }
+    if (is_record_in_table(variabledeclaration->name)) {
+        cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
+        exit(0);
     }
 
     string user_type;
@@ -198,4 +196,29 @@ void check_assignment(Assignment *assignment) {
     }
 }
 
+void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration) {
+    if (simpleDeclaration->variabledeclaration) {
+        check_VariableDeclaration(simpleDeclaration->variabledeclaration);
+    }
+    if (simpleDeclaration->typedeclaration) {
+//        check_TypeDeclaration(simpleDeclaration->typedeclaration)
+    }
+}
 
+void check_Declaration(Declaration *declaration) {
+    if (declaration->simpledeclaration) {
+        check_SimpleDeclaration(declaration->simpledeclaration);
+    }
+    if (declaration->routinedeclaration){
+//        check_RoutineDeclaration(declaration->routinedeclaration);
+    }
+}
+
+void check_Program(Program *program) {
+    if (program->declaration) {
+        check_Declaration(program->declaration);
+    }
+    if (program->program) {
+        check_Program(program->program);
+    }
+}

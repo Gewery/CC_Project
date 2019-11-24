@@ -2,7 +2,9 @@
 #include <vector>
 #include <iostream>
 
+
 using namespace std;
+
 
 struct Program {
     struct Declaration *declaration;

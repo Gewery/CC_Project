@@ -1,1 +1,1 @@
-var b : Boolean is 1
+var b is 1
