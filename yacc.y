@@ -8,9 +8,9 @@
     void yyerror(const char *s);
     extern char yytext[];
     extern int column;
-    extern string yyextra_string;
-    extern float yyextra_float;
-    extern int yyextra_int;
+    extern string get_yyextra_string();
+    extern float get_yyextra_float();
+    extern int get_yyextra_int();
 
     // extern void print_Program(Program *program, bool isLast);
     Program *root;
@@ -172,8 +172,8 @@ SimpleDeclaration
     ;
 
 VariableDeclaration
-    : VAR IDENTIFIER COLON Type InitialValue        { $$ = new VariableDeclaration(yyextra_string, $4, $5, NULL); }
-    | VAR IDENTIFIER IS Expression                  { $$ = new VariableDeclaration(yyextra_string, NULL, NULL, $4); }
+    : VAR IDENTIFIER COLON Type InitialValue        { $$ = new VariableDeclaration(get_yyextra_string(), $4, $5, NULL); }
+    | VAR IDENTIFIER IS Expression                  { $$ = new VariableDeclaration(get_yyextra_string(), NULL, NULL, $4); }
     ;
 
 InitialValue
@@ -182,14 +182,14 @@ InitialValue
     ;
 
 TypeDeclaration
-    : TYPE IDENTIFIER IS Type                       { $$ = new TypeDeclaration(yyextra_string, $4); }
+    : TYPE IDENTIFIER IS Type                       { $$ = new TypeDeclaration(get_yyextra_string(), $4); }
     ;
 
 Type
     : PrimitiveType                                 { $$ = new Type($1, NULL, NULL, NULL); }
     | ArrayType                                     { $$ = new Type(NULL, $1, NULL, NULL); }
     | RecordType                                    { $$ = new Type(NULL, NULL, $1, NULL); }
-    | IDENTIFIER                                    { $$ = new Type(NULL, NULL, NULL, yyextra_string); }
+    | IDENTIFIER                                    { $$ = new Type(NULL, NULL, NULL, get_yyextra_string()); }
     ;
 
 PrimitiveType
@@ -212,7 +212,7 @@ VariableDeclarations
     ;
 
 RoutineDeclaration
-    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration   { $$ = new RoutineDeclaration(yyextra_string, $3, $4, $5); }
+    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration   { $$ = new RoutineDeclaration(get_yyextra_string(), $3, $4, $5); }
     ;
 
 Parameters
@@ -221,7 +221,7 @@ Parameters
     ;
 
 ParameterDeclaration
-    : IDENTIFIER COLON Type                                   { $$ = new ParameterDeclaration(yyextra_string, $3); }
+    : IDENTIFIER COLON Type                                   { $$ = new ParameterDeclaration(get_yyextra_string(), $3); }
     ;
 
 ParametersDeclaration
@@ -258,7 +258,7 @@ Assignment
     ;
 
 RoutineCall
-    : IDENTIFIER ExpressionInRoutineCall            { $$ = new RoutineCall(yyextra_string, $2); }
+    : IDENTIFIER ExpressionInRoutineCall            { $$ = new RoutineCall(get_yyextra_string(), $2); }
     ;
 
 ExpressionInRoutineCall
@@ -276,7 +276,7 @@ WhileLoop
     ;
 
 ForLoop
-    : FOR IDENTIFIER IN Reverse Range LOOP Body END { $$ = new ForLoop(yyextra_string, $4, $5, $7); }
+    : FOR IDENTIFIER IN Reverse Range LOOP Body END { $$ = new ForLoop(get_yyextra_string(), $4, $5, $7); }
     ;
 
 Range
@@ -361,11 +361,11 @@ Summand
 
 
 Primary
-    : INTEGER_LITERAL                               { $$ = new Primary(Lexems::Keywords::INTEGER, (float)yyextra_int, false, NULL,  NULL); }
-    | Sign INTEGER_LITERAL                          { $$ = new Primary(Lexems::Keywords::INTEGER, (float)yyextra_int, false, $1, NULL); }
-    | NOT INTEGER_LITERAL                           { $$ = new Primary(Lexems::Keywords::INTEGER, (float)yyextra_int, true, NULL, NULL); }
-    | REAL_LITERAL                                  { $$ = new Primary(Lexems::Keywords::REAL, yyextra_float, false, NULL, NULL); }
-    | Sign REAL_LITERAL                             { $$ = new Primary(Lexems::Keywords::REAL, yyextra_float, false, $1, NULL); }
+    : INTEGER_LITERAL                               { $$ = new Primary(Lexems::Keywords::INTEGER, (float)get_yyextra_int(), false, NULL,  NULL); }
+    | Sign INTEGER_LITERAL                          { $$ = new Primary(Lexems::Keywords::INTEGER, (float)get_yyextra_int(), false, $1, NULL); }
+    | NOT INTEGER_LITERAL                           { $$ = new Primary(Lexems::Keywords::INTEGER, (float)get_yyextra_int(), true, NULL, NULL); }
+    | REAL_LITERAL                                  { $$ = new Primary(Lexems::Keywords::REAL, get_yyextra_float(), false, NULL, NULL); }
+    | Sign REAL_LITERAL                             { $$ = new Primary(Lexems::Keywords::REAL, get_yyextra_float(), false, $1, NULL); }
     | TRUE                                          { $$ = new Primary(Lexems::Keywords::BOOLEAN, (float)true, false, NULL, NULL); }
     | FALSE                                         { $$ = new Primary(Lexems::Keywords::BOOLEAN, (float)false, false, NULL, NULL); }
     | ModifiablePrimary                             { $$ = new Primary("", 0, false, NULL, $1); }
@@ -377,11 +377,11 @@ Sign
     ;
 
 ModifiablePrimary
-    : IDENTIFIER Identifiers                         { $$ = new ModifiablePrimary(yyextra_string, $2); }
+    : IDENTIFIER Identifiers                         { $$ = new ModifiablePrimary(get_yyextra_string(), $2); }
     ;
 
 Identifiers
-    : DOT IDENTIFIER Identifiers                     { $$ = new Identifiers(yyextra_string, NULL, $3); }
+    : DOT IDENTIFIER Identifiers                     { $$ = new Identifiers(get_yyextra_string(), NULL, $3); }
     | BRACKETS_L Expression BRACKETS_R Identifiers   { $$ = new Identifiers("", $2, $4); }
     |                                                { $$ = new Identifiers("", NULL, NULL); }
     ;

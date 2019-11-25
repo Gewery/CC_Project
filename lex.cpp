@@ -19,9 +19,9 @@ int column = 0;
 static int seeneof = 0;
 
 FILE *yyin;
-string yyextra_string;
-float yyextra_float;
-int yyextra_int;
+vector<string> yyextra_strings;
+vector<float> yyextra_floats;
+vector<int> yyextra_ints;
 
 vector<pair<int, regex> > regex_tokens;
 string source;
@@ -147,16 +147,17 @@ extern int yylex(void) {
         else if (lexem == Lexems::Punctuators::BRACKETS_R)    return BRACKETS_R;
     }
     else if (token_type == TokenTypes::IDENTIFIERS) {
-        yyextra_string = lexem;
+        yyextra_strings.push_back(lexem);
         return IDENTIFIER;
     }
     else if (token_type == TokenTypes::INTEGER_LITERALS) {
-        yyextra_int = 0;
+        int yyextra_int = 0;
         for (int i = 0; i < lexem.size(); yyextra_int = yyextra_int * 10 + lexem[i] - '0', i++);
+        yyextra_ints.push_back(yyextra_int);
         return INTEGER_LITERAL;
     }
     else if (token_type == TokenTypes::FLOATING_LITERALS) {
-        yyextra_float = 0;
+        float yyextra_float = 0;
         float exp = 0.1;
         bool flag = 0;
         for (int i = 0; i < lexem.size(); i++) {
@@ -173,8 +174,39 @@ extern int yylex(void) {
                 exp /= 10;
             }
         }
+        yyextra_floats.push_back(yyextra_float);
         return REAL_LITERAL;
     }
     if (lexem != "\0") yyerror("Mystery character\n");
     return 0;
+}
+
+string get_yyextra_string() {
+    if (yyextra_strings.empty()) {
+        cout << "Lexer error. Trying to get non-existent yyextra_string.";
+        exit(1);
+    }
+    string yyextra_string = yyextra_strings.back();
+    yyextra_strings.pop_back();
+    return yyextra_string;
+}
+
+int get_yyextra_int() {
+    if (yyextra_ints.empty()) {
+        cout << "Lexer error. Trying to get non-existent yyextra_int.";
+        exit(1);
+    }
+    int yyextra_int = yyextra_ints.back();
+    yyextra_ints.pop_back();
+    return yyextra_int;
+}
+
+float get_yyextra_float() {
+    if (yyextra_floats.empty()) {
+        cout << "Lexer error. Trying to get non-existent yyextra_float.";
+        exit(1);
+    }
+    float yyextra_float = yyextra_floats.back();
+    yyextra_floats.pop_back();
+    return yyextra_float;
 }
