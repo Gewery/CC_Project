@@ -155,9 +155,8 @@
 // ======== RULES ========
 
 Program
-    : Declaration DECLARATION_SEPARATOR Program     { $$ = new Program($1, $3); root = $$; }
+    : Declaration Program                           { $$ = new Program($1, $2); root = $$; }
     | DECLARATION_SEPARATOR Program                 { $$ = $2; root = $$; }
-    | Declaration                                   { $$ = new Program($1, NULL); root = $$; }
     |                                               { $$ = new Program(NULL, NULL); root = $$; }
     ;
 
