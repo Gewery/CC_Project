@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  compiler:
+    build: .
+    tty: true
+    volumes:
+      - .:/app

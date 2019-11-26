@@ -36,6 +36,16 @@ bool is_record_in_table(string name) {
     return false;
 }
 
+//Variable* get_record_from_table(string name) {
+//    for (auto x : variables) {
+//        if (isEqual(x.first, name)) {
+//            return x;
+//        }
+//    }
+//
+//}
+
+
 //TODO peredelat' na calculator!!!
 auto check_primary(Primary *primary) {
     string type;
@@ -184,16 +194,33 @@ void check_Assignment(Assignment *assignment) {
     if (assignment->modifiableprimary) {
         name = check_modifiable_primary(assignment->modifiableprimary);
     }
-    if (assignment->expression) {
-        auto result = check_expression(assignment->expression);
-        add_to_symbol_table(name, result);
-    }
 
-    // check if modifiable primary was already declared or not
     if (!is_record_in_table(name)){
         cout << "\n\nVariable " << name << " was not declared!\n";
         exit(0);
     }
+    //getting the type of record
+    string record_type;
+    for (auto x : variables) {
+        if (isEqual(x.first, name)) {
+            record_type = x.second->type;
+        }
+    }
+
+
+    if (assignment->expression) {
+        auto result = check_expression(assignment->expression);
+        if (isEqual(result.type, record_type)) {
+            add_to_symbol_table(name, result);
+        }
+        else if (isEqual(record_type, "integer") && isEqual(result.type, "real")) {
+            cout << "UA ZDES";
+            cout << "BBB" << round(result.value);
+//            add_to_symbol_table(name, {result.type, round(result.value), result.isNot, result.sign});
+        }
+    }
+    // check if modifiable primary was already declared or not
+
 }
 
 void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration) {
