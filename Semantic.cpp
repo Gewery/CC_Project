@@ -36,16 +36,6 @@ bool is_record_in_table(string name) {
     return false;
 }
 
-//Variable* get_record_from_table(string name) {
-//    for (auto x : variables) {
-//        if (isEqual(x.first, name)) {
-//            return x;
-//        }
-//    }
-//
-//}
-
-
 //TODO peredelat' na calculator!!!
 auto check_primary(Primary *primary) {
     string type;
@@ -199,6 +189,7 @@ void check_Assignment(Assignment *assignment) {
         cout << "\n\nVariable " << name << " was not declared!\n";
         exit(0);
     }
+
     //getting the type of record
     string record_type;
     for (auto x : variables) {
@@ -207,16 +198,39 @@ void check_Assignment(Assignment *assignment) {
         }
     }
 
-
     if (assignment->expression) {
         auto result = check_expression(assignment->expression);
         if (isEqual(result.type, record_type)) {
             add_to_symbol_table(name, result);
         }
+        // int - real
         else if (isEqual(record_type, "integer") && isEqual(result.type, "real")) {
-            cout << "UA ZDES";
-            cout << "BBB" << round(result.value);
-//            add_to_symbol_table(name, {result.type, round(result.value), result.isNot, result.sign});
+            result.value = round(result.value);
+            result.type = record_type;
+            add_to_symbol_table(name, result);
+        }
+        //int - boolean, real - int, real - bool
+        else if ((isEqual(record_type, "integer") && isEqual(result.type, "boolean")) ||
+                (isEqual(record_type, "real") && isEqual(result.type, "integer")) ||
+                (isEqual(record_type, "real") && isEqual(result.type, "boolean"))) {
+            result.type = record_type;
+            add_to_symbol_table(name, result);
+        }
+
+        // bool - int
+        else if (isEqual(record_type, "boolean") && isEqual(result.type, "integer")) {
+            if (result.value == 0 || result.value == 1) {
+                result.type = record_type;
+                add_to_symbol_table(name, result);
+            }
+            else {
+                cout << "\n\nVariable " << name << " can not be casted to boolean!\n";
+                exit(0);
+            }
+        }
+        else if (isEqual(record_type, "boolean") && isEqual(result.type, "real")) {
+            cout << "\n\nVariable " << name << " can not be casted to boolean!\n";
+            exit(0);
         }
     }
     // check if modifiable primary was already declared or not
