@@ -12,7 +12,7 @@
 
 using namespace std;
 
-extern void yyerror(const char *);
+void yyerror(const char *);
 
 bool flag = 0;
 int column = 0;
@@ -179,6 +179,11 @@ extern int yylex(void) {
     }
     if (lexem != "\0") yyerror("Mystery character\n");
     return 0;
+}
+
+void yyerror(char const *s){
+    fflush(stdout);
+    printf("\n%*s\n%*s\n", column, "^", column, s);
 }
 
 string get_yyextra_string() {

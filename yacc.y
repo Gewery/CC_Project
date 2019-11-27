@@ -5,7 +5,7 @@
     #include "lexems.h"
 
     int yylex();
-    void yyerror(const char *s);
+    extern void yyerror(const char *);
     extern char yytext[];
     extern int column;
     extern string get_yyextra_string();
@@ -185,9 +185,9 @@ TypeDeclaration
     ;
 
 Type
-    : PrimitiveType                                 { $$ = new Type($1, NULL, NULL, NULL); }
-    | ArrayType                                     { $$ = new Type(NULL, $1, NULL, NULL); }
-    | RecordType                                    { $$ = new Type(NULL, NULL, $1, NULL); }
+    : PrimitiveType                                 { $$ = new Type($1, NULL, NULL, ""); }
+    | ArrayType                                     { $$ = new Type(NULL, $1, NULL, ""); }
+    | RecordType                                    { $$ = new Type(NULL, NULL, $1, ""); }
     | IDENTIFIER                                    { $$ = new Type(NULL, NULL, NULL, get_yyextra_string()); }
     ;
 
@@ -395,9 +395,4 @@ int main(int argc, char **argv){
     cout << "======###========\n\n";
     print_Program(root, 1);
     return 0;
-}
-
-void yyerror(char const *s){
-    fflush(stdout);
-    printf("\n%*s\n%*s\n", column, "^", column, s);
 }
