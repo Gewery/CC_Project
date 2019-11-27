@@ -36,8 +36,27 @@ bool is_record_in_table(string name) {
     return false;
 }
 
+
+
+void check_Identifiers(Identifiers *identifiers) {
+
+}
+
+string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
+    if (!(modifiableprimary->name).empty()) {
+        return modifiableprimary->name;
+    }
+    if (modifiableprimary->identifiers) {
+        //check identifiers
+    }
+}
+
+void check_Sign(Sign *sign) {
+
+}
+
 //TODO peredelat' na calculator!!!
-auto check_primary(Primary *primary) {
+auto check_Primary(Primary *primary) {
     string type;
     float value;
     bool isNot;
@@ -54,135 +73,125 @@ auto check_primary(Primary *primary) {
     else {
     }
 }
+
 //TODO peredelat' na calculator!!!
-auto check_summand(Summand *summand) {
+auto check_Summand(Summand *summand) {
     if (summand->expression) {
 
     }
     else if (summand->primary) {
-        return check_primary(summand->primary);
+        return check_Primary(summand->primary);
     }
 }
+
+void check_Summands(Summands *summands) {
+
+}
+
 //TODO peredelat' na calculator!!!
-auto check_factor(Factor *factor) {
+auto check_Factor(Factor *factor) {
     if (factor->summand) {
-        return check_summand(factor->summand);
+        return check_Summand(factor->summand);
     }
     if (factor->summands) {
 
     }
 }
+
+void check_SimpleOperator(SimpleOperator *simpleoperator) {
+
+}
+
+void check_Factors(Factors *factors) {
+
+}
+
 //TODO peredelat' na calculator!!!
-auto check_simple(Simple *simple) {
+auto check_Simple(Simple *simple) {
     if (simple->factor) {
-        return check_factor(simple->factor);
+        return check_Factor(simple->factor);
     }
     if (simple->factors) {
 
     }
 }
 
+void check_ComparisonOperator(ComparisonOperator *comparisonoperator) {
+
+}
+
+void check_ComparisonInRelation(ComparisonInRelation *comparisoninrelation) {
+
+}
+
 //TODO peredelat' na calculator!!!
-auto check_relation(Relation *relation) {
+auto check_Relation(Relation *relation) {
     if (relation->simple) {
-        return check_simple(relation->simple);
+        return check_Simple(relation->simple);
     }
     if (relation->comparisoninrelation) {
 
     }
 }
 
+void check_LogicalOperator(LogicalOperator *logicaloperator) {
+
+}
+
+void check_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression) {
+
+}
+
 //TODO peredelat' na calculator!!!
-auto check_expression(Expression *expression) {
+auto check_Expression(Expression *expression) {
     if (expression->relation) {
-        return check_relation(expression->relation);
+        return check_Relation(expression->relation);
     }
     if (expression->multiplerelationsinexpression) {
 
     }
 }
 
-string check_type(Type *type) {
-    string user_type;
-    if (type->arraytype) {
+void check_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
 
-    }
-    else if (type->primitivetype) {
-
-    }
-    else if (type->recordtype) {
-
-    }
-    else if (!(type->name).empty()) {
-        user_type = type->name;
-        transform(user_type.begin(), user_type.end(), user_type.begin(), ::tolower);
-        return user_type;
-    }
 }
 
-void check_VariableDeclaration(VariableDeclaration *variabledeclaration) {
-    cout << "YA TUT!";
-    // firstly, checking whether variable was already declared
-    if (is_record_in_table(variabledeclaration->name)) {
-        cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
-        exit(0);
-    }
+void check_IfStatement(IfStatement *ifstatement) {
 
-    string user_type;
-    float user_value = INFINITY;
-
-    //getting var type
-    if (variabledeclaration->type) {
-        user_type = check_type(variabledeclaration->type);
-    }
-    else {
-        // type is setting by the value of expression
-    }
-
-    // getting initial value
-    if (variabledeclaration->initialvalue->expression) {
-        auto result = check_expression(variabledeclaration->initialvalue->expression);
-        if (isEqual(result.type, user_type)) {
-            add_to_symbol_table(variabledeclaration->name, result);
-        }
-        else if (isEqual(result.type, "integer") && isEqual(user_type, "real")) {
-            add_to_symbol_table(variabledeclaration->name, result);
-        }
-        else if (isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)) {
-            add_to_symbol_table(variabledeclaration->name, result);
-        }
-        else {
-            cout << "\n\nType error!\n";
-            exit(0);
-        }
-    }
-        // case of initialization without initial value
-    else {
-        struct result_with_sign {string type;  float value; bool isNot; string sign;};
-        // initial value for bool is false
-        if (isEqual(user_type, "boolean")) {
-            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""});
-        }
-            //initial value for float and int is INF
-        else {
-            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""});
-        }
-    }
 }
 
-string check_modifiable_primary(ModifiablePrimary *modifiablePrimary) {
-    if (!(modifiablePrimary->name).empty()) {
-        return modifiablePrimary->name;
-    }
-    if (modifiablePrimary->identifiers) {
-        //check identifiers
-    }
+void check_Reverse(Reverse *reverse) {
+
+}
+
+void check_Range(Range *range) {
+
+}
+
+void check_ForLoop(ForLoop *forloop) {
+
+}
+
+void check_WhileLoop(WhileLoop *whileloop) {
+
+}
+
+void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall) {
+
+}
+
+void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall) {
+
+}
+
+void check_RoutineCall(RoutineCall *routinecall) {
+
 }
 
 void check_Assignment(Assignment *assignment) {
     string name;
     if (assignment->modifiableprimary) {
-        name = check_modifiable_primary(assignment->modifiableprimary);
+        name = check_ModifiablePrimary(assignment->modifiableprimary);
     }
 
     if (!is_record_in_table(name)){
@@ -199,7 +208,7 @@ void check_Assignment(Assignment *assignment) {
     }
 
     if (assignment->expression) {
-        auto result = check_expression(assignment->expression);
+        auto result = check_Expression(assignment->expression);
         if (isEqual(result.type, record_type)) {
             add_to_symbol_table(name, result);
         }
@@ -237,6 +246,130 @@ void check_Assignment(Assignment *assignment) {
 
 }
 
+void check_Statement(Statement *statement) {
+
+}
+
+void check_Body(Body *body) {
+
+}
+
+void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration) {
+
+}
+
+void check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
+
+}
+
+void check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration) {
+
+}
+
+void check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration) {
+
+}
+
+void check_Parameters(Parameters *parameters) {
+
+}
+
+void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
+
+}
+
+void check_VariableDeclarations(VariableDeclarations *variabledeclarations) {
+
+}
+
+void check_RecordType(RecordType *recordtype) {
+
+}
+
+void check_ArrayType(ArrayType *arraytype) {
+
+}
+
+void check_PrimitiveType(PrimitiveType *primitivetype) {
+
+}
+
+string check_Type(Type *type) {
+    string user_type;
+    if (type->arraytype) {
+
+    }
+    else if (type->primitivetype) {
+
+    }
+    else if (type->recordtype) {
+
+    }
+    else if (!(type->name).empty()) {
+        user_type = type->name;
+        transform(user_type.begin(), user_type.end(), user_type.begin(), ::tolower);
+        return user_type;
+    }
+}
+
+string check_TypeDeclaration(TypeDeclaration *typedeclaration) {
+
+}
+
+void check_InitialValue(InitialValue *initialvalue) {
+
+}
+
+void check_VariableDeclaration(VariableDeclaration *variabledeclaration) {
+    cout << "YA TUT!";
+    // firstly, checking whether variable was already declared
+    if (is_record_in_table(variabledeclaration->name)) {
+        cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
+        exit(0);
+    }
+
+    string user_type;
+    float user_value = INFINITY;
+
+    //getting var type
+    if (variabledeclaration->type) {
+        user_type = check_Type(variabledeclaration->type);
+    }
+    else {
+        // type is setting by the value of expression
+    }
+
+    // getting initial value
+    if (variabledeclaration->initialvalue->expression) {
+        auto result = check_Expression(variabledeclaration->initialvalue->expression);
+        if (isEqual(result.type, user_type)) {
+            add_to_symbol_table(variabledeclaration->name, result);
+        }
+        else if (isEqual(result.type, "integer") && isEqual(user_type, "real")) {
+            add_to_symbol_table(variabledeclaration->name, result);
+        }
+        else if (isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)) {
+            add_to_symbol_table(variabledeclaration->name, result);
+        }
+        else {
+            cout << "\n\nType error!\n";
+            exit(0);
+        }
+    }
+        // case of initialization without initial value
+    else {
+        struct result_with_sign {string type;  float value; bool isNot; string sign;};
+        // initial value for bool is false
+        if (isEqual(user_type, "boolean")) {
+            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""});
+        }
+            //initial value for float and int is INF
+        else {
+            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""});
+        }
+    }
+}
+
 void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration) {
     if (simpleDeclaration->variabledeclaration) {
         check_VariableDeclaration(simpleDeclaration->variabledeclaration);
@@ -245,6 +378,7 @@ void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration) {
 //        check_TypeDeclaration(simpleDeclaration->typedeclaration)
     }
 }
+
 
 void check_Declaration(Declaration *declaration) {
     if (declaration->simpledeclaration) {
