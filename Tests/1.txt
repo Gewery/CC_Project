@@ -1,4 +1,7 @@
+var a : Integer is 5
 var b : Integer is 5
+var c: Real is 3.0
+
 routine main (a : Integer, c : Boolean) : Boolean is
 b := 7
 var a : Boolean

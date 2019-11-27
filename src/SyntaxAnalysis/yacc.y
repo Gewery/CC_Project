@@ -2,7 +2,7 @@
     #include <stdio.h>
     #include <string>
     #include "AST.h"
-    #include "lexems.h"
+    #include "../LexicalAnalysis/lexems.h"
 
     int yylex();
     extern void yyerror(const char *);
