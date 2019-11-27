@@ -10,6 +10,12 @@
 using namespace std;
 
 unordered_map<string, Variable* > global_variables;
+unordered_map<string, string > types = {
+    {"integer", "integer"},
+    {"real", "real"},
+    {"boolean", "boolean"}
+};
+unordered_map<string, Variable* > variables;
 unordered_map<string, Function* > functions;
 
 bool isEqual(string str1, string str2) {
@@ -31,8 +37,6 @@ bool is_record_in_table(string name, unordered_map<string, Variable* > table) {
     return false;
 }
 
-
-
 void check_Identifiers(Identifiers *identifiers) {
 
 }
@@ -48,6 +52,28 @@ string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
 
 void check_Sign(Sign *sign) {
 
+}
+
+/**
+ * Check if type is already in the map of custom types.
+ * @param name  Type name
+ * @return      Boolean value storing true if type exists, false - otherwise
+ */
+bool type_exists(string name) {
+    return types.find(name) != types.end();
+}
+
+/**
+ * Add a type to the custom map list.
+ *
+ * @param name  Name of the type
+ * @param type  Actual type of a given type
+ * @return      Nothing
+ */
+void add_type(string name, string type) {
+    if (!type_exists(name))
+        types[name] = type;
+    // cout << "\n\nAdded type '" << name << "' of actual type '" << type << "'\n\n"; // LOG
 }
 
 //TODO peredelat' na calculator!!!
@@ -376,7 +402,12 @@ string check_Type(Type *type) {
 
     }
     else if (type->primitivetype) {
-
+        if (type->primitivetype->isint)
+            return "integer";
+        else if (type->primitivetype->isreal)
+            return "real";
+        else if (type->primitivetype->isboolean)
+            return "boolean";
     }
     else if (type->recordtype) {
 
@@ -388,8 +419,25 @@ string check_Type(Type *type) {
     }
 }
 
-string check_TypeDeclaration(TypeDeclaration *typedeclaration) {
+void check_TypeDeclaration(TypeDeclaration *typedeclaration) {
+    string name = typedeclaration->name,
+           type = check_Type(typedeclaration->type);
 
+    transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+    // check if type was already declared
+    if (type_exists(name)) {
+        cout << "\n######\nERROR! Type is primitive or already declared: '" << typedeclaration->name << "'\n######\n";
+        exit(EXIT_FAILURE);
+    }
+
+    // check if actual type exists
+    if (!type_exists(type)) {
+        cout << "\n######\nERROR! Actual type for your custom type doesn't exist or is out of scope: '" << type << "'\n######\n";
+        exit(EXIT_FAILURE);
+    }
+
+    add_type(name, type);
 }
 
 void check_InitialValue(InitialValue *initialvalue) {

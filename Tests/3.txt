@@ -1,0 +1,6 @@
+// Custom type declaration
+type irek is integer
+type cat is irek
+// type BOOlean is integer <- primitive type as name!
+// type irek is boolean    <- type redeclaration!
+// type kek is lol         <- actual type doesn't exist or is out of scope!

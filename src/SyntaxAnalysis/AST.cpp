@@ -119,6 +119,7 @@ void print_InitialValue(InitialValue *initialvalue, bool isLast) {
 
 void print_TypeDeclaration(TypeDeclaration *typedeclaration, bool isLast) {
     if (!typedeclaration) return;
+    check_TypeDeclaration(typedeclaration);
     print_bars(isLast);
 
     cout << "TypeDeclaration";

@@ -37,3 +37,4 @@
 yacc.cpp
 yacc.hpp
 parser
+input.txt

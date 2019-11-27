@@ -34,7 +34,7 @@ void check_Declaration(Declaration *declaration);
 void check_SimpleDeclaration(SimpleDeclaration *simpledeclaration, unordered_map<string, Variable* > local_variables);
 void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables);
 void check_InitialValue(InitialValue *initialvalue);
-string check_TypeDeclaration(TypeDeclaration *typedeclaration);
+void check_TypeDeclaration(TypeDeclaration *typedeclaration);
 string check_Type(Type *type);
 void check_PrimitiveType(PrimitiveType *primitivetype);
 void check_ArrayType(ArrayType *arraytype);
