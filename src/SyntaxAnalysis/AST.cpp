@@ -24,9 +24,11 @@ void rem_from_prefix(int a) {
 
 
 void print_bars(bool isLast) {
-    cout << " |" << "\n";
+    cout << "\n";
+    rem_from_prefix(4);
     if (isLast) cout << prefix + " └──";
     else cout << prefix +  " ├──";
+    add_spaces_to_prefix(4);
 
     if (!isLast) prefix += " │";
     else prefix += "  ";
