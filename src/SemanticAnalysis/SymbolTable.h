@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "AST.h"
+#include "../SyntaxAnalysis/AST.h"
 using namespace std;
 
 
@@ -20,12 +20,10 @@ struct Variable {
 struct Function {
     string return_type;
     float return_value;
-    int number_of_args;
     vector<Variable*> arguments;
-    Function(string return_type_of_func, float return_value_of_func, int number_of_args_of_func, vector<Variable*> &arguments_of_func) {
+    Function(string return_type_of_func, float return_value_of_func, vector<Variable*> &arguments_of_func) {
         return_type = return_type_of_func;
         return_value = return_value_of_func;
-        number_of_args = number_of_args_of_func;
         arguments = arguments_of_func;
     }
 };
@@ -33,8 +31,8 @@ struct Function {
 
 void check_Program(Program *program);
 void check_Declaration(Declaration *declaration);
-void check_SimpleDeclaration(SimpleDeclaration *simpledeclaration);
-void check_VariableDeclaration(VariableDeclaration *variabledeclaration);
+void check_SimpleDeclaration(SimpleDeclaration *simpledeclaration, unordered_map<string, Variable* > local_variables);
+void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables);
 void check_InitialValue(InitialValue *initialvalue);
 string check_TypeDeclaration(TypeDeclaration *typedeclaration);
 string check_Type(Type *type);
@@ -47,8 +45,8 @@ unordered_map<string, Variable* > check_Parameters(Parameters *parameters, unord
 unordered_map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, unordered_map<string, Variable* > local_variables);
 unordered_map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, unordered_map<string, Variable* > local_variables);
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration);
-void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration);
-void check_Body(Body *body);
+void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, unordered_map<string, Variable* > local_variables);
+void check_Body(Body *body, unordered_map<string, Variable* > local_variables);
 void check_Statement(Statement *statement);
 void check_Assignment(Assignment *assignment);
 void check_RoutineCall(RoutineCall *routinecall);

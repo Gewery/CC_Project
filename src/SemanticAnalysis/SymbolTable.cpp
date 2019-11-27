@@ -18,12 +18,10 @@ struct Variable {
 struct Function {
     string return_type;
     float return_value;
-    int number_of_args;
     vector<Variable*> arguments;
-    Function(string return_type_of_func, float return_value_of_func, int number_of_args_of_func, vector<Variable*> &arguments_of_func) {
+    Function(string return_type_of_func, float return_value_of_func,vector<Variable*> &arguments_of_func) {
         return_type = return_type_of_func;
         return_value = return_value_of_func;
-        number_of_args = number_of_args_of_func;
         arguments = arguments_of_func;
     }
 };

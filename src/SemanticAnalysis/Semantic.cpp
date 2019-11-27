@@ -19,13 +19,11 @@ bool isEqual(string str1, string str2) {
 void add_to_symbol_table(string name, auto result) {
     float value = result.value;
     Variable *v1 = new Variable(result.type, 0, value);
-    vector<Variable*> vect;
-    vect.push_back(v1);
     global_variables[name] = v1;
 }
 
-bool is_record_in_table(string name) {
-    for (auto x : global_variables) {
+bool is_record_in_table(string name, unordered_map<string, Variable* > table) {
+    for (auto x : table) {
         if (isEqual(x.first, name)) {
             return true;
         }
@@ -154,7 +152,6 @@ void check_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
 }
 
 void check_IfStatement(IfStatement *ifstatement) {
-    cout << "IFSTATEMETN!!!";
     if (ifstatement->expression) {
 
     }
@@ -200,7 +197,7 @@ void check_Assignment(Assignment *assignment) {
         name = check_ModifiablePrimary(assignment->modifiableprimary);
     }
 
-    if (!is_record_in_table(name)){
+    if (!is_record_in_table(name, global_variables)){
         cout << "\n\nVariable " << name << " was not declared!\n";
         exit(0);
     }
@@ -268,21 +265,22 @@ void check_Statement(Statement *statement) {
     }
 }
 
-void check_Body(Body *body) {
+void check_Body(Body *body, unordered_map<string, Variable* > local_variables) {
     if (body->simpledeclaration) {
+        check_SimpleDeclaration(body->simpledeclaration, local_variables);
 
     }
     if (body->statement) {
         check_Statement(body->statement);
     }
     if (body->body) {
-        check_Body(body->body);
+        check_Body(body->body, local_variables);
     }
 }
 
-void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration) {
+void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, unordered_map<string, Variable* > local_variables) {
     if (bodyinroutinedeclaration->body) {
-        check_Body(bodyinroutinedeclaration->body);
+        check_Body(bodyinroutinedeclaration->body, local_variables);
     }
 }
 
@@ -335,22 +333,25 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     unordered_map<string, Variable* > local_variables;
     string function_name;
     string type;
+//    vector<Variable*> parameters;
     if (!(routinedeclaration->name).empty()) {
         function_name = routinedeclaration->name;
     }
     if (routinedeclaration->parameters) {
         local_variables = check_Parameters(routinedeclaration->parameters, local_variables);
-        cout << "EEE";
-        for (auto x : local_variables)
-            cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
+//        for (auto x : local_variables)
+//            parameters.push_back(x);
+//            cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 
     }
     if (routinedeclaration->typeinroutinedeclaration) {
         type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
     }
     if (routinedeclaration->bodyinroutinedeclaration) {
-        check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration);
+        check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, local_variables);
     }
+//    Function *f1 = new Function(type, INFINITY, parameters);
+//    functions[function_name] = f1;
 }
 
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations) {
@@ -395,10 +396,14 @@ void check_InitialValue(InitialValue *initialvalue) {
 
 }
 
-void check_VariableDeclaration(VariableDeclaration *variabledeclaration) {
-    cout << "YA TUT!";
-    // firstly, checking whether variable was already declared
-    if (is_record_in_table(variabledeclaration->name)) {
+void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables) {
+    // firstly, checking whether variable was globally already declared
+    if (local_variables.empty() && is_record_in_table(variabledeclaration->name, global_variables)) {
+        cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
+        exit(0);
+    }
+    // checking whether variable was locally already declared
+    if (!local_variables.empty() && is_record_in_table(variabledeclaration->name, local_variables)) {
         cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
         exit(0);
     }
@@ -445,9 +450,9 @@ void check_VariableDeclaration(VariableDeclaration *variabledeclaration) {
     }
 }
 
-void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration) {
+void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, unordered_map<string, Variable* > local_variables) {
     if (simpleDeclaration->variabledeclaration) {
-        check_VariableDeclaration(simpleDeclaration->variabledeclaration);
+        check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables);
     }
     if (simpleDeclaration->typedeclaration) {
 //        check_TypeDeclaration(simpleDeclaration->typedeclaration)
@@ -457,7 +462,7 @@ void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration) {
 
 void check_Declaration(Declaration *declaration) {
     if (declaration->simpledeclaration) {
-        check_SimpleDeclaration(declaration->simpledeclaration);
+        check_SimpleDeclaration(declaration->simpledeclaration, {});
     }
     if (declaration->routinedeclaration){
         check_RoutineDeclaration(declaration->routinedeclaration);

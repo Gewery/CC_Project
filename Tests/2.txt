@@ -3,3 +3,5 @@ routine main (a : Integer, c : Boolean) : Boolean is
 b := 8
 var d : Boolean
 end
+
+//OK

@@ -8,7 +8,7 @@
 #include <math.h>
 #include <bits/stdc++.h>
 
-#include "SymbolTable.h"
+#include "../SemanticAnalysis/SymbolTable.h"
 
 using namespace std;
 

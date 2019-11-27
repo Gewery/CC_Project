@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "lexems.h"
-#include "yacc.hpp"
+#include "../SyntaxAnalysis/yacc.hpp"
 
 
 using namespace std;

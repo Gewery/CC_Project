@@ -1,0 +1,7 @@
+var b : Integer is 5
+routine main (a : Integer, c : Boolean) : Boolean is
+b := 7
+var a : Boolean
+end
+
+//ошибка т.к. a уже задекларирована в параметрах
