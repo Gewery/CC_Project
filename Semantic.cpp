@@ -18,9 +18,6 @@ bool isEqual(string str1, string str2) {
 
 void add_to_symbol_table(string name, auto result) {
     float value = result.value;
-//    if (isEqual(result.sign, "-")) {
-//        value =  -1 * value;
-//    }
     Variable *v1 = new Variable(result.type, 0, value);
     vector<Variable*> vect;
     vect.push_back(v1);
@@ -289,8 +286,10 @@ void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedecla
     }
 }
 
-void check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
-
+string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
+    if (typeinroutinedeclaration->type) {
+        return check_Type(typeinroutinedeclaration->type);
+    }
 }
 
 void check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration) {
@@ -316,7 +315,7 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
 
     }
     if (routinedeclaration->typeinroutinedeclaration) {
-        type = check_Type(routinedeclaration->typeinroutinedeclaration);
+        type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
     }
     if (routinedeclaration->bodyinroutinedeclaration) {
         check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration);

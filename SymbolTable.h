@@ -46,7 +46,7 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration);
 void check_Parameters(Parameters *parameters);
 void check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration);
 void check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration);
-void check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration);
+string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration);
 void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration);
 void check_Body(Body *body);
 void check_Statement(Statement *statement);
