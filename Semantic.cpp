@@ -292,16 +292,43 @@ string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedec
     }
 }
 
-void check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration) {
-
+unordered_map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, unordered_map<string, Variable* > local_variables) {
+    if (parametersdeclaration->parameterdeclaration) {
+        unordered_map<string, Variable* > temp = check_ParameterDeclaration(parametersdeclaration->parameterdeclaration, local_variables);
+        local_variables.insert(temp.begin(), temp.end());
+    }
+    if (parametersdeclaration->parametersdeclaration) {
+        unordered_map<string, Variable* > temp = check_ParametersDeclaration(parametersdeclaration->parametersdeclaration, local_variables);
+        local_variables.insert(temp.begin(), temp.end());
+    }
+    return local_variables;
 }
 
-void check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration) {
-
+unordered_map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, unordered_map<string, Variable* > local_variables) {
+    string name;
+    string type;
+    if (!(parameterdeclaration->name).empty()) {
+        name = parameterdeclaration->name;
+    }
+    if (parameterdeclaration->type) {
+        type = check_Type(parameterdeclaration->type);
+    }
+    Variable *v1 = new Variable(type, 1, INFINITY);
+    vector<Variable*> vect;
+    vect.push_back(v1);
+    local_variables[name] = v1;
+    return local_variables;
 }
 
-void check_Parameters(Parameters *parameters) {
-
+unordered_map<string, Variable* > check_Parameters(Parameters *parameters, unordered_map<string, Variable* > local_variables) {
+    if (parameters->parameterdeclaration) {
+        local_variables = check_ParameterDeclaration(parameters->parameterdeclaration, local_variables);
+    }
+    if (parameters->parametersdeclaration) {
+        unordered_map<string, Variable* > temp = check_ParametersDeclaration(parameters->parametersdeclaration, local_variables);
+        local_variables.insert(temp.begin(), temp.end());
+    }
+    return local_variables;
 }
 
 void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
@@ -312,6 +339,10 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
         function_name = routinedeclaration->name;
     }
     if (routinedeclaration->parameters) {
+        local_variables = check_Parameters(routinedeclaration->parameters, local_variables);
+        cout << "EEE";
+        for (auto x : local_variables)
+            cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 
     }
     if (routinedeclaration->typeinroutinedeclaration) {
@@ -320,7 +351,6 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     if (routinedeclaration->bodyinroutinedeclaration) {
         check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration);
     }
-    cout << "SSS" << function_name << type;
 }
 
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations) {
@@ -443,4 +473,9 @@ void check_Program(Program *program) {
     }
     for (auto x : global_variables)
         cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
+
+    for (auto x : functions)
+        cout << "\n" << x.first << " " << x.second->return_type  << " " << endl;
+
+
 }
