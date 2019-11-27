@@ -353,7 +353,7 @@ void print_Assignment(Assignment *assignment, bool isLast) {
     print_bars(isLast);
 
     cout << "Assignment";
-    check_Assignment(assignment);
+//    check_Assignment(assignment);
     add_spaces_to_prefix(2 + 10);
     if (!assignment->expression) print_ModifiablePrimary(assignment->modifiableprimary, 1);
     else print_ModifiablePrimary(assignment->modifiableprimary, 0);

@@ -1,2 +1,2 @@
-var b : Integer
-routine main is if true then b := true end end
+var b : Integer is 5
+routine main (a : Integer) : Boolean is if true then b := true end end

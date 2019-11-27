@@ -9,7 +9,7 @@
 
 using namespace std;
 
-unordered_map<string, Variable* > variables;
+unordered_map<string, Variable* > global_variables;
 unordered_map<string, Function* > functions;
 
 bool isEqual(string str1, string str2) {
@@ -24,11 +24,11 @@ void add_to_symbol_table(string name, auto result) {
     Variable *v1 = new Variable(result.type, 0, value);
     vector<Variable*> vect;
     vect.push_back(v1);
-    variables[name] = v1;
+    global_variables[name] = v1;
 }
 
 bool is_record_in_table(string name) {
-    for (auto x : variables) {
+    for (auto x : global_variables) {
         if (isEqual(x.first, name)) {
             return true;
         }
@@ -157,7 +157,16 @@ void check_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
 }
 
 void check_IfStatement(IfStatement *ifstatement) {
+    cout << "IFSTATEMETN!!!";
+    if (ifstatement->expression) {
 
+    }
+    if (ifstatement->body) {
+
+    }
+    if (ifstatement->elseinifstatement) {
+        check_ElseInIfStatement(ifstatement->elseinifstatement);
+    }
 }
 
 void check_Reverse(Reverse *reverse) {
@@ -201,7 +210,7 @@ void check_Assignment(Assignment *assignment) {
 
     //getting the type of record
     string record_type;
-    for (auto x : variables) {
+    for (auto x : global_variables) {
         if (isEqual(x.first, name)) {
             record_type = x.second->type;
         }
@@ -242,20 +251,42 @@ void check_Assignment(Assignment *assignment) {
             exit(0);
         }
     }
-    // check if modifiable primary was already declared or not
-
 }
 
 void check_Statement(Statement *statement) {
+    if (statement->assignment) {
+        check_Assignment(statement->assignment);
+    }
+    else if (statement->routinecall) {
 
+    }
+    else if (statement->whileloop) {
+
+    }
+    else if (statement->forloop) {
+
+    }
+    else if (statement->ifstatement) {
+        check_IfStatement(statement->ifstatement);
+    }
 }
 
 void check_Body(Body *body) {
+    if (body->simpledeclaration) {
 
+    }
+    if (body->statement) {
+        check_Statement(body->statement);
+    }
+    if (body->body) {
+        check_Body(body->body);
+    }
 }
 
 void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration) {
-
+    if (bodyinroutinedeclaration->body) {
+        check_Body(bodyinroutinedeclaration->body);
+    }
 }
 
 void check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
@@ -275,7 +306,22 @@ void check_Parameters(Parameters *parameters) {
 }
 
 void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
+    unordered_map<string, Variable* > local_variables;
+    string function_name;
+    string type;
+    if (!(routinedeclaration->name).empty()) {
+        function_name = routinedeclaration->name;
+    }
+    if (routinedeclaration->parameters) {
 
+    }
+    if (routinedeclaration->typeinroutinedeclaration) {
+        type = check_Type(routinedeclaration->typeinroutinedeclaration);
+    }
+    if (routinedeclaration->bodyinroutinedeclaration) {
+        check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration);
+    }
+    cout << "SSS" << function_name << type;
 }
 
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations) {
@@ -385,7 +431,7 @@ void check_Declaration(Declaration *declaration) {
         check_SimpleDeclaration(declaration->simpledeclaration);
     }
     if (declaration->routinedeclaration){
-//        check_RoutineDeclaration(declaration->routinedeclaration);
+        check_RoutineDeclaration(declaration->routinedeclaration);
     }
 }
 
@@ -396,6 +442,6 @@ void check_Program(Program *program) {
     if (program->program) {
         check_Program(program->program);
     }
-    for (auto x : variables)
+    for (auto x : global_variables)
         cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 }
