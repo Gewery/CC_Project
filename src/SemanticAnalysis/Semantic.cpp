@@ -22,10 +22,10 @@ bool isEqual(string str1, string str2) {
     return str1.compare(str2) == 0;
 }
 
-void add_to_symbol_table(string name, auto result) {
-    float value = result.value;
-    Variable *v1 = new Variable(result.type, 0, value);
-    global_variables[name] = v1;
+unordered_map<string, Variable* > add_to_symbol_table(string name, auto result, unordered_map<string, Variable* > table) {
+    Variable *v1 = new Variable(result.type, 0, result.value);
+    table[name] = v1;
+    return table;
 }
 
 bool is_record_in_table(string name, unordered_map<string, Variable* > table) {
@@ -217,49 +217,76 @@ void check_RoutineCall(RoutineCall *routinecall) {
 
 }
 
-void check_Assignment(Assignment *assignment) {
+void check_Assignment(Assignment *assignment, unordered_map<string, Variable* > local_variables) {
     string name;
     if (assignment->modifiableprimary) {
         name = check_ModifiablePrimary(assignment->modifiableprimary);
     }
+    bool is_local_variable= is_record_in_table(name, local_variables);
 
-    if (!is_record_in_table(name, global_variables)){
-        cout << "\n\nVariable " << name << " was not declared!\n";
+    if ((!is_record_in_table(name, global_variables) && (!is_record_in_table(name, local_variables)))){
+        cout << "\n\nASSVariable " << name << " was not declared!\n";
         exit(0);
     }
 
+
     //getting the type of record
     string record_type;
-    for (auto x : global_variables) {
-        if (isEqual(x.first, name)) {
-            record_type = x.second->type;
+    if (!is_local_variable) {
+        for (auto x : global_variables) {
+            if (isEqual(x.first, name)) {
+                record_type = x.second->type;
+            }
+        }
+    }
+    else {
+        for (auto x : local_variables) {
+            if (isEqual(x.first, name)) {
+                record_type = x.second->type;
+            }
         }
     }
 
     if (assignment->expression) {
         auto result = check_Expression(assignment->expression);
         if (isEqual(result.type, record_type)) {
-            add_to_symbol_table(name, result);
+            if (is_local_variable) {
+                local_variables =  add_to_symbol_table(name, result, local_variables);
+            }
+            else {
+                global_variables =  add_to_symbol_table(name, result, global_variables);
+            }
         }
         // int - real
         else if (isEqual(record_type, "integer") && isEqual(result.type, "real")) {
             result.value = round(result.value);
             result.type = record_type;
-            add_to_symbol_table(name, result);
+            if (is_local_variable) {
+                local_variables =  add_to_symbol_table(name, result, local_variables);
+            }
+            else {
+                global_variables =  add_to_symbol_table(name, result, global_variables);
+            }
         }
         //int - boolean, real - int, real - bool
         else if ((isEqual(record_type, "integer") && isEqual(result.type, "boolean")) ||
                 (isEqual(record_type, "real") && isEqual(result.type, "integer")) ||
                 (isEqual(record_type, "real") && isEqual(result.type, "boolean"))) {
             result.type = record_type;
-            add_to_symbol_table(name, result);
+            if (is_local_variable) {
+                local_variables =  add_to_symbol_table(name, result, local_variables);
+            }
+            else {
+                global_variables =  add_to_symbol_table(name, result, global_variables);
+            }
         }
 
         // bool - int
         else if (isEqual(record_type, "boolean") && isEqual(result.type, "integer")) {
             if (result.value == 0 || result.value == 1) {
                 result.type = record_type;
-                add_to_symbol_table(name, result);
+                is_local_variable ? add_to_symbol_table(name, result, local_variables)
+                                  : add_to_symbol_table(name, result, global_variables);
             }
             else {
                 cout << "\n\nVariable " << name << " can not be casted to boolean!\n";
@@ -273,9 +300,9 @@ void check_Assignment(Assignment *assignment) {
     }
 }
 
-void check_Statement(Statement *statement) {
+void check_Statement(Statement *statement, unordered_map<string, Variable* > local_variables) {
     if (statement->assignment) {
-        check_Assignment(statement->assignment);
+        check_Assignment(statement->assignment, local_variables);
     }
     else if (statement->routinecall) {
 
@@ -293,11 +320,11 @@ void check_Statement(Statement *statement) {
 
 void check_Body(Body *body, unordered_map<string, Variable* > local_variables) {
     if (body->simpledeclaration) {
-        check_SimpleDeclaration(body->simpledeclaration, local_variables);
+        check_SimpleDeclaration(body->simpledeclaration, local_variables, true);
 
     }
     if (body->statement) {
-        check_Statement(body->statement);
+        check_Statement(body->statement, local_variables);
     }
     if (body->body) {
         check_Body(body->body, local_variables);
@@ -444,14 +471,11 @@ void check_InitialValue(InitialValue *initialvalue) {
 
 }
 
-void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables) {
-    // firstly, checking whether variable was globally already declared
-    if (local_variables.empty() && is_record_in_table(variabledeclaration->name, global_variables)) {
-        cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
-        exit(0);
-    }
-    // checking whether variable was locally already declared
-    if (!local_variables.empty() && is_record_in_table(variabledeclaration->name, local_variables)) {
+void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables,
+                               bool scope) {
+    // firstly, checking whether variable was already declared
+
+    if ((!scope && (is_record_in_table(variabledeclaration->name, global_variables)) || (scope && is_record_in_table(variabledeclaration->name, local_variables)))) {
         cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
         exit(0);
     }
@@ -463,44 +487,57 @@ void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unorder
     if (variabledeclaration->type) {
         user_type = check_Type(variabledeclaration->type);
     }
+    // type is setting by the value of expression
     else {
-        // type is setting by the value of expression
+        // TODO
     }
 
     // getting initial value
     if (variabledeclaration->initialvalue->expression) {
         auto result = check_Expression(variabledeclaration->initialvalue->expression);
-        if (isEqual(result.type, user_type)) {
-            add_to_symbol_table(variabledeclaration->name, result);
-        }
-        else if (isEqual(result.type, "integer") && isEqual(user_type, "real")) {
-            add_to_symbol_table(variabledeclaration->name, result);
-        }
-        else if (isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)) {
-            add_to_symbol_table(variabledeclaration->name, result);
+        if ((isEqual(result.type, user_type)) ||
+            (isEqual(result.type, "integer") && isEqual(user_type, "real")) ||
+            ((isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)))) {
+            if (!scope) {
+                global_variables = add_to_symbol_table(variabledeclaration->name, result, global_variables);
+            }
+            else {
+                local_variables = add_to_symbol_table(variabledeclaration->name, result, local_variables);
+            }
+
         }
         else {
             cout << "\n\nType error!\n";
             exit(0);
         }
     }
-        // case of initialization without initial value
+    // case of initialization without initial value
     else {
         struct result_with_sign {string type;  float value; bool isNot; string sign;};
         // initial value for bool is false
         if (isEqual(user_type, "boolean")) {
-            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""});
+            if (!scope) {
+                global_variables = add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""}, global_variables);
+            }
+            else {
+                local_variables = add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""}, local_variables);
+            }
         }
-            //initial value for float and int is INF
+        //initial value for float and int is INF
         else {
-            add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""});
+            if (!scope) {
+                global_variables =  add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""}, global_variables);
+            }
+            else {
+                local_variables = add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""}, local_variables);
+            }
         }
     }
 }
 
-void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, unordered_map<string, Variable* > local_variables) {
+void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, unordered_map<string, Variable* > local_variables, bool scope) {
     if (simpleDeclaration->variabledeclaration) {
-        check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables);
+        check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables, scope);
     }
     if (simpleDeclaration->typedeclaration) {
 //        check_TypeDeclaration(simpleDeclaration->typedeclaration)
@@ -509,8 +546,9 @@ void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, unordered_map
 
 
 void check_Declaration(Declaration *declaration) {
+    bool scope = false; //global
     if (declaration->simpledeclaration) {
-        check_SimpleDeclaration(declaration->simpledeclaration, {});
+        check_SimpleDeclaration(declaration->simpledeclaration, {}, scope);
     }
     if (declaration->routinedeclaration){
         check_RoutineDeclaration(declaration->routinedeclaration);

@@ -31,7 +31,7 @@ struct Function {
 
 void check_Program(Program *program);
 void check_Declaration(Declaration *declaration);
-void check_SimpleDeclaration(SimpleDeclaration *simpledeclaration, unordered_map<string, Variable* > local_variables);
+void check_SimpleDeclaration(SimpleDeclaration *simpledeclaration, unordered_map<string, Variable* > local_variables, bool scope);
 void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables);
 void check_InitialValue(InitialValue *initialvalue);
 void check_TypeDeclaration(TypeDeclaration *typedeclaration);
@@ -47,8 +47,8 @@ unordered_map<string, Variable* > check_ParametersDeclaration(ParametersDeclarat
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration);
 void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, unordered_map<string, Variable* > local_variables);
 void check_Body(Body *body, unordered_map<string, Variable* > local_variables);
-void check_Statement(Statement *statement);
-void check_Assignment(Assignment *assignment);
+void check_Statement(Statement *statement, unordered_map<string, Variable* > local_variables);
+void check_Assignment(Assignment *assignment, unordered_map<string, Variable* > local_variables);
 void check_RoutineCall(RoutineCall *routinecall);
 void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall);
 void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall);

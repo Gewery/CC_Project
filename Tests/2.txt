@@ -4,4 +4,4 @@ b := 8
 var d : Boolean
 end
 
-//OK
+// b = 8

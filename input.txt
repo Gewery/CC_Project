@@ -1,5 +1,6 @@
 var b : Integer is 5
+
 routine main (a : Integer, c : Boolean) : Boolean is
-var d : Boolean
 b := 8
+var a : Boolean
 end
