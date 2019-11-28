@@ -52,8 +52,8 @@ pair <map<string, Variable* >, map<string, Variable* >> check_Assignment(Assignm
 void check_RoutineCall(RoutineCall *routinecall);
 void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall);
 void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall);
-void check_WhileLoop(WhileLoop *whileloop);
-void check_ForLoop(ForLoop *forloop);
+pair <map<string, Variable* >, map<string, Variable* >> check_WhileLoop(WhileLoop *whileloop, map<string, Variable* > global_variables, map<string, Variable* > local_variables);
+pair <map<string, Variable* >, map<string, Variable* >> check_ForLoop(ForLoop *forloop, map<string, Variable* > global_variables, map<string, Variable* > local_variables);
 void check_Range(Range *range);
 void check_Reverse(Reverse *reverse);
 pair <map<string, Variable* >, map<string, Variable* >> check_IfStatement(IfStatement *ifstatement, map<string, Variable* > global_variables, map<string, Variable* > local_variables);

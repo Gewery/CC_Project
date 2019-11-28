@@ -35,6 +35,17 @@ bool is_record_in_table(string name, map<string, Variable* > table) {
     return false;
 }
 
+map<string, Variable* > update_table(map<string, Variable* > source, map<string, Variable* > target) {
+    for (auto x : source) {
+        if (is_record_in_table(x.first, target)) {
+            target[x.first] = x.second;
+        }
+    }
+    return target;
+};
+
+
+
 void check_Identifiers(Identifiers *identifiers) {
 
 }
@@ -183,18 +194,8 @@ pair <map<string, Variable* >, map<string, Variable* >> check_ElseInIfStatement(
         new_global_variables = result.first;
         new_local_variables = result.second;
     }
-
-    for (auto x : new_global_variables) {
-        if (is_record_in_table(x.first, global_variables)) {
-            global_variables[x.first] = x.second;
-        }
-    }
-    for (auto x : new_global_variables) {
-        if (is_record_in_table(x.first, local_variables)) {
-            local_variables[x.first] = x.second;
-        }
-    }
-
+    global_variables = update_table(new_global_variables, global_variables);
+    local_variables = update_table(new_global_variables, local_variables);
     return make_pair(global_variables, local_variables);
 }
 
@@ -212,17 +213,8 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_IfStatement(IfSta
         auto result = check_Body(ifstatement->body, new_global_variables, new_local_variables);
         new_global_variables = result.first;
         new_local_variables = result.second;
-        for (auto x : new_global_variables) {
-            if (is_record_in_table(x.first, global_variables)) {
-                global_variables[x.first] = x.second;
-            }
-        }
-
-        for (auto x : new_global_variables) {
-            if (is_record_in_table(x.first, local_variables)) {
-                local_variables[x.first] = x.second;
-            }
-        }
+        global_variables = update_table(new_global_variables, global_variables);
+        local_variables = update_table(new_global_variables, local_variables);
     }
     if (ifstatement->elseinifstatement) {
         auto result = check_ElseInIfStatement(ifstatement->elseinifstatement, global_variables, local_variables);
@@ -240,12 +232,51 @@ void check_Range(Range *range) {
 
 }
 
-void check_ForLoop(ForLoop *forloop) {
+pair <map<string, Variable* >, map<string, Variable* >> check_ForLoop(ForLoop *forloop, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+    map<string, Variable* > new_global_variables;
+    map<string, Variable* > new_local_variables;
 
+    new_global_variables.insert(global_variables.begin(), global_variables.end());
+    new_global_variables.insert(local_variables.begin(), local_variables.end());
+
+    struct result_with_sign {string type;  float value; bool isNot; string sign;};
+
+    if (!(forloop->name).empty()) {
+//        new_local_variables = add_to_symbol_table(forloop->name, result_with_sign {"integer", 0, 0, ""}, new_local_variables);
+    }
+    if (forloop->range) {
+
+    }
+    if (forloop->reverse) {
+
+    }
+    if (forloop->body) {
+        auto result = check_Body(forloop->body, new_global_variables, new_local_variables);
+        new_global_variables = result.first;
+        new_local_variables = result.second;
+    }
+    global_variables = update_table(new_global_variables, global_variables);
+    local_variables = update_table(new_global_variables, local_variables);
+    return make_pair(global_variables, local_variables);
 }
 
-void check_WhileLoop(WhileLoop *whileloop) {
+pair <map<string, Variable* >, map<string, Variable* >> check_WhileLoop(WhileLoop *whileloop, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+    map<string, Variable* > new_global_variables;
+    map<string, Variable* > new_local_variables;
 
+    new_global_variables.insert(global_variables.begin(), global_variables.end());
+    new_global_variables.insert(local_variables.begin(), local_variables.end());
+    if (whileloop->expression) {
+
+    }
+    if (whileloop->body) {
+        auto result = check_Body(whileloop->body, new_global_variables, new_local_variables);
+        new_global_variables = result.first;
+        new_local_variables = result.second;
+    }
+    global_variables = update_table(new_global_variables, global_variables);
+    local_variables = update_table(new_global_variables, local_variables);
+    return make_pair(global_variables, local_variables);
 }
 
 void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall) {
@@ -353,7 +384,9 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Stateme
 
     }
     else if (statement->whileloop) {
-
+        auto result = check_WhileLoop(statement->whileloop, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     else if (statement->forloop) {
 
