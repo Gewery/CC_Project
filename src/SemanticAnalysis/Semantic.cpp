@@ -171,21 +171,65 @@ auto check_Expression(Expression *expression) {
     }
 }
 
-void check_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
+pair <map<string, Variable* >, map<string, Variable* >> check_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+    map<string, Variable* > new_global_variables;
+    map<string, Variable* > new_local_variables;
 
+    new_global_variables.insert(global_variables.begin(), global_variables.end());
+    new_global_variables.insert(local_variables.begin(), local_variables.end());
+
+    if (elseinifstatement->body) {
+        auto result = check_Body(elseinifstatement->body, new_global_variables, new_local_variables);
+        new_global_variables = result.first;
+        new_local_variables = result.second;
+    }
+
+    for (auto x : new_global_variables) {
+        if (is_record_in_table(x.first, global_variables)) {
+            global_variables[x.first] = x.second;
+        }
+    }
+    for (auto x : new_global_variables) {
+        if (is_record_in_table(x.first, local_variables)) {
+            local_variables[x.first] = x.second;
+        }
+    }
+
+    return make_pair(global_variables, local_variables);
 }
 
-map<string, Variable* > check_IfStatement(IfStatement *ifstatement, map<string, Variable* > local_variables) {
-    map<string, Variable* > nested_local_variables;
+pair <map<string, Variable* >, map<string, Variable* >>  check_IfStatement(IfStatement *ifstatement, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+    map<string, Variable* > new_global_variables;
+    map<string, Variable* > new_local_variables;
+
+    new_global_variables.insert(global_variables.begin(), global_variables.end());
+    new_global_variables.insert(local_variables.begin(), local_variables.end());
+
     if (ifstatement->expression) {
 
     }
     if (ifstatement->body) {
-//        local_variables = check_Body(ifstatement->body, local_variables);
+        auto result = check_Body(ifstatement->body, new_global_variables, new_local_variables);
+        new_global_variables = result.first;
+        new_local_variables = result.second;
+        for (auto x : new_global_variables) {
+            if (is_record_in_table(x.first, global_variables)) {
+                global_variables[x.first] = x.second;
+            }
+        }
+
+        for (auto x : new_global_variables) {
+            if (is_record_in_table(x.first, local_variables)) {
+                local_variables[x.first] = x.second;
+            }
+        }
     }
     if (ifstatement->elseinifstatement) {
-        check_ElseInIfStatement(ifstatement->elseinifstatement);
+        auto result = check_ElseInIfStatement(ifstatement->elseinifstatement, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
+    return make_pair(global_variables, local_variables);
 }
 
 void check_Reverse(Reverse *reverse) {
@@ -224,7 +268,7 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assign
     bool is_local_variable= is_record_in_table(name, local_variables);
 
     if ((!is_record_in_table(name, global_variables) && (!is_record_in_table(name, local_variables)))){
-        cout << "\n\nASSVariable " << name << " was not declared!\n";
+        cout << "\n\nVariable " << name << " was not declared!\n";
         exit(0);
     }
 
@@ -315,7 +359,9 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Stateme
 
     }
     else if (statement->ifstatement) {
-        local_variables = check_IfStatement(statement->ifstatement, local_variables);
+        auto result = check_IfStatement(statement->ifstatement, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     return make_pair(global_variables, local_variables);
 }
@@ -327,6 +373,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_Body(Body *body, m
         local_variables = result.second;
     }
     if (body->statement) {
+        cout << "GLOBAL VARS\n";
         auto result = check_Statement(body->statement, global_variables, local_variables);
         global_variables = result.first;
         local_variables = result.second;
@@ -396,6 +443,7 @@ map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedecl
     string function_name;
     string type;
     vector<Variable*> parameters;
+
     if (!(routinedeclaration->name).empty()) {
         function_name = routinedeclaration->name;
     }
