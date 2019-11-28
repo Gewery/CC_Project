@@ -24,11 +24,9 @@ void rem_from_prefix(int a) {
 
 
 void print_bars(bool isLast) {
-    cout << "\n";
-    rem_from_prefix(4);
+    cout << " |" << "\n";
     if (isLast) cout << prefix + " └──";
     else cout << prefix +  " ├──";
-    add_spaces_to_prefix(4);
 
     if (!isLast) prefix += " │";
     else prefix += "  ";
@@ -121,7 +119,7 @@ void print_InitialValue(InitialValue *initialvalue, bool isLast) {
 
 void print_TypeDeclaration(TypeDeclaration *typedeclaration, bool isLast) {
     if (!typedeclaration) return;
-    check_TypeDeclaration(typedeclaration);
+    // check_TypeDeclaration(typedeclaration);
     print_bars(isLast);
 
     cout << "TypeDeclaration";
