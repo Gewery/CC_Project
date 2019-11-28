@@ -217,7 +217,7 @@ void check_RoutineCall(RoutineCall *routinecall) {
 
 }
 
-void check_Assignment(Assignment *assignment, unordered_map<string, Variable* > local_variables) {
+unordered_map<string, Variable* >  check_Assignment(Assignment *assignment, unordered_map<string, Variable* > local_variables) {
     string name;
     if (assignment->modifiableprimary) {
         name = check_ModifiablePrimary(assignment->modifiableprimary);
@@ -228,7 +228,6 @@ void check_Assignment(Assignment *assignment, unordered_map<string, Variable* > 
         cout << "\n\nASSVariable " << name << " was not declared!\n";
         exit(0);
     }
-
 
     //getting the type of record
     string record_type;
@@ -298,11 +297,12 @@ void check_Assignment(Assignment *assignment, unordered_map<string, Variable* > 
             exit(0);
         }
     }
+    return local_variables;
 }
 
-void check_Statement(Statement *statement, unordered_map<string, Variable* > local_variables) {
+unordered_map<string, Variable* >  check_Statement(Statement *statement, unordered_map<string, Variable* > local_variables) {
     if (statement->assignment) {
-        check_Assignment(statement->assignment, local_variables);
+        local_variables = check_Assignment(statement->assignment, local_variables);
     }
     else if (statement->routinecall) {
 
@@ -316,25 +316,27 @@ void check_Statement(Statement *statement, unordered_map<string, Variable* > loc
     else if (statement->ifstatement) {
         check_IfStatement(statement->ifstatement);
     }
+    return local_variables;
 }
 
-void check_Body(Body *body, unordered_map<string, Variable* > local_variables) {
+unordered_map<string, Variable* > check_Body(Body *body, unordered_map<string, Variable* > local_variables) {
     if (body->simpledeclaration) {
-        check_SimpleDeclaration(body->simpledeclaration, local_variables, true);
-
+        local_variables = check_SimpleDeclaration(body->simpledeclaration, local_variables, true);
     }
     if (body->statement) {
-        check_Statement(body->statement, local_variables);
+        local_variables = check_Statement(body->statement, local_variables);
     }
     if (body->body) {
-        check_Body(body->body, local_variables);
+        local_variables = check_Body(body->body, local_variables);
     }
+    return local_variables;
 }
 
-void check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, unordered_map<string, Variable* > local_variables) {
+unordered_map<string, Variable* > check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, unordered_map<string, Variable* > local_variables) {
     if (bodyinroutinedeclaration->body) {
-        check_Body(bodyinroutinedeclaration->body, local_variables);
+        local_variables = check_Body(bodyinroutinedeclaration->body, local_variables);
     }
+    return local_variables;
 }
 
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
@@ -392,17 +394,17 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     }
     if (routinedeclaration->parameters) {
         local_variables = check_Parameters(routinedeclaration->parameters, local_variables);
-//        for (auto x : local_variables)
-//            parameters.push_back(x);
-//            cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 
     }
     if (routinedeclaration->typeinroutinedeclaration) {
         type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
     }
     if (routinedeclaration->bodyinroutinedeclaration) {
-        check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, local_variables);
+        local_variables = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, local_variables);
     }
+    cout << "TTT";
+    for (auto x : local_variables)
+        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 //    Function *f1 = new Function(type, INFINITY, parameters);
 //    functions[function_name] = f1;
 }
@@ -471,7 +473,7 @@ void check_InitialValue(InitialValue *initialvalue) {
 
 }
 
-void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables,
+unordered_map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables,
                                bool scope) {
     // firstly, checking whether variable was already declared
 
@@ -533,15 +535,17 @@ void check_VariableDeclaration(VariableDeclaration *variabledeclaration, unorder
             }
         }
     }
+    return local_variables;
 }
 
-void check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, unordered_map<string, Variable* > local_variables, bool scope) {
+unordered_map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, unordered_map<string, Variable* > local_variables, bool scope) {
     if (simpleDeclaration->variabledeclaration) {
-        check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables, scope);
+        local_variables = check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables, scope);
     }
     if (simpleDeclaration->typedeclaration) {
 //        check_TypeDeclaration(simpleDeclaration->typedeclaration)
     }
+    return local_variables;
 }
 
 

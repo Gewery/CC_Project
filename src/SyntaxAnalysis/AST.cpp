@@ -23,7 +23,6 @@ void rem_from_prefix(int a) {
     for (int i = 0; i < a; i++, prefix.pop_back());
 }
 
-
 void print_bars(bool isLast) {
     cout << " |" << "\n";
     if (isLast) cout << prefix + " └──";
