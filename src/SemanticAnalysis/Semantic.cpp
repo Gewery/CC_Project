@@ -15,8 +15,7 @@ map<string, string > types = {
     {"real", "real"},
     {"boolean", "boolean"}
 };
-map<string, Variable* > variables;
-map<string, Function* > functions;
+unordered_map<string, Function* > functions;
 
 bool isEqual(string str1, string str2) {
     return str1.compare(str2) == 0;
@@ -447,7 +446,7 @@ string check_Type(Type *type) {
     }
 }
 
-void check_TypeDeclaration(TypeDeclaration *typedeclaration) {
+void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope) {
     string name = typedeclaration->name,
            type = check_Type(typedeclaration->type);
 
@@ -542,7 +541,7 @@ map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpleDeclara
         local_variables = check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables, scope);
     }
     if (simpleDeclaration->typedeclaration) {
-//        check_TypeDeclaration(simpleDeclaration->typedeclaration)
+        check_TypeDeclaration(simpleDeclaration->typedeclaration, scope);
     }
     return local_variables;
 }

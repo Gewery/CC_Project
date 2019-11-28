@@ -1,7 +1,7 @@
 %{
     #include <stdio.h>
     #include <string>
-    #include "AST.h"
+    #include "../SemanticAnalysis/SymbolTable.h"
     #include "../LexicalAnalysis/lexems.h"
 
     int yylex();
@@ -393,6 +393,7 @@ int main(int argc, char **argv){
     yyparse();
     cout << "\n\nAST\n";
     cout << "======###========\n\n";
+    check_Program(root);
     print_Program(root, 1);
     return 0;
 }

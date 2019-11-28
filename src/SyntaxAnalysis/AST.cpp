@@ -43,7 +43,6 @@ void print_margine(int number) {
 
 void print_Program(Program *program, bool isLast) {
     if (!program) return;
-    check_Program(program);
     print_bars(isLast);
     cout << "Program";
     add_spaces_to_prefix(2 + 7);
@@ -91,7 +90,6 @@ void print_VariableDeclaration(VariableDeclaration *variabledeclaration, bool is
     cout << "VariableDeclaration";
 
     add_spaces_to_prefix(2 + 19);
-//    check_VariableDeclaration(variabledeclaration);
     cout << " |\n" + prefix  << variabledeclaration->name << "\n" + prefix;
     if (!variabledeclaration->initialvalue && !variabledeclaration->expression)
         print_Type(variabledeclaration->type, 1);
@@ -119,7 +117,6 @@ void print_InitialValue(InitialValue *initialvalue, bool isLast) {
 
 void print_TypeDeclaration(TypeDeclaration *typedeclaration, bool isLast) {
     if (!typedeclaration) return;
-    // check_TypeDeclaration(typedeclaration);
     print_bars(isLast);
 
     cout << "TypeDeclaration";
@@ -354,7 +351,6 @@ void print_Assignment(Assignment *assignment, bool isLast) {
     print_bars(isLast);
 
     cout << "Assignment";
-//    check_Assignment(assignment);
     add_spaces_to_prefix(2 + 10);
     if (!assignment->expression) print_ModifiablePrimary(assignment->modifiableprimary, 1);
     else print_ModifiablePrimary(assignment->modifiableprimary, 0);

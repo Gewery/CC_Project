@@ -34,7 +34,7 @@ void check_Declaration(Declaration *declaration);
 map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpledeclaration, map<string, Variable* > local_variables, bool scope);
 map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > local_variables, bool scope);
 void check_InitialValue(InitialValue *initialvalue);
-void check_TypeDeclaration(TypeDeclaration *typedeclaration);
+void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope);
 string check_Type(Type *type);
 void check_PrimitiveType(PrimitiveType *primitivetype);
 void check_ArrayType(ArrayType *arraytype);
