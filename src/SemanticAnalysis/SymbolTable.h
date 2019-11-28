@@ -1,5 +1,5 @@
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "../SyntaxAnalysis/AST.h"
@@ -31,8 +31,8 @@ struct Function {
 
 void check_Program(Program *program);
 void check_Declaration(Declaration *declaration);
-unordered_map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpledeclaration, unordered_map<string, Variable* > local_variables, bool scope);
-unordered_map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables, bool scope);
+map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpledeclaration, map<string, Variable* > local_variables, bool scope);
+map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > local_variables, bool scope);
 void check_InitialValue(InitialValue *initialvalue);
 void check_TypeDeclaration(TypeDeclaration *typedeclaration);
 string check_Type(Type *type);
@@ -41,14 +41,14 @@ void check_ArrayType(ArrayType *arraytype);
 void check_RecordType(RecordType *recordtype);
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations);
 void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration);
-unordered_map<string, Variable* > check_Parameters(Parameters *parameters, unordered_map<string, Variable* > local_variables);
-unordered_map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, unordered_map<string, Variable* > local_variables);
-unordered_map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, unordered_map<string, Variable* > local_variables);
+map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Variable* > local_variables);
+map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Variable* > local_variables);
+map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Variable* > local_variables);
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration);
-unordered_map<string, Variable* > check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, unordered_map<string, Variable* > local_variables);
-unordered_map<string, Variable* > check_Body(Body *body, unordered_map<string, Variable* > local_variables);
-unordered_map<string, Variable* > check_Statement(Statement *statement, unordered_map<string, Variable* > local_variables);
-unordered_map<string, Variable* > check_Assignment(Assignment *assignment, unordered_map<string, Variable* > local_variables);
+map<string, Variable* > check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Variable* > local_variables);
+map<string, Variable* > check_Body(Body *body, map<string, Variable* > local_variables);
+map<string, Variable* > check_Statement(Statement *statement, map<string, Variable* > local_variables);
+map<string, Variable* > check_Assignment(Assignment *assignment, map<string, Variable* > local_variables);
 void check_RoutineCall(RoutineCall *routinecall);
 void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall);
 void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall);

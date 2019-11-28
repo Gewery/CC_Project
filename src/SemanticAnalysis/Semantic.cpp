@@ -9,26 +9,26 @@
 
 using namespace std;
 
-unordered_map<string, Variable* > global_variables;
-unordered_map<string, string > types = {
+map<string, Variable* > global_variables;
+map<string, string > types = {
     {"integer", "integer"},
     {"real", "real"},
     {"boolean", "boolean"}
 };
-unordered_map<string, Variable* > variables;
-unordered_map<string, Function* > functions;
+map<string, Variable* > variables;
+map<string, Function* > functions;
 
 bool isEqual(string str1, string str2) {
     return str1.compare(str2) == 0;
 }
 
-unordered_map<string, Variable* > add_to_symbol_table(string name, auto result, unordered_map<string, Variable* > table) {
+map<string, Variable* > add_to_symbol_table(string name, auto result, map<string, Variable* > table) {
     Variable *v1 = new Variable(result.type, 0, result.value);
     table[name] = v1;
     return table;
 }
 
-bool is_record_in_table(string name, unordered_map<string, Variable* > table) {
+bool is_record_in_table(string name, map<string, Variable* > table) {
     for (auto x : table) {
         if (isEqual(x.first, name)) {
             return true;
@@ -217,7 +217,7 @@ void check_RoutineCall(RoutineCall *routinecall) {
 
 }
 
-unordered_map<string, Variable* >  check_Assignment(Assignment *assignment, unordered_map<string, Variable* > local_variables) {
+map<string, Variable* >  check_Assignment(Assignment *assignment, map<string, Variable* > local_variables) {
     string name;
     if (assignment->modifiableprimary) {
         name = check_ModifiablePrimary(assignment->modifiableprimary);
@@ -300,7 +300,7 @@ unordered_map<string, Variable* >  check_Assignment(Assignment *assignment, unor
     return local_variables;
 }
 
-unordered_map<string, Variable* >  check_Statement(Statement *statement, unordered_map<string, Variable* > local_variables) {
+map<string, Variable* >  check_Statement(Statement *statement, map<string, Variable* > local_variables) {
     if (statement->assignment) {
         local_variables = check_Assignment(statement->assignment, local_variables);
     }
@@ -319,7 +319,7 @@ unordered_map<string, Variable* >  check_Statement(Statement *statement, unorder
     return local_variables;
 }
 
-unordered_map<string, Variable* > check_Body(Body *body, unordered_map<string, Variable* > local_variables) {
+map<string, Variable* > check_Body(Body *body, map<string, Variable* > local_variables) {
     if (body->simpledeclaration) {
         local_variables = check_SimpleDeclaration(body->simpledeclaration, local_variables, true);
     }
@@ -332,7 +332,7 @@ unordered_map<string, Variable* > check_Body(Body *body, unordered_map<string, V
     return local_variables;
 }
 
-unordered_map<string, Variable* > check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, unordered_map<string, Variable* > local_variables) {
+map<string, Variable* > check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Variable* > local_variables) {
     if (bodyinroutinedeclaration->body) {
         local_variables = check_Body(bodyinroutinedeclaration->body, local_variables);
     }
@@ -345,7 +345,7 @@ string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedec
     }
 }
 
-unordered_map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, unordered_map<string, Variable* > local_variables) {
+map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Variable* > local_variables) {
     if (parametersdeclaration->parameterdeclaration) {
         local_variables = check_ParameterDeclaration(parametersdeclaration->parameterdeclaration, local_variables);
 //        local_variables.insert(temp.begin(), temp.end());
@@ -357,7 +357,7 @@ unordered_map<string, Variable* > check_ParametersDeclaration(ParametersDeclarat
     return local_variables;
 }
 
-unordered_map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, unordered_map<string, Variable* > local_variables) {
+map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Variable* > local_variables) {
     string name;
     string type;
     if (!(parameterdeclaration->name).empty()) {
@@ -371,7 +371,7 @@ unordered_map<string, Variable* > check_ParameterDeclaration(ParameterDeclaratio
     return local_variables;
 }
 
-unordered_map<string, Variable* > check_Parameters(Parameters *parameters, unordered_map<string, Variable* > local_variables) {
+map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Variable* > local_variables) {
     if (parameters->parameterdeclaration) {
         local_variables = check_ParameterDeclaration(parameters->parameterdeclaration, local_variables);
     }
@@ -383,7 +383,7 @@ unordered_map<string, Variable* > check_Parameters(Parameters *parameters, unord
 }
 
 void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
-    unordered_map<string, Variable* > local_variables;
+    map<string, Variable* > local_variables;
     string function_name;
     string type;
     vector<Variable*> parameters;
@@ -472,7 +472,7 @@ void check_InitialValue(InitialValue *initialvalue) {
 
 }
 
-unordered_map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabledeclaration, unordered_map<string, Variable* > local_variables,
+map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > local_variables,
                                bool scope) {
     // firstly, checking whether variable was already declared
 
@@ -537,7 +537,7 @@ unordered_map<string, Variable* > check_VariableDeclaration(VariableDeclaration 
     return local_variables;
 }
 
-unordered_map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, unordered_map<string, Variable* > local_variables, bool scope) {
+map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Variable* > local_variables, bool scope) {
     if (simpleDeclaration->variabledeclaration) {
         local_variables = check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables, scope);
     }
