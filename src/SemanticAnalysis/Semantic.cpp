@@ -268,7 +268,7 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assign
     bool is_local_variable= is_record_in_table(name, local_variables);
 
     if ((!is_record_in_table(name, global_variables) && (!is_record_in_table(name, local_variables)))){
-        cout << "\n\nVariable " << name << " was not declared!\n";
+        cout << "\n\nASSVariable " << name << " was not declared!\n";
         exit(0);
     }
 
@@ -373,7 +373,6 @@ pair <map<string, Variable* >, map<string, Variable* >> check_Body(Body *body, m
         local_variables = result.second;
     }
     if (body->statement) {
-        cout << "GLOBAL VARS\n";
         auto result = check_Statement(body->statement, global_variables, local_variables);
         global_variables = result.first;
         local_variables = result.second;
@@ -600,6 +599,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
             }
         }
     }
+
     return make_pair(global_variables, local_variables);
 }
 
