@@ -347,12 +347,12 @@ string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedec
 
 unordered_map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, unordered_map<string, Variable* > local_variables) {
     if (parametersdeclaration->parameterdeclaration) {
-        unordered_map<string, Variable* > temp = check_ParameterDeclaration(parametersdeclaration->parameterdeclaration, local_variables);
-        local_variables.insert(temp.begin(), temp.end());
+        local_variables = check_ParameterDeclaration(parametersdeclaration->parameterdeclaration, local_variables);
+//        local_variables.insert(temp.begin(), temp.end());
     }
     if (parametersdeclaration->parametersdeclaration) {
-        unordered_map<string, Variable* > temp = check_ParametersDeclaration(parametersdeclaration->parametersdeclaration, local_variables);
-        local_variables.insert(temp.begin(), temp.end());
+        local_variables = check_ParametersDeclaration(parametersdeclaration->parametersdeclaration, local_variables);
+//        local_variables.insert(temp.begin(), temp.end());
     }
     return local_variables;
 }
@@ -367,8 +367,6 @@ unordered_map<string, Variable* > check_ParameterDeclaration(ParameterDeclaratio
         type = check_Type(parameterdeclaration->type);
     }
     Variable *v1 = new Variable(type, 1, INFINITY);
-    vector<Variable*> vect;
-    vect.push_back(v1);
     local_variables[name] = v1;
     return local_variables;
 }
@@ -378,8 +376,8 @@ unordered_map<string, Variable* > check_Parameters(Parameters *parameters, unord
         local_variables = check_ParameterDeclaration(parameters->parameterdeclaration, local_variables);
     }
     if (parameters->parametersdeclaration) {
-        unordered_map<string, Variable* > temp = check_ParametersDeclaration(parameters->parametersdeclaration, local_variables);
-        local_variables.insert(temp.begin(), temp.end());
+        local_variables = check_ParametersDeclaration(parameters->parametersdeclaration, local_variables);
+//        local_variables.insert(temp.begin(), temp.end());
     }
     return local_variables;
 }
@@ -388,13 +386,16 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     unordered_map<string, Variable* > local_variables;
     string function_name;
     string type;
-//    vector<Variable*> parameters;
+    vector<Variable*> parameters;
     if (!(routinedeclaration->name).empty()) {
         function_name = routinedeclaration->name;
     }
     if (routinedeclaration->parameters) {
         local_variables = check_Parameters(routinedeclaration->parameters, local_variables);
-
+        for (std::pair<const std::__cxx11::basic_string<char>, Variable*> x : local_variables) {
+            parameters.push_back(x.second);
+            cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
+        }
     }
     if (routinedeclaration->typeinroutinedeclaration) {
         type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
@@ -402,11 +403,9 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     if (routinedeclaration->bodyinroutinedeclaration) {
         local_variables = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, local_variables);
     }
-    cout << "TTT";
-    for (auto x : local_variables)
-        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
-//    Function *f1 = new Function(type, INFINITY, parameters);
-//    functions[function_name] = f1;
+
+    Function *f1 = new Function(type, INFINITY, parameters);
+    functions[function_name] = f1;
 }
 
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations) {
@@ -569,8 +568,10 @@ void check_Program(Program *program) {
     for (auto x : global_variables)
         cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 
-    for (auto x : functions)
+    for (auto x : functions) {
         cout << "\n" << x.first << " " << x.second->return_type  << " " << endl;
-
-
+        for (auto param : x.second->arguments) {
+            cout << param->type << " " << param->value << endl;
+        }
+    }
 }
