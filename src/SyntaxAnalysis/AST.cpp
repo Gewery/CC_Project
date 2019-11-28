@@ -9,6 +9,7 @@
 #include <bits/stdc++.h>
 
 #include "../SemanticAnalysis/SymbolTable.h"
+#include "../TraceLogger/TraceLogger.h"
 
 using namespace std;
 
