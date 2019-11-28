@@ -394,6 +394,6 @@ int main(int argc, char **argv){
     cout << "\n\nAST\n";
     cout << "======###========\n\n";
     check_Program(root);
-    print_Program(root, 1);
+    //print_Program(root, 1);
     return 0;
 }

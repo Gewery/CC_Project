@@ -1,5 +1,5 @@
 var b : Integer is 5
-routine main (a : Integer, c : Boolean, d : Real, f : Integer) : Boolean is
+routine main (a : Integer, c : Boolean) : Boolean is
 var b : Boolean
 var y : Real is 6.8
 y := 6.2

@@ -9,13 +9,12 @@
 
 using namespace std;
 
-map<string, Variable* > global_variables;
 map<string, string > types = {
     {"integer", "integer"},
     {"real", "real"},
     {"boolean", "boolean"}
 };
-unordered_map<string, Function* > functions;
+map<string, Function* > functions;
 
 bool isEqual(string str1, string str2) {
     return str1.compare(str2) == 0;
@@ -176,12 +175,13 @@ void check_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
 
 }
 
-void check_IfStatement(IfStatement *ifstatement) {
+map<string, Variable* > check_IfStatement(IfStatement *ifstatement, map<string, Variable* > local_variables) {
+    map<string, Variable* > nested_local_variables;
     if (ifstatement->expression) {
 
     }
     if (ifstatement->body) {
-
+//        local_variables = check_Body(ifstatement->body, local_variables);
     }
     if (ifstatement->elseinifstatement) {
         check_ElseInIfStatement(ifstatement->elseinifstatement);
@@ -216,7 +216,7 @@ void check_RoutineCall(RoutineCall *routinecall) {
 
 }
 
-map<string, Variable* >  check_Assignment(Assignment *assignment, map<string, Variable* > local_variables) {
+pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assignment *assignment, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
     string name;
     if (assignment->modifiableprimary) {
         name = check_ModifiablePrimary(assignment->modifiableprimary);
@@ -296,12 +296,14 @@ map<string, Variable* >  check_Assignment(Assignment *assignment, map<string, Va
             exit(0);
         }
     }
-    return local_variables;
+    return make_pair(global_variables, local_variables);
 }
 
-map<string, Variable* >  check_Statement(Statement *statement, map<string, Variable* > local_variables) {
+pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Statement *statement, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
     if (statement->assignment) {
-        local_variables = check_Assignment(statement->assignment, local_variables);
+        auto result = check_Assignment(statement->assignment, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     else if (statement->routinecall) {
 
@@ -313,29 +315,37 @@ map<string, Variable* >  check_Statement(Statement *statement, map<string, Varia
 
     }
     else if (statement->ifstatement) {
-        check_IfStatement(statement->ifstatement);
+        local_variables = check_IfStatement(statement->ifstatement, local_variables);
     }
-    return local_variables;
+    return make_pair(global_variables, local_variables);
 }
 
-map<string, Variable* > check_Body(Body *body, map<string, Variable* > local_variables) {
+pair <map<string, Variable* >, map<string, Variable* >> check_Body(Body *body, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
     if (body->simpledeclaration) {
-        local_variables = check_SimpleDeclaration(body->simpledeclaration, local_variables, true);
+        auto result = check_SimpleDeclaration(body->simpledeclaration, global_variables, local_variables, true);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     if (body->statement) {
-        local_variables = check_Statement(body->statement, local_variables);
+        auto result = check_Statement(body->statement, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     if (body->body) {
-        local_variables = check_Body(body->body, local_variables);
+        auto result = check_Body(body->body, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
-    return local_variables;
+    return make_pair(global_variables, local_variables);
 }
 
-map<string, Variable* > check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Variable* > local_variables) {
+pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
     if (bodyinroutinedeclaration->body) {
-        local_variables = check_Body(bodyinroutinedeclaration->body, local_variables);
+        auto result = check_Body(bodyinroutinedeclaration->body, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
-    return local_variables;
+    return make_pair(global_variables, local_variables);
 }
 
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
@@ -344,18 +354,18 @@ string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedec
     }
 }
 
+//DONE
 map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Variable* > local_variables) {
     if (parametersdeclaration->parameterdeclaration) {
         local_variables = check_ParameterDeclaration(parametersdeclaration->parameterdeclaration, local_variables);
-//        local_variables.insert(temp.begin(), temp.end());
     }
     if (parametersdeclaration->parametersdeclaration) {
         local_variables = check_ParametersDeclaration(parametersdeclaration->parametersdeclaration, local_variables);
-//        local_variables.insert(temp.begin(), temp.end());
     }
     return local_variables;
 }
 
+//DONE
 map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Variable* > local_variables) {
     string name;
     string type;
@@ -381,7 +391,7 @@ map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Var
     return local_variables;
 }
 
-void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
+map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables) {
     map<string, Variable* > local_variables;
     string function_name;
     string type;
@@ -400,11 +410,20 @@ void check_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
         type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
     }
     if (routinedeclaration->bodyinroutinedeclaration) {
-        local_variables = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, local_variables);
+        auto result = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
 
     Function *f1 = new Function(type, INFINITY, parameters);
     functions[function_name] = f1;
+
+    cout << "LOCAL VARS\n";
+    for (auto x : local_variables)
+        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
+    cout << "====";
+
+    return global_variables;
 }
 
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations) {
@@ -471,7 +490,7 @@ void check_InitialValue(InitialValue *initialvalue) {
 
 }
 
-map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > local_variables,
+pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables,
                                bool scope) {
     // firstly, checking whether variable was already declared
 
@@ -533,38 +552,43 @@ map<string, Variable* > check_VariableDeclaration(VariableDeclaration *variabled
             }
         }
     }
-    return local_variables;
+    return make_pair(global_variables, local_variables);
 }
 
-map<string, Variable* > check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Variable* > local_variables, bool scope) {
+pair <map<string, Variable* >, map<string, Variable* >> check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope) {
     if (simpleDeclaration->variabledeclaration) {
-        local_variables = check_VariableDeclaration(simpleDeclaration->variabledeclaration, local_variables, scope);
+        auto result = check_VariableDeclaration(simpleDeclaration->variabledeclaration, global_variables, local_variables, scope);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     if (simpleDeclaration->typedeclaration) {
         check_TypeDeclaration(simpleDeclaration->typedeclaration, scope);
     }
-    return local_variables;
+    return make_pair(global_variables, local_variables);
 }
 
-
-void check_Declaration(Declaration *declaration) {
+map<string, Variable* > check_Declaration(Declaration *declaration, map<string, Variable* > global_variables) {
     bool scope = false; //global
     if (declaration->simpledeclaration) {
-        check_SimpleDeclaration(declaration->simpledeclaration, {}, scope);
+        auto result = check_SimpleDeclaration(declaration->simpledeclaration, global_variables, {}, scope);
+        global_variables = result.first;
     }
     if (declaration->routinedeclaration){
-        check_RoutineDeclaration(declaration->routinedeclaration);
+        global_variables = check_RoutineDeclaration(declaration->routinedeclaration, global_variables);
     }
+    return global_variables;
 }
 
+map<string, Variable* > glob_variables;
 void check_Program(Program *program) {
     if (program->declaration) {
-        check_Declaration(program->declaration);
+        glob_variables = check_Declaration(program->declaration, glob_variables);
     }
     if (program->program) {
         check_Program(program->program);
     }
-    for (auto x : global_variables)
+
+    for (auto x : glob_variables)
         cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
 
     for (auto x : functions) {
