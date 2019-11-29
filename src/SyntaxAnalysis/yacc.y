@@ -157,7 +157,7 @@
 Program
     : Declaration Program                           { $$ = new Program($1, $2); root = $$; }
     | DECLARATION_SEPARATOR Program                 { $$ = $2; root = $$; }
-    |                                               { $$ = new Program(NULL, NULL); root = $$; }
+    |                                               { $$ = NULL; root = $$; }
     ;
 
 Declaration
@@ -177,7 +177,7 @@ VariableDeclaration
 
 InitialValue
     : IS Expression                                 { $$ = new InitialValue($2); }
-    |                                               { $$ = new InitialValue(NULL); }
+    |                                               { $$ = new InitialValue(NULL); } //todo
     ;
 
 TypeDeclaration
@@ -207,7 +207,7 @@ RecordType
 
 VariableDeclarations
     : VariableDeclaration VariableDeclarations      { $$ = new VariableDeclarations($1, $2); }
-    |                                               { $$ = new VariableDeclarations(NULL, NULL); }
+    |                                               { $$ = NULL; }
     ;
 
 RoutineDeclaration
@@ -216,7 +216,7 @@ RoutineDeclaration
 
 Parameters
     : PARENTHESES_L ParameterDeclaration ParametersDeclaration PARENTHESES_R    { $$ = new Parameters($2, $3); }
-    |                                                                           { $$ = new Parameters(NULL, NULL); }
+    |                                                                           { $$ = NULL; }
     ;
 
 ParameterDeclaration
@@ -225,23 +225,23 @@ ParameterDeclaration
 
 ParametersDeclaration
     : COMMA ParameterDeclaration ParametersDeclaration        { $$ = new ParametersDeclaration($2, $3); }
-    |                                                         { $$ = new ParametersDeclaration(NULL, NULL); }
+    |                                                         { $$ = NULL; }
     ;
 
 TypeInRoutineDeclaration
     : COLON Type                                      { $$ = new TypeInRoutineDeclaration($2); }
-    |                                                 { $$ = new TypeInRoutineDeclaration(NULL); }
+    |                                                 { $$ = NULL; }
     ;
 
 BodyInRoutineDeclaration
     : IS Body END                                   { $$ = new BodyInRoutineDeclaration($2); }
-    |                                               { $$ = new BodyInRoutineDeclaration(NULL); }
+    |                                               { $$ = NULL; }
     ;
 
 Body
     : SimpleDeclaration Body                        { $$ = new Body($1, NULL, $2); }
     | Statement Body                                { $$ = new Body(NULL, $1, $2); }
-    |                                               { $$ = new Body(NULL, NULL, NULL); }
+    |                                               { $$ = NULL; }
     ;
 
 Statement
@@ -262,12 +262,12 @@ RoutineCall
 
 ExpressionInRoutineCall
     : PARENTHESES_L Expression ExpressionsInRoutineCall PARENTHESES_R   { $$ = new ExpressionInRoutineCall($2, $3); }
-    |                                                                   { $$ = new ExpressionInRoutineCall(NULL, NULL); }
+    |                                                                   { $$ = NULL; }
     ;
 
 ExpressionsInRoutineCall
     : COMMA Expression ExpressionInRoutineCall        { $$ = new ExpressionsInRoutineCall($2, $3); }
-    |                                                 { $$ = new ExpressionsInRoutineCall(NULL, NULL); }
+    |                                                 { $$ = NULL; }
     ;
 
 WhileLoop
@@ -293,7 +293,7 @@ IfStatement
 
 ElseInIfStatement
     : ELSE Body                                     { $$ = new ElseInIfStatement($2); }
-    |                                               { $$ = new ElseInIfStatement(NULL); }
+    |                                               { $$ = NULL; }
     ;
 
 Expression
@@ -302,7 +302,7 @@ Expression
 
 MultipleRelationsInExpression
     : LogicalOperator Relation MultipleRelationsInExpression    { $$ = new MultipleRelationsInExpression($1, $2, $3); }
-    |                                                           { $$ = new MultipleRelationsInExpression(NULL, NULL, NULL); }
+    |                                                           { $$ = NULL; }
     ;
 
 LogicalOperator
@@ -317,7 +317,7 @@ Relation
 
 ComparisonInRelation
     : ComparisonOperator Simple                     { $$ = new ComparisonInRelation($1, $2); }
-    |                                               { $$ = new ComparisonInRelation(NULL, NULL); }
+    |                                               { $$ = NULL; }
     ;
 
 ComparisonOperator
@@ -335,7 +335,7 @@ Simple
 
 Factors
     : SimpleOperator Factor Factors                 { $$ = new Factors($1, $2, $3); }
-    |                                               { $$ = new Factors(NULL, NULL, NULL); }
+    |                                               { $$ = NULL; }
     ;
 
 SimpleOperator
@@ -350,7 +350,7 @@ Factor
 
 Summands
     : Sign Summand Summands                         { $$ = new Summands($1, $2, $3); }
-    |                                               { $$ = new Summands(NULL, NULL, NULL); }
+    |                                               { $$ = NULL; }
     ;
 
 Summand
@@ -382,7 +382,7 @@ ModifiablePrimary
 Identifiers
     : DOT IDENTIFIER Identifiers                     { $$ = new Identifiers(get_yyextra_string(), NULL, $3); }
     | BRACKETS_L Expression BRACKETS_R Identifiers   { $$ = new Identifiers("", $2, $4); }
-    |                                                { $$ = new Identifiers("", NULL, NULL); }
+    |                                                { $$ = NULL; }
     ;
 
 %%
