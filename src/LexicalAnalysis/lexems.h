@@ -29,6 +29,7 @@ struct Lexems {
         static constexpr const char *RECORD  = "record";
         static constexpr const char *ARRAY   = "array";
         static constexpr const char *ROUTINE = "routine";
+        static constexpr const char *RETURN = "return";
     };
     struct BooleanLiterals {
         static constexpr const char *TRUE  = "true";

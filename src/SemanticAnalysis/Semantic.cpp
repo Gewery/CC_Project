@@ -470,6 +470,12 @@ map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Var
     return local_variables;
 }
 
+map<string, Variable* > check_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+    if (returnInRoutine->expression) {
+
+    }
+};
+
 map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables) {
     map<string, Variable* > local_variables;
     string function_name;
