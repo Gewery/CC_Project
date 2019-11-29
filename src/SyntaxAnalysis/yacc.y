@@ -179,7 +179,7 @@ VariableDeclaration
 
 InitialValue
     : IS Expression                                 { $$ = new InitialValue($2); }
-    |                                               { $$ = new InitialValue(NULL); } //todo
+    |                                               { $$ = NULL; }
     ;
 
 TypeDeclaration
