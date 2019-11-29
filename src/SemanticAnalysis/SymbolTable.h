@@ -17,11 +17,9 @@ struct Variable {
 
 struct Function {
     string return_type;
-    float return_value;
     vector<Variable*> arguments;
-    Function(string return_type_of_func, float return_value_of_func, vector<Variable*> &arguments_of_func) {
+    Function(string return_type_of_func, vector<Variable*> &arguments_of_func) {
         return_type = return_type_of_func;
-        return_value = return_value_of_func;
         arguments = arguments_of_func;
     }
 };
@@ -39,7 +37,7 @@ void check_ArrayType(ArrayType *arraytype);
 void check_RecordType(RecordType *recordtype);
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations);
 map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables);
-map<string, Variable* > check_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Variable* > global_variables, map<string, Variable* > local_variables);
+string check_ReturnInRoutine(ReturnInRoutine *returnInRoutine);
 map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Variable* > local_variables);
 map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Variable* > local_variables);
 map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Variable* > local_variables);

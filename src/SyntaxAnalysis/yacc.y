@@ -214,11 +214,11 @@ VariableDeclarations
 
 RoutineDeclaration
     : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration ReturnInRoutine  { $$ = new RoutineDeclaration(get_yyextra_string(), $3, $4, $5, $6); }
+    | ROUTINE IDENTIFIER Parameters BodyInRoutineDeclaration  { $$ = new RoutineDeclaration(get_yyextra_string(), $3, NULL, $4, NULL); }
     ;
 
 ReturnInRoutine
     : RETURN Expression                                                          { $$ = new ReturnInRoutine($2); }
-    |                                                                            { $$ = NULL; }
     ;
 
 Parameters
@@ -237,7 +237,6 @@ ParametersDeclaration
 
 TypeInRoutineDeclaration
     : COLON Type                                      { $$ = new TypeInRoutineDeclaration($2); }
-    |                                                 { $$ = NULL; }
     ;
 
 BodyInRoutineDeclaration

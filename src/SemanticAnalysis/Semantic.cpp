@@ -460,16 +460,17 @@ map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Var
     return local_variables;
 }
 
-map<string, Variable* > check_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+string check_ReturnInRoutine(ReturnInRoutine *returnInRoutine) {
+    cout << "YYYY";
     if (returnInRoutine->expression) {
-
+        return check_Expression(returnInRoutine->expression);
     }
 };
 
 map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables) {
     map<string, Variable* > local_variables;
     string function_name;
-    string type;
+    string return_type;
     vector<Variable*> parameters;
 
     if (!(routinedeclaration->name).empty()) {
@@ -483,7 +484,24 @@ map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedecl
         }
     }
     if (routinedeclaration->typeinroutinedeclaration) {
-        type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
+        return_type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
+        if (routinedeclaration->returnInRoutine) {
+            string actual_type = check_ReturnInRoutine(routinedeclaration->returnInRoutine);
+            if (!isEqual(return_type, actual_type)) {
+                cout << "\n\n" << function_name << "function's return value doesn't match the return type!\n";
+                exit(0);
+            }
+        }
+        else {
+            cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
+            exit(0);
+        }
+    }
+    if (!routinedeclaration->typeinroutinedeclaration) {
+        if (routinedeclaration->returnInRoutine) {
+            cout << "\n\nFunction " << function_name << "must not return a value!\n";
+            exit(0);
+        }
     }
     if (routinedeclaration->bodyinroutinedeclaration) {
         auto result = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, global_variables, local_variables);
@@ -491,7 +509,7 @@ map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedecl
         local_variables = result.second;
     }
 
-    Function *f1 = new Function(type, INFINITY, parameters);
+    Function *f1 = new Function(return_type, parameters);
     functions[function_name] = f1;
 
     cout << "LOCAL VARS\n";
@@ -578,14 +596,12 @@ void check_InitialValue(InitialValue *initialvalue) {
 pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables,
                                bool scope) {
     // firstly, checking whether variable was already declared
-
     if ((!scope && (is_record_in_table(variabledeclaration->name, global_variables)) || (scope && is_record_in_table(variabledeclaration->name, local_variables)))) {
         cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
         exit(0);
     }
 
     string user_type;
-    float user_value = INFINITY;
 
     //getting var type
     if (variabledeclaration->type) {
@@ -642,6 +658,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
     return make_pair(global_variables, local_variables);
 }
 
+//DONE
 pair <map<string, Variable* >, map<string, Variable* >> check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope) {
     if (simpleDeclaration->variabledeclaration) {
         auto result = check_VariableDeclaration(simpleDeclaration->variabledeclaration, global_variables, local_variables, scope);
@@ -651,10 +668,10 @@ pair <map<string, Variable* >, map<string, Variable* >> check_SimpleDeclaration(
     if (simpleDeclaration->typedeclaration) {
         check_TypeDeclaration(simpleDeclaration->typedeclaration, scope);
     }
-
     return make_pair(global_variables, local_variables);
 }
 
+//DONE
 map<string, Variable* > check_Declaration(Declaration *declaration, map<string, Variable* > global_variables) {
     bool scope = false; //global
     if (declaration->simpledeclaration) {
@@ -667,6 +684,7 @@ map<string, Variable* > check_Declaration(Declaration *declaration, map<string, 
     return global_variables;
 }
 
+//DONE
 map<string, Variable* > glob_variables;
 void check_Program(Program *program) {
     if (program->declaration) {
