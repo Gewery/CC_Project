@@ -528,12 +528,21 @@ map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedecl
     return global_variables;
 }
 
-void check_VariableDeclarations(VariableDeclarations *variabledeclarations) {
-
+void check_VariableDeclarations(string type_name, VariableDeclarations *variabledeclarations, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope) {
+    if (variabledeclarations->variabledeclaration) {
+        variabledeclarations->variabledeclaration->name = type_name + variabledeclarations->variabledeclaration->name;
+        check_VariableDeclaration(variabledeclarations->variabledeclaration, global_variables, local_variables, scope);
+    }
+    
+    if (variabledeclarations->variabledeclarations)
+        check_VariableDeclarations(type_name, variabledeclarations->variabledeclarations, global_variables, local_variables, scope);
 }
 
-void check_RecordType(RecordType *recordtype) {
-
+void check_RecordType(string type_name, RecordType *recordtype, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope) {
+    // add typename to variabledeclaration
+    if (recordtype->variabledeclarations) {
+        check_VariableDeclarations(type_name, recordtype->variabledeclarations, global_variables, local_variables, scope);
+    }
 }
 
 void check_ArrayType(ArrayType *arraytype) {
@@ -558,7 +567,7 @@ string check_Type(Type *type) {
             return "boolean";
     }
     else if (type->recordtype) {
-
+        //check_RecordType(type->name, )
     }
     else if (!(type->name).empty()) {
         user_type = type->name;
