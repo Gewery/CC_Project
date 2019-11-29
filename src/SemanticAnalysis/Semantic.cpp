@@ -389,7 +389,9 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Stateme
         local_variables = result.second;
     }
     else if (statement->forloop) {
-
+        auto result = check_ForLoop(statement->forloop, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     else if (statement->ifstatement) {
         auto result = check_IfStatement(statement->ifstatement, global_variables, local_variables);
