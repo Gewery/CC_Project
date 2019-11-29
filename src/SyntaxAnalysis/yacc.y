@@ -33,6 +33,7 @@
     struct RecordType *RecordType;
     struct VariableDeclarations *VariableDeclarations;
     struct RoutineDeclaration *RoutineDeclaration;
+    struct ReturnInRoutine *ReturnInRoutine;
     struct Parameters *Parameters;
     struct ParameterDeclaration *ParameterDeclaration;
     struct ParametersDeclaration *ParametersDeclaration;
@@ -72,7 +73,7 @@
 
 %token DECLARATION_SEPARATOR
 
-%token VAR IS END IN REVERSE WHILE
+%token VAR IS END IN REVERSE WHILE RETURN
 %token FOR FROM LOOP IF THEN ELSE
 %token REAL BOOLEAN INTEGER TYPE
 %token RECORD ROUTINE ARRAY
@@ -104,6 +105,7 @@
 %type  <RecordType> RecordType
 %type  <VariableDeclarations> VariableDeclarations
 %type  <RoutineDeclaration> RoutineDeclaration
+%type  <ReturnInRoutine> ReturnInRoutine
 %type  <Parameters> Parameters
 %type  <ParameterDeclaration> ParameterDeclaration
 %type  <ParametersDeclaration> ParametersDeclaration
@@ -211,7 +213,12 @@ VariableDeclarations
     ;
 
 RoutineDeclaration
-    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration   { $$ = new RoutineDeclaration(get_yyextra_string(), $3, $4, $5); }
+    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration ReturnInRoutine  { $$ = new RoutineDeclaration(get_yyextra_string(), $3, $4, $5, $6); }
+    ;
+
+ReturnInRoutine
+    : RETURN Expression                                                          { $$ = new ReturnInRoutine($2); }
+    |                                                                            { $$ = new ReturnInRoutine(NULL); }
     ;
 
 Parameters

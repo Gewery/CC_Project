@@ -192,7 +192,19 @@ void print_RoutineDeclaration(string prefix, RoutineDeclaration *routinedeclarat
             !routinedeclaration->bodyinroutinedeclaration);
     print_BodyInRoutineDeclaration(
             NEW_PREFIX,
-            routinedeclaration->bodyinroutinedeclaration, 1);
+            routinedeclaration->bodyinroutinedeclaration,
+            !routinedeclaration->returnInRoutine);
+    print_ReturnInRoutine(
+            NEW_PREFIX,
+            routinedeclaration->returnInRoutine, 1);
+}
+
+void print_ReturnInRoutine(string prefix, ReturnInRoutine *returnInRoutine, bool is_last) {
+    if (!returnInRoutine) return;
+    PRINT_INFO("ReturnInRoutine");
+    print_Expression(
+            NEW_PREFIX,
+            returnInRoutine->expression, 1);
 }
 
 void print_Parameters(string prefix, Parameters *parameters, bool is_last) {

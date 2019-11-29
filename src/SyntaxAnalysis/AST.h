@@ -106,12 +106,20 @@ struct RoutineDeclaration {
     struct Parameters *parameters;
     struct TypeInRoutineDeclaration *typeinroutinedeclaration;
     struct BodyInRoutineDeclaration *bodyinroutinedeclaration;
+    struct ReturnInRoutine *returnInRoutine;
     RoutineDeclaration(string name, Parameters *parameters, TypeInRoutineDeclaration *typeinroutinedeclaration,
-                       BodyInRoutineDeclaration *bodyinroutinedeclaration):
+                       BodyInRoutineDeclaration *bodyinroutinedeclaration, struct ReturnInRoutine *returnInRoutine):
             name(name),
             parameters(parameters),
             typeinroutinedeclaration(typeinroutinedeclaration),
-            bodyinroutinedeclaration(bodyinroutinedeclaration) {};
+            bodyinroutinedeclaration(bodyinroutinedeclaration),
+            returnInRoutine(returnInRoutine) {};
+};
+
+struct ReturnInRoutine {
+    struct Expression *expression;
+    ReturnInRoutine(struct Expression *expression):
+            expression(expression) {};
 };
 
 struct Parameters {
@@ -407,6 +415,7 @@ void print_ArrayType(string prefix, ArrayType *arraytype, bool isLast);
 void print_RecordType(string prefix, RecordType *recordtype, bool isLast);
 void print_VariableDeclarations(string prefix, VariableDeclarations *variabledeclarations, bool isLast);
 void print_RoutineDeclaration(string prefix, RoutineDeclaration *routinedeclaration, bool isLast);
+void print_ReturnInRoutine(string prefix, ReturnInRoutine *returnInRoutine, bool is_last);
 void print_Parameters(string prefix, Parameters *parameters, bool isLast);
 void print_ParameterDeclaration(string prefix, ParameterDeclaration *parameterdeclaration, bool isLast);
 void print_ParametersDeclaration(string prefix, ParametersDeclaration *parametersdeclaration, bool isLast);

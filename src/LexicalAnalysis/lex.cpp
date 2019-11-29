@@ -112,6 +112,7 @@ extern int yylex(void) {
         else if (lexem == Lexems::Keywords::RECORD)  return RECORD;
         else if (lexem == Lexems::Keywords::ARRAY)   return ARRAY;
         else if (lexem == Lexems::Keywords::ROUTINE) return ROUTINE;
+        else if (lexem == Lexems::Keywords::RETURN) return RETURN;
     }
     else if (token_type == TokenTypes::BOOLEAN_LITERALS) {
         if      (lexem == Lexems::BooleanLiterals::TRUE)  return TRUE;

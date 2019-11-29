@@ -389,7 +389,9 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Stateme
         local_variables = result.second;
     }
     else if (statement->forloop) {
-
+        auto result = check_ForLoop(statement->forloop, global_variables, local_variables);
+        global_variables = result.first;
+        local_variables = result.second;
     }
     else if (statement->ifstatement) {
         auto result = check_IfStatement(statement->ifstatement, global_variables, local_variables);
@@ -399,6 +401,7 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Stateme
     return make_pair(global_variables, local_variables);
 }
 
+//DONE
 pair <map<string, Variable* >, map<string, Variable* >> check_Body(Body *body, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
     if (body->simpledeclaration) {
         auto result = check_SimpleDeclaration(body->simpledeclaration, global_variables, local_variables, true);
@@ -418,6 +421,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_Body(Body *body, m
     return make_pair(global_variables, local_variables);
 }
 
+//DONE
 pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
     if (bodyinroutinedeclaration->body) {
         auto result = check_Body(bodyinroutinedeclaration->body, global_variables, local_variables);
@@ -427,6 +431,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDecla
     return make_pair(global_variables, local_variables);
 }
 
+//DONE
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
     if (typeinroutinedeclaration->type) {
         return check_Type(typeinroutinedeclaration->type);
@@ -459,16 +464,22 @@ map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *paramet
     return local_variables;
 }
 
+//DONE
 map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Variable* > local_variables) {
     if (parameters->parameterdeclaration) {
         local_variables = check_ParameterDeclaration(parameters->parameterdeclaration, local_variables);
     }
     if (parameters->parametersdeclaration) {
         local_variables = check_ParametersDeclaration(parameters->parametersdeclaration, local_variables);
-//        local_variables.insert(temp.begin(), temp.end());
     }
     return local_variables;
 }
+
+map<string, Variable* > check_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+    if (returnInRoutine->expression) {
+
+    }
+};
 
 map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables) {
     map<string, Variable* > local_variables;
@@ -592,22 +603,24 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
     }
 
     // getting initial value
-    if (variabledeclaration->initialvalue->expression) {
-        auto result = check_Expression(variabledeclaration->initialvalue->expression);
-        if ((isEqual(result.type, user_type)) ||
-            (isEqual(result.type, "integer") && isEqual(user_type, "real")) ||
-            ((isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)))) {
-            if (!scope) {
-                global_variables = add_to_symbol_table(variabledeclaration->name, result, global_variables);
+    if (variabledeclaration->initialvalue) {
+        if (variabledeclaration->initialvalue->expression) {
+            auto result = check_Expression(variabledeclaration->initialvalue->expression);
+            if ((isEqual(result.type, user_type)) ||
+                (isEqual(result.type, "integer") && isEqual(user_type, "real")) ||
+                ((isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)))) {
+                if (!scope) {
+                    global_variables = add_to_symbol_table(variabledeclaration->name, result, global_variables);
+                }
+                else {
+                    local_variables = add_to_symbol_table(variabledeclaration->name, result, local_variables);
+                }
+
             }
             else {
-                local_variables = add_to_symbol_table(variabledeclaration->name, result, local_variables);
+                cout << "\n\nType error!\n";
+                exit(0);
             }
-
-        }
-        else {
-            cout << "\n\nType error!\n";
-            exit(0);
         }
     }
     // case of initialization without initial value

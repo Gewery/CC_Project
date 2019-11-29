@@ -41,6 +41,7 @@ void check_ArrayType(ArrayType *arraytype);
 void check_RecordType(RecordType *recordtype);
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations);
 map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables);
+map<string, Variable* > check_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Variable* > global_variables, map<string, Variable* > local_variables);
 map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Variable* > local_variables);
 map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Variable* > local_variables);
 map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Variable* > local_variables);
