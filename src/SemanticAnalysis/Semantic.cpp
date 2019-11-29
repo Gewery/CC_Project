@@ -419,7 +419,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDecla
 //DONE
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
     if (typeinroutinedeclaration->type) {
-        return check_Type(typeinroutinedeclaration->type);
+        return check_Type(typeinroutinedeclaration->type, true);
     }
 }
 
@@ -442,7 +442,7 @@ map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *paramet
         name = parameterdeclaration->name;
     }
     if (parameterdeclaration->type) {
-        type = check_Type(parameterdeclaration->type);
+        type = check_Type(parameterdeclaration->type, false);
     }
     Variable *v1 = new Variable(type, 1);
     local_variables[name] = v1;
@@ -522,7 +522,7 @@ map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedecl
 
 void check_VariableDeclarations(string type_name, VariableDeclarations *variabledeclarations, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope) {
     if (variabledeclarations->variabledeclaration) {
-        variabledeclarations->variabledeclaration->name = type_name + variabledeclarations->variabledeclaration->name;
+        variabledeclarations->variabledeclaration->name = type_name + "." + variabledeclarations->variabledeclaration->name;
         check_VariableDeclaration(variabledeclarations->variabledeclaration, global_variables, local_variables, scope);
     }
     
@@ -537,41 +537,58 @@ void check_RecordType(string type_name, RecordType *recordtype, map<string, Vari
     }
 }
 
-void check_ArrayType(ArrayType *arraytype) {
+void check_ArrayType(ArrayType *arraytype, bool is_decl) {
+    if (arraytype->expression) {
+        string expr_type = check_Expression(arraytype->expression);
+        cout << "\n\n\n" << expr_type << "\n\n\n";
 
+        // check if expression type is integer
+        if (expr_type != "integer") {
+            cout << "\n######\nERROR! Array size must be integer, but found: '" << expr_type << "'\n######\n";
+            exit(EXIT_FAILURE);
+        }
+    }
+    else {  // if array size is not specified
+        // check if it's inside a declaration
+        if (is_decl) {
+            cout << "\n######\nERROR! Sizeless array declaration is not acceptable!\n######\n";
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    check_Type(arraytype->type, is_decl);     // check type of the array
 }
 
-void check_PrimitiveType(PrimitiveType *primitivetype) {
-
-}
-
-string check_Type(Type *type) {
+string check_Type(Type *type, bool is_decl) {
     string user_type;
     if (type->arraytype) {
-
+        check_ArrayType(type->arraytype, is_decl);
+        return "array";
     }
-    else if (type->primitivetype) {
-        if (type->primitivetype->isint)
-            return "integer";
-        else if (type->primitivetype->isreal)
-            return "real";
-        else if (type->primitivetype->isboolean)
-            return "boolean";
-    }
+    else if (type->primitivetype)
+        return type->primitivetype->isint ? "integer" :
+               type->primitivetype->isreal ? "real" :
+               type->primitivetype->isboolean ? "boolean" : "IMPOSSIBLE";
     else if (type->recordtype) {
         //check_RecordType(type->name, )
+        return "record";
     }
-    else if (!(type->name).empty()) {
+    else {
         user_type = type->name;
         transform(user_type.begin(), user_type.end(), user_type.begin(), ::tolower);
+        
+        // check if user type exists
+        if (!type_exists(user_type)) {
+            cout << "\n######\nERROR! Type doesn't exist or is out of scope: '" << type->name << "'\n######\n";
+            exit(EXIT_FAILURE);
+        }
+
         return user_type;
     }
 }
 
 void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope) {
-    string name = typedeclaration->name,
-           type = check_Type(typedeclaration->type);
-
+    string name = typedeclaration->name;
     transform(name.begin(), name.end(), name.begin(), ::tolower);
 
     // check if type was already declared
@@ -580,13 +597,10 @@ void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope) {
         exit(EXIT_FAILURE);
     }
 
-    // check if actual type exists
-    if (!type_exists(type)) {
-        cout << "\n######\nERROR! Actual type for your custom type doesn't exist or is out of scope: '" << type << "'\n######\n";
-        exit(EXIT_FAILURE);
-    }
+    // check actual type and get its string representation
+    string type = check_Type(typedeclaration->type, true);
 
-    add_type(name, type);
+    add_type(name, type);  // add a new type
 }
 
 void check_InitialValue(InitialValue *initialvalue) {
@@ -605,7 +619,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
 
     //getting var type
     if (variabledeclaration->type) {
-        user_type = check_Type(variabledeclaration->type);
+        user_type = check_Type(variabledeclaration->type, true);
     }
     // type is setting by the value of expression
     else {
