@@ -20,8 +20,8 @@ bool isEqual(string str1, string str2) {
     return str1.compare(str2) == 0;
 }
 
-map<string, Variable* > add_to_symbol_table(string name, auto result, map<string, Variable* > table) {
-    Variable *v1 = new Variable(result.type, 0, result.value);
+map<string, Variable* > add_to_symbol_table(string name, string type, map<string, Variable* > table) {
+    Variable *v1 = new Variable(type, 0);
     table[name] = v1;
     return table;
 }
@@ -307,52 +307,48 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assign
     }
 
     if (assignment->expression) {
-        auto result = check_Expression(assignment->expression);
-        if (isEqual(result.type, record_type)) {
-            if (is_local_variable) {
-                local_variables =  add_to_symbol_table(name, result, local_variables);
-            }
-            else {
-                global_variables =  add_to_symbol_table(name, result, global_variables);
-            }
-        }
-        // int - real
-        else if (isEqual(record_type, "integer") && isEqual(result.type, "real")) {
-            result.value = round(result.value);
-            result.type = record_type;
-            if (is_local_variable) {
-                local_variables =  add_to_symbol_table(name, result, local_variables);
-            }
-            else {
-                global_variables =  add_to_symbol_table(name, result, global_variables);
-            }
-        }
-        //int - boolean, real - int, real - bool
-        else if ((isEqual(record_type, "integer") && isEqual(result.type, "boolean")) ||
-                (isEqual(record_type, "real") && isEqual(result.type, "integer")) ||
-                (isEqual(record_type, "real") && isEqual(result.type, "boolean"))) {
-            result.type = record_type;
-            if (is_local_variable) {
-                local_variables =  add_to_symbol_table(name, result, local_variables);
-            }
-            else {
-                global_variables =  add_to_symbol_table(name, result, global_variables);
-            }
-        }
+        string actual_type = check_Expression(assignment->expression);
+//        if (isEqual(actual_type, record_type)) {
+//            if (is_local_variable) {
+//                local_variables =  add_to_symbol_table(name, actual_type, local_variables);
+//            }
+//            else {
+//                global_variables =  add_to_symbol_table(name, actual_type, global_variables);
+//            }
+//        }
+//        // int - real
+//        else if (isEqual(record_type, "integer") && isEqual(actual_type, "real")) {
+//            if (is_local_variable) {
+//                local_variables =  add_to_symbol_table(name, record_type, local_variables);
+//            }
+//            else {
+//                global_variables =  add_to_symbol_table(name, record_type, global_variables);
+//            }
+//        }
+//        //int - boolean, real - int, real - bool
+//        else if ((isEqual(record_type, "integer") && isEqual(actual_type, "boolean")) ||
+//                (isEqual(record_type, "real") && isEqual(actual_type, "integer")) ||
+//                (isEqual(record_type, "real") && isEqual(actual_type, "boolean"))) {
+//            if (is_local_variable) {
+//                local_variables =  add_to_symbol_table(name, record_type, local_variables);
+//            }
+//            else {
+//                global_variables =  add_to_symbol_table(name, record_type, global_variables);
+//            }
+//        }
 
         // bool - int
-        else if (isEqual(record_type, "boolean") && isEqual(result.type, "integer")) {
-            if (result.value == 0 || result.value == 1) {
-                result.type = record_type;
-                is_local_variable ? add_to_symbol_table(name, result, local_variables)
-                                  : add_to_symbol_table(name, result, global_variables);
-            }
-            else {
-                cout << "\n\nVariable " << name << " can not be casted to boolean!\n";
-                exit(0);
-            }
-        }
-        else if (isEqual(record_type, "boolean") && isEqual(result.type, "real")) {
+//        else if (isEqual(record_type, "boolean") && isEqual(actual_type, "integer")) {
+//            if (result.value == 0 || result.value == 1) {
+//                is_local_variable ? add_to_symbol_table(name, record_type, local_variables)
+//                                  : add_to_symbol_table(name, record_type, global_variables);
+//            }
+//            else {
+//                cout << "\n\nVariable " << name << " can not be casted to boolean!\n";
+//                exit(0);
+//            }
+//        }
+        if (isEqual(record_type, "boolean") && isEqual(actual_type, "real")) {
             cout << "\n\nVariable " << name << " can not be casted to boolean!\n";
             exit(0);
         }
@@ -448,7 +444,7 @@ map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *paramet
     if (parameterdeclaration->type) {
         type = check_Type(parameterdeclaration->type);
     }
-    Variable *v1 = new Variable(type, 1, INFINITY);
+    Variable *v1 = new Variable(type, 1);
     local_variables[name] = v1;
     return local_variables;
 }
@@ -483,7 +479,7 @@ map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedecl
         local_variables = check_Parameters(routinedeclaration->parameters, local_variables);
         for (std::pair<const std::__cxx11::basic_string<char>, Variable*> x : local_variables) {
             parameters.push_back(x.second);
-            cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
+            cout << "\n" << x.first << " " << x.second->type  << endl;
         }
     }
     if (routinedeclaration->typeinroutinedeclaration) {
@@ -500,7 +496,7 @@ map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedecl
 
     cout << "LOCAL VARS\n";
     for (auto x : local_variables)
-        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
+        cout << "\n" << x.first << " " << x.second->type << endl;
     cout << "====";
 
     return global_variables;
@@ -603,15 +599,15 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
     // getting initial value
     if (variabledeclaration->initialvalue) {
         if (variabledeclaration->initialvalue->expression) {
-            auto result = check_Expression(variabledeclaration->initialvalue->expression);
-            if ((isEqual(result.type, user_type)) ||
-                (isEqual(result.type, "integer") && isEqual(user_type, "real")) ||
-                ((isEqual(result.type, "integer") && isEqual(user_type,"boolean") && (result.value == 0 || result.value == 1)))) {
+            string actual_type = check_Expression(variabledeclaration->initialvalue->expression);
+            if ((isEqual(actual_type, user_type)) ||
+                (isEqual(actual_type, "integer") && isEqual(user_type, "real")) ||
+                ((isEqual(actual_type, "integer") && isEqual(user_type,"boolean")))) {
                 if (!scope) {
-                    global_variables = add_to_symbol_table(variabledeclaration->name, result, global_variables);
+                    global_variables = add_to_symbol_table(variabledeclaration->name, actual_type, global_variables);
                 }
                 else {
-                    local_variables = add_to_symbol_table(variabledeclaration->name, result, local_variables);
+                    local_variables = add_to_symbol_table(variabledeclaration->name, actual_type, local_variables);
                 }
 
             }
@@ -623,23 +619,22 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
     }
     // case of initialization without initial value
     else {
-        struct result_with_sign {string type;  float value; bool isNot; string sign;};
         // initial value for bool is false
         if (isEqual(user_type, "boolean")) {
             if (!scope) {
-                global_variables = add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""}, global_variables);
+                global_variables = add_to_symbol_table(variabledeclaration->name, user_type, global_variables);
             }
             else {
-                local_variables = add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, 0, 0, ""}, local_variables);
+                local_variables = add_to_symbol_table(variabledeclaration->name, user_type, local_variables);
             }
         }
         //initial value for float and int is INF
         else {
             if (!scope) {
-                global_variables =  add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""}, global_variables);
+                global_variables = add_to_symbol_table(variabledeclaration->name, user_type, global_variables);
             }
             else {
-                local_variables = add_to_symbol_table(variabledeclaration->name, result_with_sign {user_type, INFINITY, 0, ""}, local_variables);
+                local_variables = add_to_symbol_table(variabledeclaration->name, user_type, local_variables);
             }
         }
     }
@@ -656,6 +651,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_SimpleDeclaration(
     if (simpleDeclaration->typedeclaration) {
         check_TypeDeclaration(simpleDeclaration->typedeclaration, scope);
     }
+
     return make_pair(global_variables, local_variables);
 }
 
@@ -681,12 +677,12 @@ void check_Program(Program *program) {
     }
 
     for (auto x : glob_variables)
-        cout << "\n" << x.first << " " << x.second->type  << " " << x.second->value << endl;
+        cout << "\n" << x.first << " " << x.second->type << endl;
 
     for (auto x : functions) {
         cout << "\n" << x.first << " " << x.second->return_type  << " " << endl;
         for (auto param : x.second->arguments) {
-            cout << param->type << " " << param->value << endl;
+            cout << param->type << endl;
         }
     }
 }

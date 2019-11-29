@@ -9,11 +9,9 @@ using namespace std;
 struct Variable {
     string type;
     bool scope; // 0 - global, 1 - local
-    float value;
-    Variable(string type_of_var, bool scope_of_var, float value_of_var) {
+    Variable(string type_of_var, bool scope_of_var) {
         type = type_of_var;
         scope = scope_of_var;
-        value = value_of_var;
     }
 };
 
