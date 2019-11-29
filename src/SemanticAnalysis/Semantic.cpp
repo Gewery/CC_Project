@@ -44,6 +44,15 @@ map<string, Variable* > update_table(map<string, Variable* > source, map<string,
     return target;
 };
 
+string returned_type(string a, string b) {
+    if (a == "float" || b == "float") return "float";
+    else if (a == "int" || b == "int") return "int";
+    else if (a == "bool" || b == "bool") return "bool";
+    else {
+        cout << "Wrong type (" << a << ", " << b << ")\n";
+        exit(1);
+    }
+}
 
 
 void check_Identifiers(Identifiers *identifiers) {
@@ -85,101 +94,70 @@ void add_type(string name, string type) {
     // cout << "\n\nAdded type '" << name << "' of actual type '" << type << "'\n\n"; // LOG
 }
 
-//TODO peredelat' na calculator!!!
-auto check_Primary(Primary *primary) {
-    string type;
-    float value;
-    bool isNot;
-    string sign;
-    struct result_with_sign {string type;  float value; bool isNot; string sign;};
-    if (!(primary->type).empty()) {
-        if (primary->sign) {
-            return result_with_sign {primary->type, primary->value, primary->isNot, primary->sign->op};
-        }
-        else {
-            return result_with_sign {primary->type, primary->value, primary->isNot, ""};
-        }
-    }
-    else {
-    }
+//DONE
+string check_Primary(Primary *primary) {
+    return primary->type;
 }
 
-//TODO peredelat' na calculator!!!
-auto check_Summand(Summand *summand) {
+//DONE
+string check_Summand(Summand *summand) {
     if (summand->expression) {
-
-    }
-    else if (summand->primary) {
+        return check_Expression(summand->expression);
+    } else {
         return check_Primary(summand->primary);
     }
 }
 
-void check_Summands(Summands *summands) {
-
+//DONE
+string check_Summands(Summands *summands) {
+    string summand_type = check_Summand(summands->summand);
+    if (summands->summands) {
+        return returned_type(summand_type, check_Summands(summands->summands));
+    } else {
+        return summand_type;
+    }
 }
 
-//TODO peredelat' na calculator!!!
-auto check_Factor(Factor *factor) {
-    if (factor->summand) {
-        return check_Summand(factor->summand);
-    }
+//DONE
+string check_Factor(Factor *factor) {
+    string summand_type = check_Summand(factor->summand);
     if (factor->summands) {
-
+        return returned_type(summand_type, check_Summands(factor->summands));
+    } else {
+        return summand_type;
     }
 }
 
-void check_SimpleOperator(SimpleOperator *simpleoperator) {
-
-}
-
-void check_Factors(Factors *factors) {
-
-}
-
-//TODO peredelat' na calculator!!!
-auto check_Simple(Simple *simple) {
-    if (simple->factor) {
-        return check_Factor(simple->factor);
+//DONE
+string check_Factors(Factors *factors) {
+    string factor_type = check_Factor(factors->factor);
+    if (factors->factors) {
+        return returned_type(factor_type, check_Factors(factors->factors));
+    } else {
+        return factor_type;
     }
+}
+
+//DONE
+string check_Simple(Simple *simple) {
+    string factor_type = check_Factor(simple->factor);
     if (simple->factors) {
-
+        return returned_type(factor_type, check_Factors(simple->factors));
+    } else {
+        return factor_type;
     }
 }
 
-void check_ComparisonOperator(ComparisonOperator *comparisonoperator) {
-
+//DONE
+string check_Relation(Relation *relation) {
+    if (relation->comparisoninrelation) return "bool";
+    else return check_Simple(relation->simple);
 }
 
-void check_ComparisonInRelation(ComparisonInRelation *comparisoninrelation) {
-
-}
-
-//TODO peredelat' na calculator!!!
-auto check_Relation(Relation *relation) {
-    if (relation->simple) {
-        return check_Simple(relation->simple);
-    }
-    if (relation->comparisoninrelation) {
-
-    }
-}
-
-void check_LogicalOperator(LogicalOperator *logicaloperator) {
-
-}
-
-void check_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression) {
-
-}
-
-//TODO peredelat' na calculator!!!
-auto check_Expression(Expression *expression) {
-    if (expression->relation) {
-        return check_Relation(expression->relation);
-    }
-    if (expression->multiplerelationsinexpression) {
-
-    }
+//DONE
+string check_Expression(Expression *expression) {
+    if (expression->multiplerelationsinexpression) return "bool";
+    else return check_Relation(expression->relation);
 }
 
 pair <map<string, Variable* >, map<string, Variable* >> check_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {

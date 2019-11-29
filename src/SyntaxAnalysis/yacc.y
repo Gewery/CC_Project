@@ -218,7 +218,7 @@ RoutineDeclaration
 
 ReturnInRoutine
     : RETURN Expression                                                          { $$ = new ReturnInRoutine($2); }
-    |                                                                            { $$ = new ReturnInRoutine(NULL); }
+    |                                                                            { $$ = NULL; }
     ;
 
 Parameters

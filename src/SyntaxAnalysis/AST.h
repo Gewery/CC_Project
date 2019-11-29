@@ -364,24 +364,22 @@ struct Summand {
             expression(expression) {};
 };
 
+struct Sign {
+    string op;
+    Sign(string op):
+            op(op) {};
+};
+
 struct Primary {
     string type;
     float value;
     bool isNot;
-    struct Sign* sign;
     struct ModifiablePrimary* modifiablePrimary;
     Primary(string type, float value,  bool isNot, struct Sign* sign, struct ModifiablePrimary* modifiablePrimary):
             type(type),
             value(value),
             isNot(isNot),
-            sign(sign),
-            modifiablePrimary(modifiablePrimary) {};
-};
-
-struct Sign {
-    string op;
-    Sign(string op):
-            op(op) {};
+            modifiablePrimary(modifiablePrimary) { if (sign) value *= sign->op == "-" ? -1 : 1; };
 };
 
 struct ModifiablePrimary {

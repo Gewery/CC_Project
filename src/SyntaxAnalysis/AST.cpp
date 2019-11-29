@@ -574,10 +574,6 @@ void print_Primary(string prefix, Primary *primary, bool is_last) {
     PRINT_INFO(format("Primary (%s, %f, %s)",
                       primary->type.c_str(), primary->value, primary->isNot ? "is_not" : "not_is_not").c_str());
 
-    print_Sign(
-            NEW_PREFIX,
-            primary->sign,
-            !primary->modifiablePrimary);
     print_ModifiablePrimary(
             NEW_PREFIX,
             primary->modifiablePrimary, 1);
