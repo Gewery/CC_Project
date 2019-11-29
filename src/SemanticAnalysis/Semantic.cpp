@@ -26,7 +26,7 @@ map<string, Variable* > add_to_symbol_table(string name, auto result, map<string
     return table;
 }
 
-bool is_record_in_table(string name, map<string, Variable* > table) {
+bool is_record_in_table(string name, auto table) {
     for (auto x : table) {
         if (isEqual(x.first, name)) {
             return true;
@@ -287,8 +287,16 @@ void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinec
 
 }
 
-void check_RoutineCall(RoutineCall *routinecall) {
+void check_RoutineCall(RoutineCall *routinecall, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+    if (!(routinecall->name).empty()) {
+        if (!is_record_in_table(routinecall->name, functions)) {
+            cout << "\n\nFunction " << routinecall->name << " is not declared!\n";
+            exit(0);
+        }
+    }
+    if (routinecall->expressioninroutinecall) {
 
+    }
 }
 
 pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assignment *assignment, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
@@ -381,6 +389,9 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Stateme
         local_variables = result.second;
     }
     else if (statement->routinecall) {
+        check_RoutineCall(statement->routinecall, global_variables, local_variables);
+//        global_variables = result.first;
+//        local_variables = result.second;
 
     }
     else if (statement->whileloop) {

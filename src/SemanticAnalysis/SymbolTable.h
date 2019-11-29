@@ -50,7 +50,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDecla
 pair <map<string, Variable* >, map<string, Variable* >> check_Body(Body *body,  map<string, Variable* > global_variables, map<string, Variable* > local_variables);
 pair <map<string, Variable* >, map<string, Variable* >> check_Statement(Statement *statement, map<string, Variable* > global_variables, map<string, Variable* > local_variables);
 pair <map<string, Variable* >, map<string, Variable* >> check_Assignment(Assignment *assignment, map<string, Variable* > global_variable, map<string, Variable* > local_variables);
-void check_RoutineCall(RoutineCall *routinecall);
+void check_RoutineCall(RoutineCall *routinecall, map<string, Variable* > global_variables, map<string, Variable* > local_variables);
 void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall);
 void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall);
 pair <map<string, Variable* >, map<string, Variable* >> check_WhileLoop(WhileLoop *whileloop, map<string, Variable* > global_variables, map<string, Variable* > local_variables);
