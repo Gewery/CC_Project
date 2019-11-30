@@ -1,6 +1,9 @@
 // Custom type declaration
 type irek is integer
 type cat is irek
-// type BOOlean is integer <- primitive type as name!
-// type irek is boolean    <- type redeclaration!
-// type kek is lol         <- actual type doesn't exist or is out of scope!
+type haha is array[5+(5*10-12/3)+12%4] cat
+// type BOOlean is integer            <- primitive type as name!
+// type irek is boolean               <- type redeclaration!
+// type kek is lol                    <- actual type doesn't exist or is out of scope!
+// type arr is array[] integer        <- array size can be omitted only in routine parameters declaration
+// type a is array[5+5 or 5] integer  <- only integer numbers are allowed as array size
