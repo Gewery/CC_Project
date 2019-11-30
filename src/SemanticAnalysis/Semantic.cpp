@@ -182,7 +182,6 @@ string check_Simple(Simple *simple) {
         return factor_type;
 }
 
-//DONE
 string check_Relation(Relation *relation) {
     if (relation->comparisoninrelation)
         return "boolean";
@@ -190,7 +189,6 @@ string check_Relation(Relation *relation) {
         return check_Simple(relation->simple);
 }
 
-//DONE
 string check_Expression(Expression *expression) {
     if (expression->multiplerelationsinexpression)
         return "boolean";
@@ -295,27 +293,34 @@ pair <map<string, Variable* >, map<string, Variable* >> check_WhileLoop(WhileLoo
     return make_pair(global_variables, local_variables);
 }
 
-void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall) {
-
+// DanyaDone
+void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall, map<string, Identifier*> declared_identifiers) {
+    if (expressionsinroutinecall->expression)
+        check_Expression(expressionsinroutinecall->expression, declared_identifiers);
+    if (expressionsinroutinecall->expressionsinroutinecall)
+        check_ExpressionsInRoutineCall(expressionsinroutinecall->expressionsinroutinecall, delcared_identifiers);
 }
 
-void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall) {
-
+// DanyaDone
+void check_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall, map<string, Identifier*> declared_identifiers) {
+    if (expressioninroutinecall->expression)
+        check_Expression(expressioninroutinecall->expression, declared_identifiers);
+    if (expressioninroutinecall->expressionsinroutinecall)
+        check_ExpressionsInRoutineCall(expressioninroutinecall->expressionsinroutinecall, declared_identifiers);
 }
 
-void check_RoutineCall(RoutineCall *routinecall, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
-    if (!(routinecall->name).empty()) {
-        if (!is_record_in_table(routinecall->name, functions)) {
-            cout << "\n\nFunction " << routinecall->name << " is not declared!\n";
-            exit(0);
-        }
+// DanyaDone
+void check_RoutineCall(RoutineCall *routinecall, map<string, Identifier*> declared_identifiers) {
+    if (!declared_identifiers[routinecall->name]) {
+        cout << "\n\nFunction " << routinecall->name << " was not declared!\n";
+        exit(0);
     }
     if (routinecall->expressioninroutinecall) {
-
+        check_ExpressionInRoutineCall(routinecall->expressioninroutinecall, declared_identifiers);
     }
 }
 
-pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assignment *assignment, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+void check_Assignment(Assignment *assignment, map<string, Identifier*> declared_identifiers) {
     string name;
     if (assignment->modifiableprimary) {
         name = check_ModifiablePrimary(assignment->modifiableprimary);
@@ -394,34 +399,23 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assign
     return make_pair(global_variables, local_variables);
 }
 
-pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Statement *statement, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
+// DanyaDone
+void check_Statement(Statement *statement, map<string, Identifier* > declared_identifiers) {
     if (statement->assignment) {
-        auto result = check_Assignment(statement->assignment, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
+        check_Assignment(statement->assignment, declared_identifiers);
     }
     else if (statement->routinecall) {
-        check_RoutineCall(statement->routinecall, global_variables, local_variables);
-//        global_variables = result.first;
-//        local_variables = result.second;
-
+        check_RoutineCall(statement->routinecall, declared_identifiers);
     }
     else if (statement->whileloop) {
-        auto result = check_WhileLoop(statement->whileloop, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
+        check_WhileLoop(statement->whileloop, declared_identifiers);
     }
     else if (statement->forloop) {
-        auto result = check_ForLoop(statement->forloop, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
+        check_ForLoop(statement->forloop, declared_identifiers);
     }
     else if (statement->ifstatement) {
-        auto result = check_IfStatement(statement->ifstatement, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
+        check_IfStatement(statement->ifstatement, declared_identifiers);
     }
-    return make_pair(global_variables, local_variables);
 }
 
 // DanyaDone
@@ -430,7 +424,7 @@ map<string, Identifier*> check_Body(Body *body, map<string, Identifier*> declare
         declared_identifiers = check_SimpleDeclaration(body->simpledeclaration, declared_identifiers);
 
     if (body->statement)
-        declared_identifiers = check_Statement(body->statement, declared_identifiers);
+        check_Statement(body->statement, declared_identifiers);
 
     if (body->body)
         declared_identifiers = check_Body(body->body, declared_identifiers);

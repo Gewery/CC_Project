@@ -273,7 +273,7 @@ ExpressionInRoutineCall
     ;
 
 ExpressionsInRoutineCall
-    : COMMA Expression ExpressionInRoutineCall        { $$ = new ExpressionsInRoutineCall($2, $3); }
+    : COMMA Expression ExpressionsInRoutineCall        { $$ = new ExpressionsInRoutineCall($2, $3); }
     |                                                 { $$ = NULL; }
     ;
 

@@ -211,10 +211,10 @@ struct ExpressionInRoutineCall {
 
 struct ExpressionsInRoutineCall {
     struct Expression *expression;
-    struct ExpressionInRoutineCall *expressioninroutinecall;
-    ExpressionsInRoutineCall(Expression *expression, ExpressionInRoutineCall *expressioninroutinecall):
+    struct ExpressionsInRoutineCall *expressionsinroutinecall;
+    ExpressionsInRoutineCall(Expression *expression, ExpressionsInRoutineCall *expressionsinroutinecall):
             expression(expression),
-            expressioninroutinecall(expressioninroutinecall) {};
+            expressionsinroutinecall(expressionsinroutinecall) {};
 };
 
 struct WhileLoop {
