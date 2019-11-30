@@ -540,7 +540,6 @@ void check_RecordType(string type_name, RecordType *recordtype, map<string, Vari
 void check_ArrayType(ArrayType *arraytype, bool is_decl) {
     if (arraytype->expression) {
         string expr_type = check_Expression(arraytype->expression);
-        cout << "\n\n\n" << expr_type << "\n\n\n";
 
         // check if expression type is integer
         if (expr_type != "integer") {

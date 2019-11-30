@@ -39,7 +39,7 @@ void read_file() {
             regex("^\\s*(;)([\\s\\S]*)")));
     regex_tokens.push_back(make_pair(
             TokenTypes::KEYWORDS,
-            regex("^\\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|type|record|routine)(?![a-zA-Z0-9_])([\\s\\S]*)")));
+            regex("^\\s*(var|is|end|in|reverse|while|for|from|loop|if|then|else|real|boolean|integer|type|record|routine|array)(?![a-zA-Z0-9_])([\\s\\S]*)")));
     regex_tokens.push_back(make_pair(
             TokenTypes::BOOLEAN_LITERALS,
             regex("^\\s*(false|true)(?![a-zA-Z0-9_])([\\s\\S]*)")));
