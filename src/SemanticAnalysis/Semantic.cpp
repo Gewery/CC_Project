@@ -9,16 +9,16 @@
 
 using namespace std;
 
+#define VARIABLE "Variable"
+#define FUNCTION "Function"
+#define TYPE "Type" 
+
 map<string, string > types = {
     {"integer", "integer"},
     {"real", "real"},
     {"boolean", "boolean"}
 };
 map<string, Function* > functions;
-
-bool isEqual(string str1, string str2) {
-    return str1.compare(str2) == 0;
-}
 
 map<string, Variable* > add_to_symbol_table(string name, string type, map<string, Variable* > table) {
     Variable *v1 = new Variable(type, 0);
@@ -28,7 +28,7 @@ map<string, Variable* > add_to_symbol_table(string name, string type, map<string
 
 bool is_record_in_table(string name, auto table) {
     for (auto x : table) {
-        if (isEqual(x.first, name)) {
+        if (x.first == name) {
             return true;
         }
     }
@@ -95,7 +95,7 @@ void add_type(string name, string type) {
 }
 
 //DONE
-string check_Primary(Primary *primary) {
+string check_Primary(Primary *primary) { // What about ModifiablePrimary? Come on, primary->type can be ""
     return primary->type;
 }
 
@@ -293,14 +293,14 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assign
     string record_type;
     if (!is_local_variable) {
         for (auto x : global_variables) {
-            if (isEqual(x.first, name)) {
+            if (x.first == name) {
                 record_type = x.second->type;
             }
         }
     }
     else {
         for (auto x : local_variables) {
-            if (isEqual(x.first, name)) {
+            if (x.first == name) {
                 record_type = x.second->type;
             }
         }
@@ -348,7 +348,7 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Assignment(Assign
 //                exit(0);
 //            }
 //        }
-        if (isEqual(record_type, "boolean") && isEqual(actual_type, "real")) {
+        if (record_type == "boolean" && actual_type == "real") {
             cout << "\n\nVariable " << name << " can not be casted to boolean!\n";
             exit(0);
         }
@@ -386,56 +386,48 @@ pair <map<string, Variable* >, map<string, Variable* >>  check_Statement(Stateme
     return make_pair(global_variables, local_variables);
 }
 
-//DONE
-pair <map<string, Variable* >, map<string, Variable* >> check_Body(Body *body, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
-    if (body->simpledeclaration) {
-        auto result = check_SimpleDeclaration(body->simpledeclaration, global_variables, local_variables, true);
-        global_variables = result.first;
-        local_variables = result.second;
-    }
-    if (body->statement) {
-        auto result = check_Statement(body->statement, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
-    }
-    if (body->body) {
-        auto result = check_Body(body->body, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
-    }
-    return make_pair(global_variables, local_variables);
+// DanyaDone
+map<string, Identifier*> check_Body(Body *body, map<string, Identifier*> declared_identifiers) {
+    if (body->simpledeclaration)
+        declared_identifiers = check_SimpleDeclaration(body->simpledeclaration, declared_identifiers);
+
+    if (body->statement)
+        declared_identifiers = check_Statement(body->statement, declared_identifiers);
+
+    if (body->body)
+        declared_identifiers = check_Body(body->body, declared_identifiers);
+
+    return declared_identifiers;
 }
 
-//DONE
-pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
-    if (bodyinroutinedeclaration->body) {
-        auto result = check_Body(bodyinroutinedeclaration->body, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
-    }
-    return make_pair(global_variables, local_variables);
+// DanyaDone
+map<string, Identifier*> check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Identifier*> declared_identifiers) {
+    if (bodyinroutinedeclaration->body)
+        declared_identifiers = check_Body(bodyinroutinedeclaration->body, declared_identifiers);
+
+    return declared_identifiers;
 }
 
-//DONE
-string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
+// DanyaNotReallyDone
+string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration, map<string, Identifier*> declared_identifiers) {
     if (typeinroutinedeclaration->type) {
-        return check_Type(typeinroutinedeclaration->type, false);
+        return check_Type(typeinroutinedeclaration->type, false); //TODO pass declared_identifiers and use it
     }
 }
 
-//DONE
-map<string, Variable* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Variable* > local_variables) {
-    if (parametersdeclaration->parameterdeclaration) {
-        local_variables = check_ParameterDeclaration(parametersdeclaration->parameterdeclaration, local_variables);
-    }
-    if (parametersdeclaration->parametersdeclaration) {
-        local_variables = check_ParametersDeclaration(parametersdeclaration->parametersdeclaration, local_variables);
-    }
-    return local_variables;
+// DanyaDone
+map<string, Identifier* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Identifier* > declared_identifiers) {
+    if (parametersdeclaration->parameterdeclaration)
+        declared_identifiers = check_ParameterDeclaration(parametersdeclaration->parameterdeclaration, declared_identifiers);
+
+    if (parametersdeclaration->parametersdeclaration)
+        declared_identifiers = check_ParametersDeclaration(parametersdeclaration->parametersdeclaration, declared_identifiers);
+
+    return declared_identifiers;
 }
 
-//DONE
-map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Variable* > local_variables) {
+// DanyaDone
+map<string, Identifier* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Identifier* > declared_identifiers) {
     string name;
     string type;
     if (!(parameterdeclaration->name).empty()) {
@@ -444,80 +436,65 @@ map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *paramet
     if (parameterdeclaration->type) {
         type = check_Type(parameterdeclaration->type, true);
     }
-    Variable *v1 = new Variable(type, 1);
-    local_variables[name] = v1;
-    return local_variables;
+    declared_identifiers[name] = new Identifier(VARIABLE, type);
+    return declared_identifiers;
 }
 
-//DONE
-map<string, Variable* > check_Parameters(Parameters *parameters, map<string, Variable* > local_variables) {
-    if (parameters->parameterdeclaration) {
-        local_variables = check_ParameterDeclaration(parameters->parameterdeclaration, local_variables);
-    }
-    if (parameters->parametersdeclaration) {
-        local_variables = check_ParametersDeclaration(parameters->parametersdeclaration, local_variables);
-    }
-    return local_variables;
+// DanyaDone
+map<string, Identifier*> check_Parameters(Parameters *parameters, map<string, Identifier* > declared_identifiers) {
+    if (parameters->parameterdeclaration)
+        declared_identifiers = check_ParameterDeclaration(parameters->parameterdeclaration, declared_identifiers);
+
+    if (parameters->parametersdeclaration)
+        declared_identifiers = check_ParametersDeclaration(parameters->parametersdeclaration, declared_identifiers);
+
+    return declared_identifiers;
 }
 
-string check_ReturnInRoutine(ReturnInRoutine *returnInRoutine) {
-    cout << "YYYY";
+string check_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Identifier* > declared_identifiers) {
     if (returnInRoutine->expression) {
         return check_Expression(returnInRoutine->expression);
     }
 };
 
-map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables) {
-    map<string, Variable* > local_variables;
+// DanyaDone
+map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Identifier* > declared_identifiers) {
     string function_name;
     string return_type;
-    vector<Variable*> parameters;
 
-    if (!(routinedeclaration->name).empty()) {
-        function_name = routinedeclaration->name;
-    }
+    map<string, Identifier*> declared_identifiers_in_function;
+
+    function_name = routinedeclaration->name;
     if (routinedeclaration->parameters) {
-        local_variables = check_Parameters(routinedeclaration->parameters, local_variables);
-        for (std::pair<const std::__cxx11::basic_string<char>, Variable*> x : local_variables) {
-            parameters.push_back(x.second);
-            cout << "\n" << x.first << " " << x.second->type  << endl;
-        }
+        declared_identifiers_in_function = check_Parameters(routinedeclaration->parameters, declared_identifiers); // we can use this inside body
     }
     if (routinedeclaration->typeinroutinedeclaration) {
-        return_type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration);
-        if (routinedeclaration->returnInRoutine) {
-            string actual_type = check_ReturnInRoutine(routinedeclaration->returnInRoutine);
-            if (!isEqual(return_type, actual_type)) {
-                cout << "\n\n" << function_name << "function's return value doesn't match the return type!\n";
-                exit(0);
-            }
-        }
-        else {
-            cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
-            exit(0);
-        }
+        return_type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
     }
-    if (!routinedeclaration->typeinroutinedeclaration) {
+    else {
         if (routinedeclaration->returnInRoutine) {
             cout << "\n\nFunction " << function_name << "must not return a value!\n";
             exit(0);
         }
     }
-    if (routinedeclaration->bodyinroutinedeclaration) {
-        auto result = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, global_variables, local_variables);
-        global_variables = result.first;
-        local_variables = result.second;
+
+    declared_identifiers[function_name] = new Identifier(FUNCTION, return_type);
+
+    declared_identifiers_in_function = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, declared_identifiers_in_function);
+
+    if (routinedeclaration->returnInRoutine) {
+        string actual_type = check_ReturnInRoutine(routinedeclaration->returnInRoutine, declared_identifiers_in_function);
+        if (return_type != actual_type) {
+            cout << "\n\n" << function_name << "function's return value doesn't match the return type!\n";
+            exit(0);
+        }
+    }
+    else { // Impossible btw
+        cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
+        exit(0);
     }
 
-    Function *f1 = new Function(return_type, parameters);
-    functions[function_name] = f1;
-
-    cout << "LOCAL VARS\n";
-    for (auto x : local_variables)
-        cout << "\n" << x.first << " " << x.second->type << endl;
-    cout << "====";
-
-    return global_variables;
+    return declared_identifiers;
 }
 
 void check_VariableDeclarations(string type_name, VariableDeclarations *variabledeclarations, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope) {
@@ -549,7 +526,7 @@ void check_ArrayType(ArrayType *arraytype, bool is_param) {
     }
     else {  // if array size is not specified
         // check if it's inside a declaration
-        if (is_param) {
+        if (is_param) { //TODO: R u sure about this?
             cout << "\n######\nERROR! Sizeless array declaration is not acceptable!\n######\n";
             exit(EXIT_FAILURE);
         }
@@ -606,114 +583,92 @@ void check_InitialValue(InitialValue *initialvalue) {
 
 }
 
-pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables,
-                               bool scope) {
+// DanyaDone
+map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers) {
     // firstly, checking whether variable was already declared
-    if ((!scope && (is_record_in_table(variabledeclaration->name, global_variables)) || (scope && is_record_in_table(variabledeclaration->name, local_variables)))) {
+    if (declared_identifiers[variabledeclaration->name]) {
         cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
         exit(0);
     }
 
     string user_type;
-
     //getting var type
     if (variabledeclaration->type) {
-        user_type = check_Type(variabledeclaration->type, false);
+        user_type = check_Type(variabledeclaration->type, declared_identifiers);
     }
     // type is setting by the value of expression
+    else if (variabledeclaration->expression) { // var b is 5
+        user_type = check_Expression(variabledeclaration->expression, declared_identifiers);
+        declared_identifiers[variabledeclaration->name] = new Identifier("Variable", user_type);
+        return declared_identifiers;
+    }
     else {
-        // TODO
+        cout << "Something is defenitely wrong in declaration of this variable: " << variabledeclaration->name << "\n";
+        exit(0);
     }
 
     // getting initial value
     if (variabledeclaration->initialvalue) {
-        if (variabledeclaration->initialvalue->expression) {
+        if (variabledeclaration->initialvalue->expression) { // var b: Integer is 5, TODO: test this: var b : array[12] is arr2
             string actual_type = check_Expression(variabledeclaration->initialvalue->expression);
-            if ((isEqual(actual_type, user_type)) ||
-                (isEqual(actual_type, "integer") && isEqual(user_type, "real")) ||
-                ((isEqual(actual_type, "integer") && isEqual(user_type,"boolean")))) {
-                if (!scope) {
-                    global_variables = add_to_symbol_table(variabledeclaration->name, actual_type, global_variables);
-                }
-                else {
-                    local_variables = add_to_symbol_table(variabledeclaration->name, actual_type, local_variables);
-                }
-
+            if (actual_type == user_type || 
+            (user_type == "real" && actual_type == "integer") ||
+            (user_type == "boolean" && actual_type == "integer")) {
+                declared_identifiers[variabledeclaration->name] = new Identifier(VARIABLE, user_type); // we will not check sizes of arrays here. Lets do it in runtime
             }
             else {
                 cout << "\n\nType error!\n";
                 exit(0);
             }
         }
-    }
-    // case of initialization without initial value
-    else {
-        // initial value for bool is false
-        if (isEqual(user_type, "boolean")) {
-            if (!scope) {
-                global_variables = add_to_symbol_table(variabledeclaration->name, user_type, global_variables);
-            }
-            else {
-                local_variables = add_to_symbol_table(variabledeclaration->name, user_type, local_variables);
-            }
-        }
-        //initial value for float and int is INF
-        else {
-            if (!scope) {
-                global_variables = add_to_symbol_table(variabledeclaration->name, user_type, global_variables);
-            }
-            else {
-                local_variables = add_to_symbol_table(variabledeclaration->name, user_type, local_variables);
-            }
+        else { // case of initialization without initial value:  var b : Integer
+            declared_identifiers[variabledeclaration->name] = new Identifier("Variable", user_type);
         }
     }
-
-    return make_pair(global_variables, local_variables);
+    
+    return declared_identifiers;
 }
 
-//DONE
-pair <map<string, Variable* >, map<string, Variable* >> check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope) {
+// DanyaDone
+map<string, Identifier*> check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Identifier*> declared_identifiers) {
     if (simpleDeclaration->variabledeclaration) {
-        auto result = check_VariableDeclaration(simpleDeclaration->variabledeclaration, global_variables, local_variables, scope);
-        global_variables = result.first;
-        local_variables = result.second;
+        declared_identifiers = check_VariableDeclaration(simpleDeclaration->variabledeclaration, declared_identifiers);
     }
     if (simpleDeclaration->typedeclaration) {
-        check_TypeDeclaration(simpleDeclaration->typedeclaration, scope);
+        declared_identifiers = check_TypeDeclaration(simpleDeclaration->typedeclaration, declared_identifiers);
     }
-    return make_pair(global_variables, local_variables);
+    return declared_identifiers;
 }
 
-//DONE
-map<string, Variable* > check_Declaration(Declaration *declaration, map<string, Variable* > global_variables) {
-    bool scope = false; //global
+// DanyaDone
+map<string, Identifier*> check_Declaration(Declaration *declaration, map<string, Identifier*> declared_identifiers) {
     if (declaration->simpledeclaration) {
-        auto result = check_SimpleDeclaration(declaration->simpledeclaration, global_variables, {}, scope);
-        global_variables = result.first;
+        declared_identifiers = check_SimpleDeclaration(declaration->simpledeclaration, declared_identifiers);
     }
     if (declaration->routinedeclaration){
-        global_variables = check_RoutineDeclaration(declaration->routinedeclaration, global_variables);
+        declared_identifiers = check_RoutineDeclaration(declaration->routinedeclaration, declared_identifiers);
     }
-    return global_variables;
+    return declared_identifiers;
 }
 
-//DONE
-map<string, Variable* > glob_variables;
+// DanyaDone
 void check_Program(Program *program) {
+    map<string, Identifier*> declared_identifiers;
+
     if (program->declaration) {
-        glob_variables = check_Declaration(program->declaration, glob_variables);
+        declared_identifiers = check_Declaration(program->declaration, declared_identifiers);
     }
     if (program->program) {
-        check_Program(program->program);
+        check_Program(program->program, declared_identifiers);
     }
 
-    for (auto x : glob_variables)
-        cout << "\n" << x.first << " " << x.second->type << endl;
+    // for (auto x : glob_variables)
+    //     cout << "\n" << x.first << " " << x.second->type << endl;
 
-    for (auto x : functions) {
-        cout << "\n" << x.first << " " << x.second->return_type  << " " << endl;
-        for (auto param : x.second->arguments) {
-            cout << param->type << endl;
-        }
-    }
+    // for (auto x : functions) {
+    //     cout << "\n" << x.first << " " << x.second->return_type  << " " << endl;
+    //     for (auto param : x.second->arguments) {
+    //         cout << param->type << endl;
+    //     }
+    // }
 }

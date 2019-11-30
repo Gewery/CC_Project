@@ -6,23 +6,32 @@
 using namespace std;
 
 
-struct Variable {
-    string type;
-    bool scope; // 0 - global, 1 - local
-    Variable(string type_of_var, bool scope_of_var) {
-        type = type_of_var;
-        scope = scope_of_var;
-    }
+struct Identifier {
+    string identifier_type; // "Variable", "Function" or "Type"
+    string value_type;
+
+    Identifier(string identifier_type, string value_type): identifier_type(identifier_type), value_type(value_type) {}
+    // Variable *variable;
+    // Function *funciton;
+    // Type *type;
 };
 
-struct Function {
-    string return_type;
-    vector<Variable*> arguments;
-    Function(string return_type_of_func, vector<Variable*> &arguments_of_func) {
-        return_type = return_type_of_func;
-        arguments = arguments_of_func;
-    }
-};
+// struct Variable {
+//     string type;
+// };
+
+// struct Function {
+//     // string return_type;
+//     // vector<Variable*> arguments;
+//     // Function(string return_type_of_func, vector<Variable*> &arguments_of_func) {
+//     //     return_type = return_type_of_func;
+//     //     arguments = arguments_of_func;
+//     // }
+// };
+
+// struct Type {
+
+// };
 
 
 void check_Program(Program *program);
