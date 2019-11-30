@@ -31,8 +31,8 @@ pair <map<string, Variable* >, map<string, Variable* >> check_SimpleDeclaration(
 pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Variable* > global_variables, map<string, Variable* > local_variables, bool scope);
 void check_InitialValue(InitialValue *initialvalue);
 void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope);
-string check_Type(Type *type, bool is_decl);
-void check_ArrayType(ArrayType *arraytype, bool is_decl);
+string check_Type(Type *type, bool is_decl=false);
+string check_ArrayType(ArrayType *arraytype, bool is_decl);
 void check_RecordType(RecordType *recordtype);
 void check_VariableDeclarations(VariableDeclarations *variabledeclarations);
 map<string, Variable* > check_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Variable* > global_variables);
@@ -63,4 +63,4 @@ string check_Summands(Summands *summands);
 string check_Summand(Summand *summand);
 string check_Primary(Primary *primary);
 string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary);
-void check_Identifiers(Identifiers *identifiers);
+string check_Identifiers(Identifiers *identifiers, string path);

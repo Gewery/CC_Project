@@ -201,7 +201,7 @@ PrimitiveType
 
 ArrayType
     : ARRAY BRACKETS_L Expression BRACKETS_R Type   { $$ = new ArrayType($3, $5); }
-    | ARRAY BRACKETS_L BRACKETS_R Type              { $$ = new ArrayType(NULL, $5); }
+    | ARRAY BRACKETS_L BRACKETS_R Type              { $$ = new ArrayType(NULL, $4); }
     ;
 
 RecordType

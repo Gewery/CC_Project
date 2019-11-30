@@ -44,36 +44,9 @@ map<string, Variable* > update_table(map<string, Variable* > source, map<string,
     return target;
 };
 
-string returned_type(string a, string b) {
-    if (a == "float" || b == "float") return "float";
-    else if (a == "int" || b == "int") return "int";
-    else if (a == "bool" || b == "bool") return "bool";
-    else {
-        cout << "Wrong type (" << a << ", " << b << ")\n";
-        exit(1);
-    }
-}
-
-
-void check_Identifiers(Identifiers *identifiers) {
-
-}
-
-string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
-    if (!(modifiableprimary->name).empty()) {
-        return modifiableprimary->name;
-    }
-    if (modifiableprimary->identifiers) {
-        //check identifiers
-    }
-}
-
-void check_Sign(Sign *sign) {
-
-}
-
 /**
  * Check if type is already in the map of custom types.
+ * 
  * @param name  Type name
  * @return      Boolean value storing true if type exists, false - otherwise
  */
@@ -94,70 +67,135 @@ void add_type(string name, string type) {
     // cout << "\n\nAdded type '" << name << "' of actual type '" << type << "'\n\n"; // LOG
 }
 
+/**
+ * Choose dominant type - the one which should be returned after two primaries' cast.
+ * 
+ * @param type1  Type of the first primary
+ * @param type2  Type of the second primary
+ * @return       String indicating the output dominant type
+ */
+string cast_types(string type1, string type2) {
+    if (type1 == "real" || type2 == "real")
+        return "real";
+    else if (type1 == "integer" || type2 == "integer")
+        return "integer";
+    else if (type1 == "boolean" || type2 == "boolean")
+        return "boolean";
+    else {
+        cout << "Wrong type (" << type1 << ", " << type2 << ")\n";
+        exit(1);
+    }
+}
+
+/**
+ * Check identifier's usage correctness, return actial identifier's type.
+ * 
+ * @param identifiers  Structure contatining identifiers' data
+ * @param path         Full identifier's name in case of records dot notation
+ * @return             Actual type of identifiers
+ */
+string check_Identifiers(Identifiers *identifiers, string path) {
+    string full_name = path + "." + identifiers->name;
+
+    // TODO: check if used variable exists in current scope
+    cout << "In function 'check_Identifiers' there must be check on variable existence and scope correctness" << endl;
+
+    if (identifiers->identifiers)
+        return check_Identifiers(identifiers->identifiers, full_name);
+    else
+        return types[full_name];
+}
+
+/**
+ * Check identifiers' usage correctness, return actual type of modifiable primary.
+ * 
+ * @param modifiableprimary  Structure contatining modifiable primary's data
+ * @return                   Actual type of modifiable primary
+ */
+string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
+    string ident_name = modifiableprimary->name;
+
+    // TODO: check if used variable exists in current scope
+    cout << "In function 'check_ModifiablePrimary' there must be check on variable existence and scope correctness" << endl;
+
+    string type = types[ident_name];
+
+    if (modifiableprimary->identifiers)
+        return cast_types(type, check_Identifiers(modifiableprimary->identifiers, ident_name));
+    else
+        return type;
+}
+
 //DONE
 string check_Primary(Primary *primary) {
-    return primary->type;
+    if (primary->type != "")
+        return primary->type;
+    else
+        return check_ModifiablePrimary(primary->modifiablePrimary);
 }
 
 //DONE
 string check_Summand(Summand *summand) {
-    if (summand->expression) {
+    if (summand->expression)
         return check_Expression(summand->expression);
-    } else {
+    else
         return check_Primary(summand->primary);
-    }
 }
 
 //DONE
 string check_Summands(Summands *summands) {
     string summand_type = check_Summand(summands->summand);
-    if (summands->summands) {
-        return returned_type(summand_type, check_Summands(summands->summands));
-    } else {
+
+    if (summands->summands)
+        return cast_types(summand_type, check_Summands(summands->summands));
+    else
         return summand_type;
-    }
 }
 
 //DONE
 string check_Factor(Factor *factor) {
     string summand_type = check_Summand(factor->summand);
-    if (factor->summands) {
-        return returned_type(summand_type, check_Summands(factor->summands));
-    } else {
+
+    if (factor->summands)
+        return cast_types(summand_type, check_Summands(factor->summands));
+    else
         return summand_type;
-    }
 }
 
 //DONE
 string check_Factors(Factors *factors) {
     string factor_type = check_Factor(factors->factor);
-    if (factors->factors) {
-        return returned_type(factor_type, check_Factors(factors->factors));
-    } else {
+
+    if (factors->factors)
+        return cast_types(factor_type, check_Factors(factors->factors));
+    else
         return factor_type;
-    }
 }
 
 //DONE
 string check_Simple(Simple *simple) {
     string factor_type = check_Factor(simple->factor);
-    if (simple->factors) {
-        return returned_type(factor_type, check_Factors(simple->factors));
-    } else {
+
+    if (simple->factors)
+        return cast_types(factor_type, check_Factors(simple->factors));
+    else
         return factor_type;
-    }
 }
 
 //DONE
 string check_Relation(Relation *relation) {
-    if (relation->comparisoninrelation) return "bool";
-    else return check_Simple(relation->simple);
+    if (relation->comparisoninrelation)
+        return "boolean";
+    else
+        return check_Simple(relation->simple);
 }
 
 //DONE
 string check_Expression(Expression *expression) {
-    if (expression->multiplerelationsinexpression) return "bool";
-    else return check_Relation(expression->relation);
+    if (expression->multiplerelationsinexpression)
+        return "boolean";
+    else
+        return check_Relation(expression->relation);
 }
 
 pair <map<string, Variable* >, map<string, Variable* >> check_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string, Variable* > global_variables, map<string, Variable* > local_variables) {
@@ -419,7 +457,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDecla
 //DONE
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
     if (typeinroutinedeclaration->type) {
-        return check_Type(typeinroutinedeclaration->type, false);
+        return check_Type(typeinroutinedeclaration->type);
     }
 }
 
@@ -537,7 +575,7 @@ void check_RecordType(string type_name, RecordType *recordtype, map<string, Vari
     }
 }
 
-void check_ArrayType(ArrayType *arraytype, bool is_param) {
+string check_ArrayType(ArrayType *arraytype, bool is_param) {
     if (arraytype->expression) {
         string expr_type = check_Expression(arraytype->expression);
 
@@ -547,26 +585,34 @@ void check_ArrayType(ArrayType *arraytype, bool is_param) {
             exit(EXIT_FAILURE);
         }
     }
-    else {  // if array size is not specified
-        // check if it's inside a declaration
-        if (is_param) {
-            cout << "\n######\nERROR! Sizeless array declaration is not acceptable!\n######\n";
+    // if array size is not specified
+    else {
+        // check if it's inside a routine parameters declaration
+        if (!is_param) {
+            cout << "\n######\nERROR! Sizeless array declaration is not acceptable here!\n######\n";
             exit(EXIT_FAILURE);
         }
     }
 
-    check_Type(arraytype->type, is_param);     // check type of the array
+    
+    return check_Type(arraytype->type, is_param);     // check type of the array
 }
 
-string check_Type(Type *type, bool is_param) {
+/**
+ * Checks type correctness and return its string representation.
+ * 
+ * @param type      type structure containing type informationL is it array, record, primitive or user-defined
+ * @param is_param  is type declared for routine parameter (false by default)
+ * @return          string representation of given type (if it's a custom type, its actual type is returned)
+ */
+string check_Type(Type *type, bool is_param/*=false*/) {
     string user_type;
     if (type->arraytype) {
-        check_ArrayType(type->arraytype, is_param);
-        return "array";
+        return "array:" + check_ArrayType(type->arraytype, is_param);
     }
     else if (type->primitivetype)
-        return type->primitivetype->isint ? "integer" :
-               type->primitivetype->isreal ? "real" :
+        return type->primitivetype->isint     ? "integer" :
+               type->primitivetype->isreal    ? "real"    :
                type->primitivetype->isboolean ? "boolean" : "IMPOSSIBLE";
     else if (type->recordtype) {
         //check_RecordType(type->name, )
@@ -582,10 +628,17 @@ string check_Type(Type *type, bool is_param) {
             exit(EXIT_FAILURE);
         }
 
-        return user_type;
+        // return actual type of a custom type
+        return types[user_type];
     }
 }
 
+/**
+ * Check if a new type has been already declared, and store it if correct.
+ * 
+ * @param typedeclaration  Structure containing new type data
+ * @param scope            Scope of this type *to be removed*
+ */
 void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope) {
     string name = typedeclaration->name;
     transform(name.begin(), name.end(), name.begin(), ::tolower);
@@ -597,7 +650,7 @@ void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope) {
     }
 
     // check actual type and get its string representation
-    string type = check_Type(typedeclaration->type, false);
+    string type = check_Type(typedeclaration->type);
 
     add_type(name, type);  // add a new type
 }
@@ -618,7 +671,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
 
     //getting var type
     if (variabledeclaration->type) {
-        user_type = check_Type(variabledeclaration->type, false);
+        user_type = check_Type(variabledeclaration->type);
     }
     // type is setting by the value of expression
     else {
