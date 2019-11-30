@@ -419,7 +419,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_BodyInRoutineDecla
 //DONE
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
     if (typeinroutinedeclaration->type) {
-        return check_Type(typeinroutinedeclaration->type, true);
+        return check_Type(typeinroutinedeclaration->type, false);
     }
 }
 
@@ -442,7 +442,7 @@ map<string, Variable* > check_ParameterDeclaration(ParameterDeclaration *paramet
         name = parameterdeclaration->name;
     }
     if (parameterdeclaration->type) {
-        type = check_Type(parameterdeclaration->type, false);
+        type = check_Type(parameterdeclaration->type, true);
     }
     Variable *v1 = new Variable(type, 1);
     local_variables[name] = v1;
@@ -537,7 +537,7 @@ void check_RecordType(string type_name, RecordType *recordtype, map<string, Vari
     }
 }
 
-void check_ArrayType(ArrayType *arraytype, bool is_decl) {
+void check_ArrayType(ArrayType *arraytype, bool is_param) {
     if (arraytype->expression) {
         string expr_type = check_Expression(arraytype->expression);
 
@@ -549,19 +549,19 @@ void check_ArrayType(ArrayType *arraytype, bool is_decl) {
     }
     else {  // if array size is not specified
         // check if it's inside a declaration
-        if (is_decl) {
+        if (is_param) {
             cout << "\n######\nERROR! Sizeless array declaration is not acceptable!\n######\n";
             exit(EXIT_FAILURE);
         }
     }
 
-    check_Type(arraytype->type, is_decl);     // check type of the array
+    check_Type(arraytype->type, is_param);     // check type of the array
 }
 
-string check_Type(Type *type, bool is_decl) {
+string check_Type(Type *type, bool is_param) {
     string user_type;
     if (type->arraytype) {
-        check_ArrayType(type->arraytype, is_decl);
+        check_ArrayType(type->arraytype, is_param);
         return "array";
     }
     else if (type->primitivetype)
@@ -597,7 +597,7 @@ void check_TypeDeclaration(TypeDeclaration *typedeclaration, bool scope) {
     }
 
     // check actual type and get its string representation
-    string type = check_Type(typedeclaration->type, true);
+    string type = check_Type(typedeclaration->type, false);
 
     add_type(name, type);  // add a new type
 }
@@ -618,7 +618,7 @@ pair <map<string, Variable* >, map<string, Variable* >> check_VariableDeclaratio
 
     //getting var type
     if (variabledeclaration->type) {
-        user_type = check_Type(variabledeclaration->type, true);
+        user_type = check_Type(variabledeclaration->type, false);
     }
     // type is setting by the value of expression
     else {
