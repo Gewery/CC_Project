@@ -2,6 +2,8 @@
     #include <stdio.h>
     #include <string>
     #include <map>
+    #include <iostream>
+    #include <fstream>
     #include "../SemanticAnalysis/SymbolTable.h"
     #include "../LexicalAnalysis/lexems.h"
 
@@ -13,7 +15,6 @@
     extern float get_yyextra_float();
     extern int get_yyextra_int();
 
-    // extern void print_Program(Program *program, bool isLast);
     Program *root;
 %}
 %union {
@@ -396,16 +397,22 @@ Identifiers
 %%
 
 int main(int argc, char **argv){
-    cout << "Lexical Analyzer!\n";
-    cout << "======###========\n\n";
+    cout << "Lexical Analyzer!\n======###========\n\n";
     yyparse();
-    cout << "\n\nAST\n";
-    cout << "======###========\n\n";
+    cout << "\n\nAST\n======###========\n\n";
     map<string, Identifier*> declared_identifiers;
     declared_identifiers["integer"] = new Identifier("Type", "integer");
     declared_identifiers["real"] = new Identifier("Type", "real");
     declared_identifiers["boolean"] = new Identifier("Type", "boolean");
     check_Program(root, declared_identifiers);
     print_Tree(root);
+
+    cout << "\n\nAST JSON\n======###========\n\n";
+    string serialized_json = serialize_Tree(root);
+    std::cout << serialized_json << std::endl;
+    ofstream file("tree.json");
+    file << serialized_json;
+    file.close();
+
     return 0;
 }
