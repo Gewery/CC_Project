@@ -474,8 +474,8 @@ string check_Type(Type *type, map<string, Identifier*> declared_identifiers, Ide
         transform(user_type.begin(), user_type.end(), user_type.begin(), ::tolower);
         
         // check if user type exists
-        if (!declared_identifiers[type->name]) {
-            cout << "\n######\nERROR! Type doesn't exist in this scope: '" << type->name << "'\n######\n";
+        if (!declared_identifiers[user_type]) {
+            cout << "\n######\nERROR! Type doesn't exist in this scope: '" << user_type << "'\n######\n";
             exit(EXIT_FAILURE);
         }
 
