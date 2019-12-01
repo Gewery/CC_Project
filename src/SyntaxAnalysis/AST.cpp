@@ -345,7 +345,7 @@ void print_ExpressionsInRoutineCall(string prefix, ExpressionsInRoutineCall *exp
             NEW_PREFIX,
             expressionsinroutinecall->expression,
             !expressionsinroutinecall->expressionsinroutinecall);
-    print_ExpressionInRoutineCall(
+    print_ExpressionsInRoutineCall(
             NEW_PREFIX,
             expressionsinroutinecall->expressionsinroutinecall, 1);
 }
