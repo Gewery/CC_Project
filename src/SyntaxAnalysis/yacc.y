@@ -1,6 +1,7 @@
 %{
     #include <stdio.h>
     #include <string>
+    #include <map>
     #include "../SemanticAnalysis/SymbolTable.h"
     #include "../LexicalAnalysis/lexems.h"
 
@@ -400,7 +401,11 @@ int main(int argc, char **argv){
     yyparse();
     cout << "\n\nAST\n";
     cout << "======###========\n\n";
-    check_Program(root);
+    map<string, Identifier*> declared_identifiers;
+    declared_identifiers["integer"] = new Identifier("Type", "integer");
+    declared_identifiers["real"] = new Identifier("Type", "real");
+    declared_identifiers["boolean"] = new Identifier("Type", "boolean");
+    check_Program(root, declared_identifiers);
     print_Tree(root);
     return 0;
 }

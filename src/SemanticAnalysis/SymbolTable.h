@@ -5,7 +5,6 @@
 #include "../SyntaxAnalysis/AST.h"
 using namespace std;
 
-
 struct Identifier {
     string identifier_type; // "Variable", "Function" or "Type"
     string value_type;
@@ -35,7 +34,7 @@ struct Identifier {
 // };
 
 
-void check_Program(Program *program);
+void check_Program(Program *program, map<string, Identifier*> declared_identifiers);
 map<string, Identifier*> check_Declaration(Declaration *declaration, map<string, Identifier*> declared_identifiers);
 map<string, Identifier*> check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Identifier*> declared_identifiers);
 map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, Identifier *parent = nullptr);
@@ -74,4 +73,4 @@ string check_Summands(Summands *summands, map<string, Identifier*> declared_iden
 string check_Summand(Summand *summand, map<string, Identifier*> declared_identifiers);
 string check_Primary(Primary *primary, map<string, Identifier*> declared_identifiers);
 string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers);
-string check_Identifiers(Identifiers *identifiers, Identifier* ident);
+string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string, Identifier*> declared_identifiers);

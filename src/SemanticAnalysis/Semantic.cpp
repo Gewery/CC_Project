@@ -41,10 +41,10 @@ string cast_types(string type1, string type2) {
  * @return             Actual type of identifiers
  * DanyaDone
  */
-string check_Identifiers(Identifiers *identifiers, Identifier* ident) {
+string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string, Identifier*> declared_identifiers) {
 
     if (identifiers->expression) {
-        check_Expression(identifiers->expression);
+        check_Expression(identifiers->expression, declared_identifiers);
     }
 
     if (!ident->subidentifiers[identifiers->name]) {
@@ -53,7 +53,7 @@ string check_Identifiers(Identifiers *identifiers, Identifier* ident) {
     }
 
     if (identifiers->identifiers)
-        return check_Identifiers(identifiers->identifiers, ident->subidentifiers[identifiers->name]);
+        return check_Identifiers(identifiers->identifiers, ident->subidentifiers[identifiers->name], declared_identifiers);
     else
         return ident->subidentifiers[identifiers->name]->value_type;
 }
@@ -76,7 +76,7 @@ string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string,
     string type = declared_identifiers[ident_name]->value_type;
 
     if (modifiableprimary->identifiers)
-        return check_Identifiers(modifiableprimary->identifiers, declared_identifiers[ident_name]);
+        return check_Identifiers(modifiableprimary->identifiers, declared_identifiers[ident_name], declared_identifiers);
     else
         return type;
 }
@@ -146,7 +146,7 @@ void check_ComparisonInRelation(ComparisonInRelation *comparisoninrelation, map<
 // DanyaDone
 string check_Relation(Relation *relation, map<string, Identifier*> declared_identifiers) {
     if (relation->comparisoninrelation) {
-        check_ComparisonInRelation(relation->comparisoninrelation, declared_identifiers)
+        check_ComparisonInRelation(relation->comparisoninrelation, declared_identifiers);
         return "boolean";
     }
     else
@@ -180,7 +180,7 @@ void check_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string, I
 // DanyaDone
 void check_IfStatement(IfStatement *ifstatement, map<string, Identifier*> declared_identifiers) {
     if (ifstatement->expression)
-        check_Expression(ifstatement->expression, declared_identifiers)
+        check_Expression(ifstatement->expression, declared_identifiers);
 
     if (ifstatement->body)
         check_Body(ifstatement->body, declared_identifiers);
@@ -204,7 +204,7 @@ void check_Range(Range *range, map<string, Identifier*> declared_identifiers) {
 }
 
 // DanyaDone
-void check_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers) {
+void check_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers) { // TODO Read-only thing
     if (!(forloop->name).empty()) {
         declared_identifiers[forloop->name] = new Identifier(VARIABLE, "integer", 1);
     }
@@ -230,7 +230,7 @@ void check_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinrouti
     if (expressionsinroutinecall->expression)
         check_Expression(expressionsinroutinecall->expression, declared_identifiers);
     if (expressionsinroutinecall->expressionsinroutinecall)
-        check_ExpressionsInRoutineCall(expressionsinroutinecall->expressionsinroutinecall, delcared_identifiers);
+        check_ExpressionsInRoutineCall(expressionsinroutinecall->expressionsinroutinecall, declared_identifiers);
 }
 
 // DanyaDone
@@ -313,6 +313,8 @@ string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedec
     if (typeinroutinedeclaration->type) {
         return check_Type(typeinroutinedeclaration->type, declared_identifiers);
     }
+    else
+        return ""; // Impossible btw
 }
 
 // DanyaDone
@@ -334,7 +336,7 @@ map<string, Identifier* > check_ParameterDeclaration(ParameterDeclaration *param
         name = parameterdeclaration->name;
     }
     if (parameterdeclaration->type) {
-        type = check_Type(parameterdeclaration->type, true);
+        type = check_Type(parameterdeclaration->type, declared_identifiers, nullptr, true);
     }
     declared_identifiers[name] = new Identifier(VARIABLE, type);
     return declared_identifiers;
@@ -356,6 +358,8 @@ string check_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Ident
     if (returnInRoutine->expression) {
         return check_Expression(returnInRoutine->expression, declared_identifiers);
     }
+    else
+        return ""; // Impossible btw
 };
 
 // DanyaDone
@@ -424,7 +428,7 @@ string check_RecordType(RecordType *recordtype, map<string, Identifier*> declare
 // DanyaDone
 string check_ArrayType(ArrayType *arraytype, map<string, Identifier*> declared_identifiers, bool is_param) {
     if (arraytype->expression) {
-        string expr_type = check_Expression(arraytype->expression);
+        string expr_type = check_Expression(arraytype->expression, declared_identifiers);
 
         // check if expression type is integer
         if (expr_type != "integer") {
@@ -442,7 +446,7 @@ string check_ArrayType(ArrayType *arraytype, map<string, Identifier*> declared_i
     }
 
     
-    return check_Type(arraytype->type, declared_identifiers, is_param);     // check type of the array
+    return check_Type(arraytype->type, declared_identifiers, nullptr, is_param);     // check type of the array
 }
 
 /**
@@ -453,7 +457,7 @@ string check_ArrayType(ArrayType *arraytype, map<string, Identifier*> declared_i
  * @return          string representation of given type (if it's a custom type, its actual type is returned)
  * DanyaDone
  */
-string check_Type(Type *type, map<string, Identifier*> declared_identifiers, Identifier* ident = nullptr, bool is_param/*=false*/) {
+string check_Type(Type *type, map<string, Identifier*> declared_identifiers, Identifier* ident /*= nullptr*/, bool is_param/*=false*/) {
     string user_type;
     if (type->arraytype) {
         return "array:" + check_ArrayType(type->arraytype, declared_identifiers, is_param);
@@ -513,7 +517,7 @@ string check_InitialValue(InitialValue *initialvalue, map<string, Identifier* > 
 }
 
 // DanyaDone
-map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, Identifier *parent = nullptr) {
+map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, Identifier *parent /*= nullptr*/) {
     // firstly, checking whether variable was already declared
     if (declared_identifiers[variabledeclaration->name]) {
         cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
@@ -527,8 +531,8 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
     //getting var type
     if (variabledeclaration->type) {
         user_type = check_Type(variabledeclaration->type, declared_identifiers, new_identifier);
+        new_identifier->value_type = user_type;
     }
-    new_identifier->value_type = user_type;
     // type is setting by the value of expression
     else if (variabledeclaration->expression) { // var b is 5
         user_type = check_Expression(variabledeclaration->expression, declared_identifiers);
@@ -543,13 +547,14 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
     // getting initial value
     if (variabledeclaration->initialvalue) {
         if (variabledeclaration->initialvalue) { // var b: Integer is 5, TODO: test this: var b : array[12] is arr2
-            string actual_type = check_InitialValue(variabledeclaration->initialvalue);
+            string actual_type = check_InitialValue(variabledeclaration->initialvalue, declared_identifiers);
             if (actual_type == user_type || 
             (user_type == "real" && actual_type == "integer") ||
             (user_type == "boolean" && actual_type == "integer")) {
-                if (parent) // Only in case of record declaration
+                if (parent) {// Only in case of record declaration
                     parent->subidentifiers[variabledeclaration->name] = new_identifier;
-                    declared_identifiers[&parent + variabledeclaration->name] = new_identifier;
+                    //declared_identifiers[(string)(&parent) + variabledeclaration->name] = new_identifier;
+                }
                 else
                     declared_identifiers[variabledeclaration->name] = new_identifier; // we will not check sizes of arrays here. Lets do it in runtime
             }
@@ -559,9 +564,10 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
             }
         }
         else { // case of initialization without initial value:  var b : Integer
-            if (parent) // Only in case of record declaration
+            if (parent) {// Only in case of record declaration
                 parent->subidentifiers[variabledeclaration->name] = new_identifier;
-                declared_identifiers[&parent + variabledeclaration->name] = new_identifier;
+                //declared_identifiers[(string)(&parent) + variabledeclaration->name] = new_identifier;
+            }
             else
                 declared_identifiers[variabledeclaration->name] = new_identifier;
         }
@@ -593,12 +599,7 @@ map<string, Identifier*> check_Declaration(Declaration *declaration, map<string,
 }
 
 // DanyaDone
-void check_Program(Program *program) {
-    map<string, Identifier*> declared_identifiers;
-    declared_identifiers["integer"] = new Identifier(TYPE, "integer");
-    declared_identifiers["real"] = new Identifier(TYPE, "real");
-    declared_identifiers["boolean"] = new Identifier(TYPE, "boolean");
-
+void check_Program(Program *program, map<string, Identifier*> declared_identifiers) {
     if (program->declaration)
         declared_identifiers = check_Declaration(program->declaration, declared_identifiers);
 
