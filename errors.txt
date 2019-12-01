@@ -1,8 +1,0 @@
-./src/SemanticAnalysis/Semantic.cpp: In function 'std::__cxx11::string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration*, std::map<std::__cxx11::basic_string<char>, Identifier*>)':
-./src/SemanticAnalysis/Semantic.cpp:316:1: warning: control reaches end of non-void function [-Wreturn-type]
- }
- ^
-./src/SemanticAnalysis/Semantic.cpp: In function 'std::__cxx11::string check_ReturnInRoutine(ReturnInRoutine*, std::map<std::__cxx11::basic_string<char>, Identifier*>)':
-./src/SemanticAnalysis/Semantic.cpp:359:1: warning: control reaches end of non-void function [-Wreturn-type]
- };
- ^
