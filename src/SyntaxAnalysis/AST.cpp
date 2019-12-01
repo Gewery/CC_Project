@@ -344,10 +344,10 @@ void print_ExpressionsInRoutineCall(string prefix, ExpressionsInRoutineCall *exp
     print_Expression(
             NEW_PREFIX,
             expressionsinroutinecall->expression,
-            !expressionsinroutinecall->expressioninroutinecall);
+            !expressionsinroutinecall->expressionsinroutinecall);
     print_ExpressionInRoutineCall(
             NEW_PREFIX,
-            expressionsinroutinecall->expressioninroutinecall, 1);
+            expressionsinroutinecall->expressionsinroutinecall, 1);
 }
 
 void print_WhileLoop(string prefix, WhileLoop *whileloop, bool is_last) {
