@@ -381,7 +381,7 @@ struct Primary {
             type(type),
             value(value),
             isNot(isNot),
-            modifiablePrimary(modifiablePrimary) { if (sign) value *= sign->op == "-" ? -1 : 1; };
+            modifiablePrimary(modifiablePrimary) { if (sign) this->value *= sign->op == "-" ? -1 : 1; };
 };
 
 struct ModifiablePrimary {
