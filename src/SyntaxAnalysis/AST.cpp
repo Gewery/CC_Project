@@ -681,9 +681,9 @@ json to_json_Type(Type *type) {
 json to_json_PrimitiveType(PrimitiveType *primitivetype) {
     if (!primitivetype) return {};
     return {
-            {"name", primitivetype->isint ? "int" :
-                     primitivetype->isreal ? "real" :
-                     primitivetype->isboolean ? "bool" : "undef"}
+            {"is_int",  primitivetype->isint},
+            {"is_real", primitivetype->isreal},
+            {"is_bool", primitivetype->isboolean}
     };
 }
 
@@ -844,15 +844,15 @@ json to_json_ForLoop(ForLoop *forloop) {
 json to_json_Range(Range *range) {
     if (!range) return {};
     return {
-            {"Expression", to_json_Expression(range->expression2)},
-            {"Expression", to_json_Expression(range->expression1)}
+            {"Expression1", to_json_Expression(range->expression1)},
+            {"Expression2", to_json_Expression(range->expression2)}
     };
 }
 
 json to_json_Reverse(Reverse *reverse) {
     if (!reverse) return {};
     return {
-            {"name", reverse->isreverse ? "is_inverse" : "not_inverse"}
+            {"is_reverse", reverse->isreverse}
     };
 }
 
