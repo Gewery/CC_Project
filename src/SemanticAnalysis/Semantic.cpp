@@ -13,12 +13,6 @@ using namespace std;
 #define FUNCTION "Function"
 #define TYPE "Type" 
 
-map<string, string > types = {
-    {"integer", "integer"},
-    {"real", "real"},
-    {"boolean", "boolean"}
-};
-
 /**
  * Choose dominant type - the one which should be returned after two primaries' cast.
  * 
@@ -45,17 +39,23 @@ string cast_types(string type1, string type2) {
  * @param identifiers  Structure contatining identifiers' data
  * @param path         Full identifier's name in case of records dot notation
  * @return             Actual type of identifiers
+ * DanyaDone
  */
-string check_Identifiers(Identifiers *identifiers, string path) {
-    string full_name = path + "." + identifiers->name;
+string check_Identifiers(Identifiers *identifiers, Identifier* ident) {
 
-    // TODO: check if used variable exists in current scope
-    cout << "In function 'check_Identifiers' there must be check on variable existence and scope correctness" << endl;
+    if (identifiers->expression) {
+        check_Expression(identifiers->expression);
+    }
+
+    if (!ident->subidentifiers[identifiers->name]) {
+        cout << identifiers->name << "Was not declared in this scope";
+        exit(EXIT_FAILURE);
+    }
 
     if (identifiers->identifiers)
-        return check_Identifiers(identifiers->identifiers, full_name);
+        return check_Identifiers(identifiers->identifiers, ident->subidentifiers[identifiers->name]);
     else
-        return types[full_name];
+        return ident->subidentifiers[identifiers->name]->value_type;
 }
 
 /**
@@ -63,6 +63,7 @@ string check_Identifiers(Identifiers *identifiers, string path) {
  * 
  * @param modifiableprimary  Structure contatining modifiable primary's data
  * @return                   Actual type of modifiable primary
+ * DanyaDone
  */
 string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers) {
     string ident_name = modifiableprimary->name;
@@ -75,7 +76,7 @@ string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string,
     string type = declared_identifiers[ident_name]->value_type;
 
     if (modifiableprimary->identifiers)
-        return cast_types(type, check_Identifiers(modifiableprimary->identifiers, ident_name));
+        return check_Identifiers(modifiableprimary->identifiers, declared_identifiers[ident_name]);
     else
         return type;
 }
@@ -399,23 +400,23 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
 
 
 // DanyaDone
-string check_VariableDeclarations(VariableDeclarations *variabledeclarations, map<string, Identifier*> declared_identifiers) {
+string check_VariableDeclarations(VariableDeclarations *variabledeclarations, map<string, Identifier*> declared_identifiers, Identifier* ident) {
     string result;
     if (variabledeclarations->variabledeclaration) {
-        check_VariableDeclaration(variabledeclarations->variabledeclaration, declared_identifiers);
+        check_VariableDeclaration(variabledeclarations->variabledeclaration, declared_identifiers, ident);
         result = variabledeclarations->variabledeclaration->name + "-" + check_Type(variabledeclarations->variabledeclaration->type, declared_identifiers);
     }
     
     if (variabledeclarations->variabledeclarations)
-        result += ":" + check_VariableDeclarations(variabledeclarations->variabledeclarations, declared_identifiers);
+        result += ":" + check_VariableDeclarations(variabledeclarations->variabledeclarations, declared_identifiers, ident);
     
     return result;
 }
 
 // DanyaDone
-string check_RecordType(RecordType *recordtype, map<string, Identifier*> declared_identifiers) {
+string check_RecordType(RecordType *recordtype, map<string, Identifier*> declared_identifiers, Identifier *ident) {
     if (recordtype->variabledeclarations)
-        return check_VariableDeclarations(recordtype->variabledeclarations, declared_identifiers);
+        return check_VariableDeclarations(recordtype->variabledeclarations, declared_identifiers, ident);
     else 
         return ""; // Impossible btw
 }
@@ -452,7 +453,7 @@ string check_ArrayType(ArrayType *arraytype, map<string, Identifier*> declared_i
  * @return          string representation of given type (if it's a custom type, its actual type is returned)
  * DanyaDone
  */
-string check_Type(Type *type, map<string, Identifier*> declared_identifiers, bool is_param/*=false*/) {
+string check_Type(Type *type, map<string, Identifier*> declared_identifiers, Identifier* ident = nullptr, bool is_param/*=false*/) {
     string user_type;
     if (type->arraytype) {
         return "array:" + check_ArrayType(type->arraytype, declared_identifiers, is_param);
@@ -462,7 +463,7 @@ string check_Type(Type *type, map<string, Identifier*> declared_identifiers, boo
                type->primitivetype->isreal    ? "real"    :
                type->primitivetype->isboolean ? "boolean" : "IMPOSSIBLE";
     else if (type->recordtype) {
-        return "record:" + check_RecordType(type->recordtype, declared_identifiers);
+        return "record:" + check_RecordType(type->recordtype, declared_identifiers, ident);
     }
     else {
         user_type = type->name;
@@ -512,7 +513,7 @@ string check_InitialValue(InitialValue *initialvalue, map<string, Identifier* > 
 }
 
 // DanyaDone
-map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers) {
+map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, Identifier *parent = nullptr) {
     // firstly, checking whether variable was already declared
     if (declared_identifiers[variabledeclaration->name]) {
         cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
@@ -520,10 +521,14 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
     }
 
     string user_type;
+
+    Identifier *new_identifier = new Identifier(VARIABLE, user_type);
+
     //getting var type
     if (variabledeclaration->type) {
-        user_type = check_Type(variabledeclaration->type, declared_identifiers);
+        user_type = check_Type(variabledeclaration->type, declared_identifiers, new_identifier);
     }
+    new_identifier->value_type = user_type;
     // type is setting by the value of expression
     else if (variabledeclaration->expression) { // var b is 5
         user_type = check_Expression(variabledeclaration->expression, declared_identifiers);
@@ -542,7 +547,11 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
             if (actual_type == user_type || 
             (user_type == "real" && actual_type == "integer") ||
             (user_type == "boolean" && actual_type == "integer")) {
-                declared_identifiers[variabledeclaration->name] = new Identifier(VARIABLE, user_type); // we will not check sizes of arrays here. Lets do it in runtime
+                if (parent) // Only in case of record declaration
+                    parent->subidentifiers[variabledeclaration->name] = new_identifier;
+                    declared_identifiers[&parent + variabledeclaration->name] = new_identifier;
+                else
+                    declared_identifiers[variabledeclaration->name] = new_identifier; // we will not check sizes of arrays here. Lets do it in runtime
             }
             else {
                 cout << "\n\nType error!\n";
@@ -550,7 +559,11 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
             }
         }
         else { // case of initialization without initial value:  var b : Integer
-            declared_identifiers[variabledeclaration->name] = new Identifier("Variable", user_type);
+            if (parent) // Only in case of record declaration
+                parent->subidentifiers[variabledeclaration->name] = new_identifier;
+                declared_identifiers[&parent + variabledeclaration->name] = new_identifier;
+            else
+                declared_identifiers[variabledeclaration->name] = new_identifier;
         }
     }
     
