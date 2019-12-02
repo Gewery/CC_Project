@@ -375,6 +375,10 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
     }
     if (routinedeclaration->typeinroutinedeclaration) {
         return_type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
+        if (!routinedeclaration->returnInRoutine) {
+            cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
+            exit(EXIT_FAILURE);
+        }
     }
     else {
         if (routinedeclaration->returnInRoutine) {
@@ -393,10 +397,6 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
             cout << "\n\n" << function_name << "function's return value doesn't match the return type!\n";
             exit(EXIT_FAILURE);
         }
-    }
-    else { // Impossible btw
-        cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
-        exit(EXIT_FAILURE);
     }
 
     return declared_identifiers;

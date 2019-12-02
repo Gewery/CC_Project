@@ -4,5 +4,6 @@ var b : Boolean
 var y : Real is 6.8
 y := 6.2
 end
+return true
 
 // y = 6.2

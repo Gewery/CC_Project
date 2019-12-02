@@ -6,5 +6,6 @@ routine main (a : Integer, c : Boolean) : Boolean is
 var a : Boolean
 b := 7
 end
+return true
 
 //ошибка т.к. a уже задекларирована в параметрах

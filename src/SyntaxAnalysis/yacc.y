@@ -400,12 +400,13 @@ int main(int argc, char **argv){
     cout << "Lexical Analyzer!\n======###========\n\n";
     yyparse();
     cout << "\n\nAST\n======###========\n\n";
+    print_Tree(root);
     map<string, Identifier*> declared_identifiers;
     declared_identifiers["integer"] = new Identifier("Type", "integer");
     declared_identifiers["real"] = new Identifier("Type", "real");
     declared_identifiers["boolean"] = new Identifier("Type", "boolean");
     check_Program(root, declared_identifiers);
-    print_Tree(root);
+    
 
     cout << "\n\nAST JSON\n======###========\n\n";
     string serialized_json = serialize_Tree(root);
