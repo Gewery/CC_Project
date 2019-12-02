@@ -5,3 +5,4 @@ while true loop
 b:=8.3
 end
 end
+return true
