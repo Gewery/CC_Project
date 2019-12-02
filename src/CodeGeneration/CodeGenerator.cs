@@ -1,11 +1,12 @@
-namespace DefaultNamespace
+﻿using System;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
+
+namespace CodeGeneration
 {
     public class CodeGenerator
     {
-        using Mono.Cecil;
-        using Mono.Cecil.Cil;
-
-        public void Compile(string str)
+        private static void Compile(string str)
         {
             var name = new AssemblyNameDefinition("SuperGreeterBinary", new Version(1, 0, 0, 0));
             var asm = AssemblyDefinition.CreateAssembly(name, "greeter.exe", ModuleKind.Console);
@@ -35,9 +36,7 @@ namespace DefaultNamespace
 
         static void Main(params string[] args)
         {
-            Compile();
+            Compile("abc");
         }
-
-
     }
 }
