@@ -47,7 +47,7 @@ map<string, Identifier*> allow_redeclaration(map<string, Identifier*> declared_i
  * @return             Actual type of identifiers
  * DanyaDone
  */
-string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string, Identifier*> declared_identifiers) {
+string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string, Identifier*> declared_identifiers, string type_change_to/*=""*/) {
 
     if (identifiers->expression) {
         check_Expression(identifiers->expression, declared_identifiers);
@@ -59,9 +59,12 @@ string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string
     }
 
     if (identifiers->identifiers)
-        return check_Identifiers(identifiers->identifiers, ident->subidentifiers[identifiers->name], declared_identifiers);
-    else
+        return check_Identifiers(identifiers->identifiers, ident->subidentifiers[identifiers->name], declared_identifiers, type_change_to);
+    else {
+        if (type_change_to != "")
+            ident->subidentifiers[identifiers->name]->value_type = type_change_to;
         return ident->subidentifiers[identifiers->name]->value_type;
+    }
 }
 
 /**
@@ -71,7 +74,7 @@ string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string
  * @return                   Actual type of modifiable primary
  * DanyaDone
  */
-string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers, bool check_read_only/*=false*/) {
+string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers, bool check_read_only/*=false*/, string type_change_to/*=""*/) {
     string ident_name = modifiableprimary->name;
 
     if (!declared_identifiers[ident_name]) {
@@ -86,9 +89,12 @@ string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string,
     string type = declared_identifiers[ident_name]->value_type;
 
     if (modifiableprimary->identifiers)
-        return check_Identifiers(modifiableprimary->identifiers, declared_identifiers[ident_name], declared_identifiers);
-    else
+        return check_Identifiers(modifiableprimary->identifiers, declared_identifiers[ident_name], declared_identifiers, type_change_to);
+    else {
+        if (type_change_to != "")
+            return declared_identifiers[ident_name]->value_type = type_change_to;
         return type;
+    }
 }
 
 // DanyaDone
@@ -214,7 +220,7 @@ void check_Range(Range *range, map<string, Identifier*> declared_identifiers) {
 }
 
 // DanyaDone
-void check_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers) { // TODO Read-only thing
+void check_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers) {
     map<string, Identifier*> redeclaration_allowed = allow_redeclaration(declared_identifiers);
     if (!(forloop->name).empty()) {
         redeclaration_allowed[forloop->name] = new Identifier(VARIABLE, "integer", 1);
@@ -266,6 +272,7 @@ void check_RoutineCall(RoutineCall *routinecall, map<string, Identifier*> declar
 // DanyaDone
 void check_Assignment(Assignment *assignment, map<string, Identifier*> declared_identifiers) {
     string left_part_type, right_part_type;
+
     if (assignment->modifiableprimary)
         left_part_type = check_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers, true);
     
@@ -280,6 +287,17 @@ void check_Assignment(Assignment *assignment, map<string, Identifier*> declared_
         cout << "Impossible to cast " << left_part_type << " to " << right_part_type << "\n";
         exit(EXIT_FAILURE);
     }
+
+    // To change type of left part if needed
+    if (assignment->modifiableprimary && left_part_type.substr(0, 5) == "array" && right_part_type.substr(0, 5) == "array") {
+        left_part_type = check_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers, true, right_part_type);
+    }
+
+    if ((left_part_type.substr(0, 5) == "array") != (right_part_type.substr(0, 5) == "array")) {
+        cout << "Impossible to cast " << left_part_type << " to " << right_part_type << "\n";
+        exit(EXIT_FAILURE);
+    }
+
 }
 
 // DanyaDone
@@ -382,11 +400,11 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
     string function_name;
     string return_type;
 
-    map<string, Identifier*> declared_identifiers_in_function;
+    map<string, Identifier*> declared_identifiers_in_function = allow_redeclaration(declared_identifiers);
 
     function_name = routinedeclaration->name;
     if (routinedeclaration->parameters) {
-        declared_identifiers_in_function = check_Parameters(routinedeclaration->parameters, allow_redeclaration(declared_identifiers)); // we can use this inside body
+        declared_identifiers_in_function = check_Parameters(routinedeclaration->parameters, declared_identifiers_in_function); // we can use this inside body
     }
     if (routinedeclaration->typeinroutinedeclaration) {
         return_type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
@@ -402,7 +420,9 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
         }
     }
 
-    declared_identifiers[function_name] = new Identifier(FUNCTION, return_type);
+    Identifier *function_name_identifier = new Identifier(FUNCTION, return_type); 
+    declared_identifiers[function_name] = function_name_identifier;
+    declared_identifiers_in_function[function_name] = function_name_identifier;
 
     declared_identifiers_in_function = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, declared_identifiers_in_function);
 
@@ -561,7 +581,7 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
 
     // getting initial value
     
-    if (variabledeclaration->initialvalue) { // var b: Integer is 5, TODO: test this: var b : array[12] is arr2
+    if (variabledeclaration->initialvalue) { // var b: Integer is 5
         string actual_type = check_InitialValue(variabledeclaration->initialvalue, declared_identifiers);
         if (actual_type == user_type || 
         (user_type == "real" && actual_type == "integer") ||
@@ -570,7 +590,11 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
                 parent->subidentifiers[variabledeclaration->name] = new_identifier;
             }
             else
-                declared_identifiers[variabledeclaration->name] = new_identifier; // we will not check sizes of arrays here. Lets do it in runtime
+                declared_identifiers[variabledeclaration->name] = new_identifier;
+        }
+        else if (actual_type.substr(0, 5) == "array" && user_type.substr(0, 5) == "array") {
+            new_identifier->value_type = actual_type;
+            declared_identifiers[variabledeclaration->name] = new_identifier;
         }
         else {
             cout << "\n\nType error!\n";
@@ -618,4 +642,13 @@ void check_Program(Program *program, map<string, Identifier*> declared_identifie
 
     if (program->program)
         check_Program(program->program, declared_identifiers);
+}
+
+bool run_Semantic_Analyzer(Program *program) {
+    map<string, Identifier*> declared_identifiers;
+    declared_identifiers["integer"] = new Identifier("Type", "integer");
+    declared_identifiers["real"] = new Identifier("Type", "real");
+    declared_identifiers["boolean"] = new Identifier("Type", "boolean");
+    check_Program(program, declared_identifiers);
+    return true;
 }
