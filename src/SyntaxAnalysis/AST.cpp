@@ -397,7 +397,7 @@ void print_Range(string prefix, Range *range, bool is_last) {
 
 void print_Reverse(string prefix, Reverse *reverse, bool is_last) {
     if (!reverse) return;
-    PRINT_INFO(format("RoutineCall (%s)", reverse->isreverse ? "is_inverse" : "not_inverse").c_str());
+    PRINT_INFO(format("Reverse (%s)", reverse->isreverse ? "is_inverse" : "not_inverse").c_str());
 }
 
 void print_IfStatement(string prefix, IfStatement *ifstatement, bool is_last) {
