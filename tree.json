@@ -41,54 +41,21 @@
     },
     "Program": {
       "Declaration": {
-        "RoutineDeclaration": {
-          "BodyInRoutineDeclaration": {
-            "Body": {
-              "Body": {
-                "Body": null,
-                "SimpleDeclaration": null,
-                "Statement": {
-                  "Assignment": null,
-                  "ForLoop": {
-                    "Body": {
-                      "Body": null,
-                      "SimpleDeclaration": null,
-                      "Statement": {
-                        "Assignment": {
-                          "Expression": {
-                            "MultipleRelationsInExpression": null,
-                            "Relation": {
-                              "ComparisonInRelation": null,
-                              "Simple": {
-                                "Factor": {
-                                  "Summand": {
-                                    "Expression": null,
-                                    "Primary": {
-                                      "ModifiablePrimary": null,
-                                      "is_not": false,
-                                      "type": "integer",
-                                      "value": 4.0
-                                    }
-                                  },
-                                  "Summands": null
-                                },
-                                "Factors": null
-                              }
-                            }
-                          },
-                          "ModifiablePrimary": {
-                            "Identifiers": null,
-                            "name": "b"
-                          }
-                        },
-                        "ForLoop": null,
-                        "IfStatement": null,
-                        "RoutineCall": null,
-                        "WhileLoop": null
-                      }
-                    },
-                    "Range": {
-                      "Expression1": {
+        "RoutineDeclaration": null,
+        "SimpleDeclaration": {
+          "TypeDeclaration": null,
+          "VariableDeclaration": {
+            "Expression": null,
+            "InitialValue": null,
+            "Type": {
+              "ArrayType": null,
+              "PrimitiveType": null,
+              "RecordType": {
+                "VariableDeclarations": {
+                  "VariableDeclaration": {
+                    "Expression": null,
+                    "InitialValue": {
+                      "Expression": {
                         "MultipleRelationsInExpression": null,
                         "Relation": {
                           "ComparisonInRelation": null,
@@ -108,44 +75,34 @@
                             "Factors": null
                           }
                         }
-                      },
-                      "Expression2": {
-                        "MultipleRelationsInExpression": null,
-                        "Relation": {
-                          "ComparisonInRelation": null,
-                          "Simple": {
-                            "Factor": {
-                              "Summand": {
-                                "Expression": null,
-                                "Primary": {
-                                  "ModifiablePrimary": null,
-                                  "is_not": false,
-                                  "type": "integer",
-                                  "value": 6.0
-                                }
-                              },
-                              "Summands": null
-                            },
-                            "Factors": null
-                          }
-                        }
                       }
                     },
-                    "Reverse": {
-                      "is_reverse": false
+                    "Type": {
+                      "ArrayType": null,
+                      "PrimitiveType": null,
+                      "RecordType": null,
+                      "name": "Integer"
                     },
-                    "name": "i"
+                    "name": "temp"
                   },
-                  "IfStatement": null,
-                  "RoutineCall": null,
-                  "WhileLoop": null
+                  "VariableDeclarations": null
                 }
               },
-              "SimpleDeclaration": {
-                "TypeDeclaration": null,
-                "VariableDeclaration": {
-                  "Expression": null,
-                  "InitialValue": {
+              "name": ""
+            },
+            "name": "rec"
+          }
+        }
+      },
+      "Program": {
+        "Declaration": {
+          "RoutineDeclaration": {
+            "BodyInRoutineDeclaration": {
+              "Body": {
+                "Body": null,
+                "SimpleDeclaration": null,
+                "Statement": {
+                  "Assignment": {
                     "Expression": {
                       "MultipleRelationsInExpression": null,
                       "Relation": {
@@ -157,8 +114,8 @@
                               "Primary": {
                                 "ModifiablePrimary": null,
                                 "is_not": false,
-                                "type": "real",
-                                "value": 9.300000190734863
+                                "type": "integer",
+                                "value": 6.0
                               }
                             },
                             "Summands": null
@@ -166,79 +123,79 @@
                           "Factors": null
                         }
                       }
+                    },
+                    "ModifiablePrimary": {
+                      "Identifiers": null,
+                      "name": "rec"
                     }
                   },
-                  "Type": {
-                    "ArrayType": null,
-                    "PrimitiveType": null,
-                    "RecordType": null,
-                    "name": "Real"
-                  },
-                  "name": "p"
+                  "ForLoop": null,
+                  "IfStatement": null,
+                  "RoutineCall": null,
+                  "WhileLoop": null
                 }
-              },
-              "Statement": null
-            }
-          },
-          "Parameters": {
-            "ParameterDeclaration": {
-              "Type": {
-                "ArrayType": null,
-                "PrimitiveType": null,
-                "RecordType": null,
-                "name": "Integer"
-              },
-              "name": "a"
+              }
             },
-            "ParametersDeclaration": {
+            "Parameters": {
               "ParameterDeclaration": {
                 "Type": {
                   "ArrayType": null,
                   "PrimitiveType": null,
                   "RecordType": null,
-                  "name": "Boolean"
+                  "name": "Integer"
                 },
-                "name": "c"
+                "name": "a"
               },
-              "ParametersDeclaration": null
-            }
-          },
-          "ReturnInRoutine": {
-            "Expression": {
-              "MultipleRelationsInExpression": null,
-              "Relation": {
-                "ComparisonInRelation": null,
-                "Simple": {
-                  "Factor": {
-                    "Summand": {
-                      "Expression": null,
-                      "Primary": {
-                        "ModifiablePrimary": null,
-                        "is_not": false,
-                        "type": "boolean",
-                        "value": 1.0
-                      }
-                    },
-                    "Summands": null
+              "ParametersDeclaration": {
+                "ParameterDeclaration": {
+                  "Type": {
+                    "ArrayType": null,
+                    "PrimitiveType": null,
+                    "RecordType": null,
+                    "name": "Boolean"
                   },
-                  "Factors": null
+                  "name": "c"
+                },
+                "ParametersDeclaration": null
+              }
+            },
+            "ReturnInRoutine": {
+              "Expression": {
+                "MultipleRelationsInExpression": null,
+                "Relation": {
+                  "ComparisonInRelation": null,
+                  "Simple": {
+                    "Factor": {
+                      "Summand": {
+                        "Expression": null,
+                        "Primary": {
+                          "ModifiablePrimary": null,
+                          "is_not": false,
+                          "type": "boolean",
+                          "value": 1.0
+                        }
+                      },
+                      "Summands": null
+                    },
+                    "Factors": null
+                  }
                 }
               }
-            }
+            },
+            "TypeInRoutineDeclaration": {
+              "Type": {
+                "ArrayType": null,
+                "PrimitiveType": null,
+                "RecordType": null,
+                "name": "Boolean"
+              }
+            },
+            "name": "main"
           },
-          "TypeInRoutineDeclaration": {
-            "Type": {
-              "ArrayType": null,
-              "PrimitiveType": null,
-              "RecordType": null,
-              "name": "Boolean"
-            }
-          },
-          "name": "main"
+          "SimpleDeclaration": null
         },
-        "SimpleDeclaration": null
-      },
-      "Program": null
+        "Program": null
+      }
     }
   }
 }

@@ -276,6 +276,10 @@ void check_Assignment(Assignment *assignment, map<string, Identifier*> declared_
         cout << "Impossible to cast real to boolean\n";
         exit(EXIT_FAILURE);
     }
+    if (left_part_type.substr(0, 6) == "record" && left_part_type != right_part_type) {
+        cout << "Impossible to cast " << left_part_type << " to " << right_part_type << "\n";
+        exit(EXIT_FAILURE);
+    }
 }
 
 // DanyaDone
@@ -556,29 +560,29 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
     }
 
     // getting initial value
-    if (variabledeclaration->initialvalue) {
-        if (variabledeclaration->initialvalue) { // var b: Integer is 5, TODO: test this: var b : array[12] is arr2
-            string actual_type = check_InitialValue(variabledeclaration->initialvalue, declared_identifiers);
-            if (actual_type == user_type || 
-            (user_type == "real" && actual_type == "integer") ||
-            (user_type == "boolean" && actual_type == "integer")) {
-                if (parent) {// Only in case of record declaration
-                    parent->subidentifiers[variabledeclaration->name] = new_identifier;
-                }
-                else
-                    declared_identifiers[variabledeclaration->name] = new_identifier; // we will not check sizes of arrays here. Lets do it in runtime
-            }
-            else {
-                cout << "\n\nType error!\n";
-                exit(EXIT_FAILURE);
-            }
-        }
-        else { // case of initialization without initial value:  var b : Integer
+    
+    if (variabledeclaration->initialvalue) { // var b: Integer is 5, TODO: test this: var b : array[12] is arr2
+        string actual_type = check_InitialValue(variabledeclaration->initialvalue, declared_identifiers);
+        if (actual_type == user_type || 
+        (user_type == "real" && actual_type == "integer") ||
+        (user_type == "boolean" && actual_type == "integer")) {
             if (parent) {// Only in case of record declaration
                 parent->subidentifiers[variabledeclaration->name] = new_identifier;
             }
             else
-                declared_identifiers[variabledeclaration->name] = new_identifier;
+                declared_identifiers[variabledeclaration->name] = new_identifier; // we will not check sizes of arrays here. Lets do it in runtime
+        }
+        else {
+            cout << "\n\nType error!\n";
+            exit(EXIT_FAILURE);
+        }
+    }
+    else { // case of initialization without initial value:  var b : Integer
+        if (parent) {// Only in case of record declaration
+            parent->subidentifiers[variabledeclaration->name] = new_identifier;
+        }
+        else {
+            declared_identifiers[variabledeclaration->name] = new_identifier;
         }
     }
     
