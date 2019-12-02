@@ -1,6 +1,6 @@
 var b : Integer is 5
 routine main (a : Integer, c : Boolean) : Boolean is
-var p : Real is 9.3
+var i : Real is 9.3
 for i in 5 .. 6 loop
 b:=4
 end

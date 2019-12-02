@@ -9,30 +9,10 @@ struct Identifier {
     string identifier_type; // "Variable", "Function" or "Type"
     string value_type;
     bool read_only;
+    bool can_redeclare;
     map<string, Identifier*> subidentifiers;
-    Identifier(string identifier_type, string value_type, bool read_only = false): identifier_type(identifier_type), value_type(value_type), read_only(read_only) {}
-    // Variable *variable;
-    // Function *funciton;
-    // Type *type;
+    Identifier(string identifier_type, string value_type, bool read_only = false): identifier_type(identifier_type), value_type(value_type), read_only(read_only), can_redeclare(false) {}
 };
-
-// struct Variable {
-//     string type;
-// };
-
-// struct Function {
-//     // string return_type;
-//     // vector<Variable*> arguments;
-//     // Function(string return_type_of_func, vector<Variable*> &arguments_of_func) {
-//     //     return_type = return_type_of_func;
-//     //     arguments = arguments_of_func;
-//     // }
-// };
-
-// struct Type {
-
-// };
-
 
 void check_Program(Program *program, map<string, Identifier*> declared_identifiers);
 map<string, Identifier*> check_Declaration(Declaration *declaration, map<string, Identifier*> declared_identifiers);
@@ -72,5 +52,5 @@ string check_Factor(Factor *factor, map<string, Identifier*> declared_identifier
 string check_Summands(Summands *summands, map<string, Identifier*> declared_identifiers);
 string check_Summand(Summand *summand, map<string, Identifier*> declared_identifiers);
 string check_Primary(Primary *primary, map<string, Identifier*> declared_identifiers);
-string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers);
+string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers, bool check_read_only=false);
 string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string, Identifier*> declared_identifiers);

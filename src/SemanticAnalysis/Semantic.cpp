@@ -33,6 +33,12 @@ string cast_types(string type1, string type2) {
     }
 }
 
+map<string, Identifier*> allow_redeclaration(map<string, Identifier*> declared_identifiers) {
+    for (auto elem : declared_identifiers)
+        elem.second->can_redeclare = true;
+    return declared_identifiers;
+}
+
 /**
  * Check identifier's usage correctness, return actual identifier's type.
  * 
@@ -65,11 +71,15 @@ string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string
  * @return                   Actual type of modifiable primary
  * DanyaDone
  */
-string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers) {
+string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers, bool check_read_only/*=false*/) {
     string ident_name = modifiableprimary->name;
 
     if (!declared_identifiers[ident_name]) {
         cout << ident_name << " was not declared in this scope\n";
+        exit(EXIT_FAILURE);
+    }
+    if (check_read_only && declared_identifiers[ident_name]->read_only) {
+        cout << ident_name << " is read-only in this scope\n";
         exit(EXIT_FAILURE);
     }
 
@@ -174,7 +184,7 @@ string check_Expression(Expression *expression, map<string, Identifier*> declare
 // DanyaDone
 void check_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string, Identifier*> declared_identifiers) {
     if (elseinifstatement->body)
-        check_Body(elseinifstatement->body, declared_identifiers);
+        check_Body(elseinifstatement->body, allow_redeclaration(declared_identifiers));
 }
 
 // DanyaDone
@@ -183,7 +193,7 @@ void check_IfStatement(IfStatement *ifstatement, map<string, Identifier*> declar
         check_Expression(ifstatement->expression, declared_identifiers);
 
     if (ifstatement->body)
-        check_Body(ifstatement->body, declared_identifiers);
+        check_Body(ifstatement->body, allow_redeclaration(declared_identifiers));
 
     if (ifstatement->elseinifstatement)
         check_ElseInIfStatement(ifstatement->elseinifstatement, declared_identifiers);
@@ -205,14 +215,15 @@ void check_Range(Range *range, map<string, Identifier*> declared_identifiers) {
 
 // DanyaDone
 void check_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers) { // TODO Read-only thing
+    map<string, Identifier*> redeclaration_allowed = allow_redeclaration(declared_identifiers);
     if (!(forloop->name).empty()) {
-        declared_identifiers[forloop->name] = new Identifier(VARIABLE, "integer", 1);
+        redeclaration_allowed[forloop->name] = new Identifier(VARIABLE, "integer", 1);
     }
     if (forloop->range) {
-        check_Range(forloop->range, declared_identifiers);
+        check_Range(forloop->range, redeclaration_allowed);
     }
     if (forloop->body) {
-        check_Body(forloop->body, declared_identifiers);
+        check_Body(forloop->body, redeclaration_allowed);
     }
 }
 
@@ -222,7 +233,7 @@ void check_WhileLoop(WhileLoop *whileloop, map<string, Identifier*> declared_ide
         check_Expression(whileloop->expression, declared_identifiers);
 
     if (whileloop->body)
-        check_Body(whileloop->body, declared_identifiers);
+        check_Body(whileloop->body, allow_redeclaration(declared_identifiers));
 }
 
 // DanyaDone
@@ -256,7 +267,7 @@ void check_RoutineCall(RoutineCall *routinecall, map<string, Identifier*> declar
 void check_Assignment(Assignment *assignment, map<string, Identifier*> declared_identifiers) {
     string left_part_type, right_part_type;
     if (assignment->modifiableprimary)
-        left_part_type = check_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers);
+        left_part_type = check_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers, true);
     
     if (assignment->expression)
         right_part_type = check_Expression(assignment->expression, declared_identifiers);
@@ -371,7 +382,7 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
 
     function_name = routinedeclaration->name;
     if (routinedeclaration->parameters) {
-        declared_identifiers_in_function = check_Parameters(routinedeclaration->parameters, declared_identifiers); // we can use this inside body
+        declared_identifiers_in_function = check_Parameters(routinedeclaration->parameters, allow_redeclaration(declared_identifiers)); // we can use this inside body
     }
     if (routinedeclaration->typeinroutinedeclaration) {
         return_type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
@@ -519,7 +530,7 @@ string check_InitialValue(InitialValue *initialvalue, map<string, Identifier* > 
 // DanyaDone
 map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, Identifier *parent /*= nullptr*/) {
     // firstly, checking whether variable was already declared
-    if (declared_identifiers[variabledeclaration->name]) {
+    if (declared_identifiers[variabledeclaration->name] && !declared_identifiers[variabledeclaration->name]->can_redeclare) {
         cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
         exit(EXIT_FAILURE);
     }
@@ -553,7 +564,6 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
             (user_type == "boolean" && actual_type == "integer")) {
                 if (parent) {// Only in case of record declaration
                     parent->subidentifiers[variabledeclaration->name] = new_identifier;
-                    //declared_identifiers[(string)(&parent) + variabledeclaration->name] = new_identifier;
                 }
                 else
                     declared_identifiers[variabledeclaration->name] = new_identifier; // we will not check sizes of arrays here. Lets do it in runtime
@@ -566,7 +576,6 @@ map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variable
         else { // case of initialization without initial value:  var b : Integer
             if (parent) {// Only in case of record declaration
                 parent->subidentifiers[variabledeclaration->name] = new_identifier;
-                //declared_identifiers[(string)(&parent) + variabledeclaration->name] = new_identifier;
             }
             else
                 declared_identifiers[variabledeclaration->name] = new_identifier;
