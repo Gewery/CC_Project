@@ -18,15 +18,15 @@ namespace CodeGeneration
         public void EmitRoot(JsonEntity el)
         {
             var nameDef = new AssemblyNameDefinition("CodeGenerator", new Version(1, 0, 0, 0));
-            var asm = AssemblyDefinition.CreateAssembly(nameDef, "CodeGenerator", ModuleKind.Console);
+            var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.dll", ModuleKind.Console);
 
-//            this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
-            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
-            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
+            this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
+//            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
+//            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
 //            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
 //            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
-//            this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
-            
+            this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
+            Console.WriteLine(this.Types["Void"]);
 
             bootstrap = new MethodDefinition("Context",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
@@ -36,33 +36,28 @@ namespace CodeGeneration
                 this.EmitDeclaration(declaration);
             }
             
-            
             var ip = bootstrap.Body.GetILProcessor();
-            ip.Emit(OpCodes.Ldstr, "Hello ,");
-            ip.Emit(OpCodes.Call,
-                asm.MainModule.Import(typeof(Console).GetMethod("WriteLine", new Type[] {typeof(string)})));
             
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
             
-            var type = new TypeDefinition("CodeGenerator", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
+            var type = new TypeDefinition("supergreeter", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
+//            type = this.ImportStuffIntoModule(type);
             asm.MainModule.Types.Add(type);
             type.Methods.Add(bootstrap);
 
-            this.ImportStuffIntoModule(type);
-            
-
-            // указываем точку входа для исполняемого файла
             asm.EntryPoint = bootstrap;
-            asm.Write("./CodeGeneration.dll");
+            asm.Write("./result.dll");
         }
 
-        private void ImportStuffIntoModule(TypeDefinition type)
+        private TypeDefinition ImportStuffIntoModule(TypeDefinition type)
         {
             foreach (var variable in this.Variables)
             {
                 type.Fields.Add(variable.Value);
             }
+
+            return type;
         }
 
         public void EmitDeclaration(JsonEntity declaration)
@@ -127,9 +122,9 @@ namespace CodeGeneration
             switch (type)
             {
                 case "Integer":
-                    Console.Write("Storing whatever is on the stack into a field named: ");
-                    Console.WriteLine(declaration.Name);
-                    bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
+//                    Console.Write("Storing whatever is on the stack into a field named: ");
+//                    Console.WriteLine(declaration.Name);
+//                    bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
                     break;
             }
         }
@@ -179,8 +174,6 @@ namespace CodeGeneration
                 default:
                     throw new Exception("sosi jopy");
             }
-
-            // 00))0)000)0)0))00)))0)0)0)0))0))0)))00))0))0)0))))))))))
         }
 
         private void EmitSimple(JsonEntity declaration)
@@ -195,8 +188,6 @@ namespace CodeGeneration
                 default:
                     throw new Exception("sosi jopy");
             }
-
-            // 00))0)000)0)0))00)))0)0)0)0))0))0)))00))0))0)0))))))))))
         }
 
         private void EmitFactor(JsonEntity declaration)
@@ -211,8 +202,6 @@ namespace CodeGeneration
                 default:
                     throw new Exception("sosi jopy");
             }
-
-            // 00))0)000)0)0))00)))0)0)0)0))0))0)))00))0))0)0))))))))))
         }
 
         private void EmitSummand(JsonEntity declaration)
@@ -227,18 +216,14 @@ namespace CodeGeneration
                 default:
                     throw new Exception("sosi jopy");
             }
-
-            // 00))0)000)0)0))00)))0)0)0)0))0))0)))00))0))0)0))))))))))
         }
 
         private void EmitPrimary(JsonEntity declaration)
         {
-            Console.Write("Storing this onto the stack: ");
-            Console.WriteLine(declaration.Value);
-            this.bootstrap.Body.GetILProcessor().Emit(
-                OpCodes.Ldc_I4, int.Parse(declaration.Value));
-
-            // 00))0)000)0)0))00)))0)0)0)0))0))0)))00))0))0)0))))))))))
+//            Console.Write("Storing this onto the stack: ");
+//            Console.WriteLine(declaration.Value);
+//            this.bootstrap.Body.GetILProcessor().Emit(
+//                OpCodes.Ldc_I4, int.Parse(declaration.Value));
         }
     }
 }
