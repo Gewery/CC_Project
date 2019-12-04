@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseNETCoreGenerator>true</UseNETCoreGenerator>
+    <DependsOnNETStandard>true</DependsOnNETStandard>
   </PropertyGroup>
 
   <ItemGroup>
