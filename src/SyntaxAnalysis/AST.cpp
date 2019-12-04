@@ -807,7 +807,6 @@ json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     append_non_null(&children, to_json_Parameters(routinedeclaration->parameters));
     append_non_null(&children, to_json_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration));
     append_non_null(&children, to_json_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration));
-    append_non_null(&children, to_json_ReturnInRoutine(routinedeclaration->returnInRoutine));
     return json{{TYPE,     "RoutineDeclaration"},
                 {VALUE,    routinedeclaration->name},
                 {CHILDREN, json(children)}};
@@ -900,6 +899,7 @@ json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedec
 
     std::vector<json> children;
     append_non_null(&children, to_json_Body(bodyinroutinedeclaration->body));
+    append_non_null(&children, to_json_ReturnInRoutine(bodyinroutinedeclaration->returnInRoutine));
     return json{{TYPE,     "BodyInRoutineDeclaration"},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
