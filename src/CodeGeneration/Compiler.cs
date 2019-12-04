@@ -35,7 +35,13 @@ namespace CodeGeneration
             {
                 this.EmitDeclaration(declaration);
             }
+            
+            
             var ip = bootstrap.Body.GetILProcessor();
+            ip.Emit(OpCodes.Ldstr, "Hello ,");
+            ip.Emit(OpCodes.Call,
+                asm.MainModule.Import(typeof(Console).GetMethod("WriteLine", new Type[] {typeof(string)})));
+            
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
             
@@ -121,8 +127,8 @@ namespace CodeGeneration
             switch (type)
             {
                 case "Integer":
-//                    Console.Write("Storing whatever is on the stack into a field named: ");
-//                    Console.WriteLine(declaration.Name);
+                    Console.Write("Storing whatever is on the stack into a field named: ");
+                    Console.WriteLine(declaration.Name);
                     bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
                     break;
             }
@@ -227,8 +233,8 @@ namespace CodeGeneration
 
         private void EmitPrimary(JsonEntity declaration)
         {
-//            Console.Write("Storing this onto the stack: ");
-//            Console.WriteLine(declaration.Value);
+            Console.Write("Storing this onto the stack: ");
+            Console.WriteLine(declaration.Value);
             this.bootstrap.Body.GetILProcessor().Emit(
                 OpCodes.Ldc_I4, int.Parse(declaration.Value));
 
