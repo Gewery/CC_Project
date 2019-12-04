@@ -13,8 +13,13 @@
 
 using namespace std;
 
+#ifdef DANYA
+#define NEW_PREFIX (prefix + (is_last ? "   " : "|  "))
+#define PRINT_INFO(INFO) printf("%s%s%s\n", prefix.c_str(), (is_last ? "\\--" : "|--"), INFO)
+#else
 #define NEW_PREFIX (prefix + (is_last ? "   " : "│  "))
 #define PRINT_INFO(INFO) printf("%s%s%s\n", prefix.c_str(), (is_last ? "└──" : "├──"), INFO)
+#endif
 
 string format(const char *fmt, ...) {
     va_list args;
@@ -194,11 +199,7 @@ void print_RoutineDeclaration(string prefix, RoutineDeclaration *routinedeclarat
             !routinedeclaration->bodyinroutinedeclaration);
     print_BodyInRoutineDeclaration(
             NEW_PREFIX,
-            routinedeclaration->bodyinroutinedeclaration,
-            !routinedeclaration->returnInRoutine);
-    print_ReturnInRoutine(
-            NEW_PREFIX,
-            routinedeclaration->returnInRoutine, 1);
+            routinedeclaration->bodyinroutinedeclaration, 1);
 }
 
 void print_ReturnInRoutine(string prefix, ReturnInRoutine *returnInRoutine, bool is_last) {
@@ -259,7 +260,11 @@ void print_BodyInRoutineDeclaration(string prefix, BodyInRoutineDeclaration *bod
 
     print_Body(
             NEW_PREFIX,
-            bodyinroutinedeclaration->body, 1);
+            bodyinroutinedeclaration->body, 
+            !bodyinroutinedeclaration->returnInRoutine);
+        print_ReturnInRoutine(
+            NEW_PREFIX,
+            bodyinroutinedeclaration->returnInRoutine, 1);
 }
 
 void print_Body(string prefix, Body *body, bool is_last) {
@@ -718,8 +723,7 @@ json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
             {"TypeInRoutineDeclaration", to_json_TypeInRoutineDeclaration(
                     routinedeclaration->typeinroutinedeclaration)},
             {"BodyInRoutineDeclaration", to_json_BodyInRoutineDeclaration(
-                    routinedeclaration->bodyinroutinedeclaration)},
-            {"ReturnInRoutine",          to_json_ReturnInRoutine(routinedeclaration->returnInRoutine)}
+                    routinedeclaration->bodyinroutinedeclaration)}
     };
 }
 
@@ -764,7 +768,8 @@ json to_json_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedec
 json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration) {
     if (!bodyinroutinedeclaration) return {};
     return {
-            {"Body", to_json_Body(bodyinroutinedeclaration->body)}
+            {"Body", to_json_Body(bodyinroutinedeclaration->body)},
+            {"ReturnInRoutine",          to_json_ReturnInRoutine(bodyinroutinedeclaration->returnInRoutine)}
     };
 }
 

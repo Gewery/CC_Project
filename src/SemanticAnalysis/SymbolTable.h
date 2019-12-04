@@ -31,7 +31,7 @@ map<string, Identifier*> check_Parameters(Parameters *parameters, map<string, Id
 map<string, Identifier* > check_ParameterDeclaration(ParameterDeclaration *parameterdeclaration, map<string, Identifier* > declared_identifiers);
 map<string, Identifier* > check_ParametersDeclaration(ParametersDeclaration *parametersdeclaration, map<string, Identifier* > declared_identifiers);
 string check_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration, map<string, Identifier*> declared_identifiers);
-map<string, Identifier*> check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Identifier*> declared_identifiers);
+string check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Identifier*> declared_identifiers);
 map<string, Identifier*> check_Body(Body *body, map<string, Identifier*> declared_identifiers);
 void check_Statement(Statement *statement, map<string, Identifier* > declared_identifiers);
 void check_Assignment(Assignment *assignment, map<string, Identifier*> declared_identifiers);

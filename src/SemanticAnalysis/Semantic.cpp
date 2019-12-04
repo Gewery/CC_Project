@@ -334,11 +334,16 @@ map<string, Identifier*> check_Body(Body *body, map<string, Identifier*> declare
 }
 
 // DanyaDone
-map<string, Identifier*> check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Identifier*> declared_identifiers) {
+string check_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Identifier*> declared_identifiers) {
     if (bodyinroutinedeclaration->body)
         declared_identifiers = check_Body(bodyinroutinedeclaration->body, declared_identifiers);
+    
+    if (bodyinroutinedeclaration->returnInRoutine) {
+        string actual_type = check_ReturnInRoutine(bodyinroutinedeclaration->returnInRoutine, declared_identifiers);
+        return actual_type;
+    }
 
-    return declared_identifiers;
+    return "";
 }
 
 // DanyaDone
@@ -408,13 +413,13 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
     }
     if (routinedeclaration->typeinroutinedeclaration) {
         return_type = check_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
-        if (!routinedeclaration->returnInRoutine) {
+        if (routinedeclaration->bodyinroutinedeclaration && !routinedeclaration->bodyinroutinedeclaration->returnInRoutine) {
             cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
             exit(EXIT_FAILURE);
         }
     }
     else {
-        if (routinedeclaration->returnInRoutine) {
+        if (routinedeclaration->bodyinroutinedeclaration && routinedeclaration->bodyinroutinedeclaration->returnInRoutine) {
             cout << "\n\nFunction " << function_name << "must not return a value!\n";
             exit(EXIT_FAILURE);
         }
@@ -424,14 +429,11 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
     declared_identifiers[function_name] = function_name_identifier;
     declared_identifiers_in_function[function_name] = function_name_identifier;
 
-    declared_identifiers_in_function = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, declared_identifiers_in_function);
+    string actual_type = check_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, declared_identifiers_in_function);
 
-    if (routinedeclaration->returnInRoutine) {
-        string actual_type = check_ReturnInRoutine(routinedeclaration->returnInRoutine, declared_identifiers_in_function);
-        if (return_type != actual_type) {
-            cout << "\n\n" << function_name << "function's return value doesn't match the return type!\n";
-            exit(EXIT_FAILURE);
-        }
+    if (actual_type != "" && return_type != actual_type) {
+        cout << "\n\n" << function_name << "function must return " << return_type << " but return " << actual_type << " found" << "\n";
+        exit(EXIT_FAILURE);
     }
 
     return declared_identifiers;
