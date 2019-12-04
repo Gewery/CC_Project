@@ -90,14 +90,14 @@ namespace CodeGeneration
 
         private void EmitVariableDeclaration(JsonEntity declaration)
         {
-            var ivasiq = declaration.Children[1];
+            var ivasiq = declaration.Children[0];
+           
             String type = null;
             
-            if (ivasiq.Type == "Type")
+            if (ivasiq.Type == "type")
             {
                 type = this.GetType(ivasiq);
             }
-            
             if (type == null)
             {
                 throw new Exception("sosi joopy");
@@ -131,7 +131,7 @@ namespace CodeGeneration
 
         private string GetType(JsonEntity declaration)
         {
-            return declaration.Name;
+            return declaration.Value;
         }
 
         private void EmitInitialValue(JsonEntity declaration)
