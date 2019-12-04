@@ -620,95 +620,163 @@ void print_Identifiers(string prefix, Identifiers *identifiers, bool is_last) {
 /* ========== SERIALISE TO JSON ========== */
 /* ======================================= */
 
+void append_non_null(std::vector<json> *v, json j) {
+    if (j != nullptr) v->push_back(j);
+}
+
 string serialize_Tree(Program *program) {
-    return json{{"Program", to_json_Program(program)}}.dump(2);
+    return to_json_Program(program).dump(2);
 }
 
 json to_json_Program(Program *program) {
-    if (!program) return {};
-    return {
-            {"Declaration", to_json_Declaration(program->declaration)},
-            {"Program",     to_json_Program(program->program)}
-    };
+    if (!program) return nullptr;
+
+    auto *cur = program;
+    std::vector<json> children;
+    while (cur) {
+        append_non_null(&children, to_json_Declaration(cur->declaration));
+        cur = cur->program;
+    }
+    return json{{"type",     "Program"},
+                {"value",    {}},
+                {"children", json(children)}};
+//    return {
+//            {"Declaration", to_json_Declaration(program->declaration)},
+//            {"Program",     to_json_Program(program->program)}
+//    };
 }
 
 json to_json_Declaration(Declaration *declaration) {
-    if (!declaration) return {};
-    return {
-            {"SimpleDeclaration",  to_json_SimpleDeclaration(declaration->simpledeclaration)},
-            {"RoutineDeclaration", to_json_RoutineDeclaration(declaration->routinedeclaration)}
-    };
+    if (!declaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_SimpleDeclaration(declaration->simpledeclaration));
+    append_non_null(&children, to_json_RoutineDeclaration(declaration->routinedeclaration));
+    return json{{"type",     "Declaration"},
+                {"value",    {}},
+                {"children", json(children)}};
+//    return {
+//            {"SimpleDeclaration",  to_json_SimpleDeclaration(declaration->simpledeclaration)},
+//            {"RoutineDeclaration", to_json_RoutineDeclaration(declaration->routinedeclaration)}
+//    };
 }
 
 json to_json_SimpleDeclaration(SimpleDeclaration *simpledeclaration) {
-    if (!simpledeclaration) return {};
-    return {
-            {"VariableDeclaration", to_json_VariableDeclaration(simpledeclaration->variabledeclaration)},
-            {"TypeDeclaration",     to_json_TypeDeclaration(simpledeclaration->typedeclaration)}
-    };
+    if (!simpledeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_VariableDeclaration(simpledeclaration->variabledeclaration));
+    append_non_null(&children, to_json_TypeDeclaration(simpledeclaration->typedeclaration));
+    return json{{"type",     "SimpleDeclaration"},
+                {"value",    {}},
+                {"children", json(children)}};
+//    return {
+//            {"VariableDeclaration", to_json_VariableDeclaration(simpledeclaration->variabledeclaration)},
+//            {"TypeDeclaration",     to_json_TypeDeclaration(simpledeclaration->typedeclaration)}
+//    };
 }
 
 json to_json_VariableDeclaration(VariableDeclaration *variabledeclaration) {
-    if (!variabledeclaration) return {};
-    return {
-            {"name",         variabledeclaration->name},
-            {"Type",         to_json_Type(variabledeclaration->type)},
-            {"InitialValue", to_json_InitialValue(variabledeclaration->initialvalue)},
-            {"Expression",   to_json_Expression(variabledeclaration->expression)}
-    };
+    if (!variabledeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Type(variabledeclaration->type));
+    append_non_null(&children, to_json_InitialValue(variabledeclaration->initialvalue));
+    append_non_null(&children, to_json_Expression(variabledeclaration->expression));
+    return json{{"type",     "VariableDeclaration"},
+                {"value",    variabledeclaration->name},
+                {"children", json(children)}};
+//    return {
+//            {"name",         variabledeclaration->name},
+//            {"Type",         to_json_Type(variabledeclaration->type)},
+//            {"InitialValue", to_json_InitialValue(variabledeclaration->initialvalue)},
+//            {"Expression",   to_json_Expression(variabledeclaration->expression)}
+//    };
 }
 
 json to_json_InitialValue(InitialValue *initialvalue) {
-    if (!initialvalue) return {};
-    return {
-            {"Expression", to_json_Expression(initialvalue->expression)}
-    };
+    if (!initialvalue) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(initialvalue->expression));
+    return json{{"type",     "InitialValue"},
+                {"value",    {}},
+                {"children", json(children)}};
+//    return {
+//            {"Expression", to_json_Expression(initialvalue->expression)}
+//    };
 }
 
 json to_json_TypeDeclaration(TypeDeclaration *typedeclaration) {
-    if (!typedeclaration) return {};
-    return {
-            {"name", typedeclaration->name},
-            {"Type", to_json_Type(typedeclaration->type)}
-    };
+    if (!typedeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Type(typedeclaration->type));
+    return json{{"type",     "TypeDeclaration"},
+                {"value",    typedeclaration->name},
+                {"children", json(children)}};
+//    return {
+//            {"name", typedeclaration->name},
+//            {"Type", to_json_Type(typedeclaration->type)}
+//    };
 }
 
 json to_json_Type(Type *type) {
-    if (!type) return {};
-    return {
-            {"name",          type->name},
-            {"PrimitiveType", to_json_PrimitiveType(type->primitivetype)},
-            {"ArrayType",     to_json_ArrayType(type->arraytype)},
-            {"RecordType",    to_json_RecordType(type->recordtype)}
-    };
+    if (!type) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_PrimitiveType(type->primitivetype));
+    append_non_null(&children, to_json_ArrayType(type->arraytype));
+    append_non_null(&children, to_json_RecordType(type->recordtype));
+    return json{{"type",     "Type"},
+                {"value",    type->name},
+                {"children", json(children)}};
+//    return {
+//            {"name",          type->name},
+//            {"PrimitiveType", to_json_PrimitiveType(type->primitivetype)},
+//            {"ArrayType",     to_json_ArrayType(type->arraytype)},
+//            {"RecordType",    to_json_RecordType(type->recordtype)}
+//    };
 }
 
 json to_json_PrimitiveType(PrimitiveType *primitivetype) {
-    if (!primitivetype) return {};
-    return {
-            {"is_int",  primitivetype->isint},
-            {"is_real", primitivetype->isreal},
-            {"is_bool", primitivetype->isboolean}
-    };
+    if (!primitivetype) return nullptr;
+
+    std::vector<json> children;
+    return json{{"type",     "PrimitiveType"},
+                {"value",    primitivetype->isint ? "int" : primitivetype->isreal ? "real" : "bool"},
+                {"children", json(children)}};
+//    return {
+//            {"is_int",  primitivetype->isint},
+//            {"is_real", primitivetype->isreal},
+//            {"is_bool", primitivetype->isboolean}
+//    };
 }
 
 json to_json_ArrayType(ArrayType *arraytype) {
-    if (!arraytype) return {};
-    return {
-            {"Expression", to_json_Expression(arraytype->expression)},
-            {"Type",       to_json_Type(arraytype->type)}
-    };
+    if (!arraytype) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(arraytype->expression));
+    append_non_null(&children, to_json_Type(arraytype->type));
+    return json{{"type",     "ArrayType"},
+                {"value",    {}},
+                {"children", json(children)}};
+//    return {
+//            {"Expression", to_json_Expression(arraytype->expression)},
+//            {"Type",       to_json_Type(arraytype->type)}
+//    };
 }
 
 json to_json_RecordType(RecordType *recordtype) {
-    if (!recordtype) return {};
+    if (!recordtype) return nullptr;
     return {
             {"VariableDeclarations", to_json_VariableDeclarations(recordtype->variabledeclarations)},
     };
 }
 
 json to_json_VariableDeclarations(VariableDeclarations *variabledeclarations) {
-    if (!variabledeclarations) return {};
+    if (!variabledeclarations) return nullptr;
     return {
             {"VariableDeclaration",  to_json_VariableDeclaration(variabledeclarations->variabledeclaration)},
             {"VariableDeclarations", to_json_VariableDeclarations(variabledeclarations->variabledeclarations)}
@@ -716,7 +784,7 @@ json to_json_VariableDeclarations(VariableDeclarations *variabledeclarations) {
 }
 
 json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
-    if (!routinedeclaration) return {};
+    if (!routinedeclaration) return nullptr;
     return {
             {"name",                     routinedeclaration->name},
             {"Parameters",               to_json_Parameters(routinedeclaration->parameters)},
@@ -728,14 +796,14 @@ json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
 }
 
 json to_json_ReturnInRoutine(ReturnInRoutine *returnInRoutine) {
-    if (!returnInRoutine) return {};
+    if (!returnInRoutine) return nullptr;
     return {
             {"Expression", to_json_Expression(returnInRoutine->expression)}
     };
 }
 
 json to_json_Parameters(Parameters *parameters) {
-    if (!parameters) return {};
+    if (!parameters) return nullptr;
     return {
             {"ParameterDeclaration",  to_json_ParameterDeclaration(parameters->parameterdeclaration)},
             {"ParametersDeclaration", to_json_ParametersDeclaration(parameters->parametersdeclaration)}
@@ -743,7 +811,7 @@ json to_json_Parameters(Parameters *parameters) {
 }
 
 json to_json_ParameterDeclaration(ParameterDeclaration *parameterdeclaration) {
-    if (!parameterdeclaration) return {};
+    if (!parameterdeclaration) return nullptr;
     return {
             {"name", parameterdeclaration->name},
             {"Type", to_json_Type(parameterdeclaration->type)}
@@ -751,7 +819,7 @@ json to_json_ParameterDeclaration(ParameterDeclaration *parameterdeclaration) {
 }
 
 json to_json_ParametersDeclaration(ParametersDeclaration *parametersdeclaration) {
-    if (!parametersdeclaration) return {};
+    if (!parametersdeclaration) return nullptr;
     return {
             {"ParameterDeclaration",  to_json_ParameterDeclaration(parametersdeclaration->parameterdeclaration)},
             {"ParametersDeclaration", to_json_ParametersDeclaration(parametersdeclaration->parametersdeclaration)}
@@ -759,14 +827,14 @@ json to_json_ParametersDeclaration(ParametersDeclaration *parametersdeclaration)
 }
 
 json to_json_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
-    if (!typeinroutinedeclaration) return {};
+    if (!typeinroutinedeclaration) return nullptr;
     return {
             {"Type", to_json_Type(typeinroutinedeclaration->type)}
     };
 }
 
 json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration) {
-    if (!bodyinroutinedeclaration) return {};
+    if (!bodyinroutinedeclaration) return nullptr;
     return {
             {"Body", to_json_Body(bodyinroutinedeclaration->body)},
             {"ReturnInRoutine",          to_json_ReturnInRoutine(bodyinroutinedeclaration->returnInRoutine)}
@@ -774,7 +842,7 @@ json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedec
 }
 
 json to_json_Body(Body *body) {
-    if (!body) return {};
+    if (!body) return nullptr;
     return {
             {"SimpleDeclaration", to_json_SimpleDeclaration(body->simpledeclaration)},
             {"Statement",         to_json_Statement(body->statement)},
@@ -783,7 +851,7 @@ json to_json_Body(Body *body) {
 }
 
 json to_json_Statement(Statement *statement) {
-    if (!statement) return {};
+    if (!statement) return nullptr;
     return {
             {"Assignment",  to_json_Assignment(statement->assignment)},
             {"RoutineCall", to_json_RoutineCall(statement->routinecall)},
@@ -794,7 +862,7 @@ json to_json_Statement(Statement *statement) {
 }
 
 json to_json_Assignment(Assignment *assignment) {
-    if (!assignment) return {};
+    if (!assignment) return nullptr;
     return {
             {"ModifiablePrimary", to_json_ModifiablePrimary(assignment->modifiableprimary)},
             {"Expression",        to_json_Expression(assignment->expression)}
@@ -802,7 +870,7 @@ json to_json_Assignment(Assignment *assignment) {
 }
 
 json to_json_RoutineCall(RoutineCall *routinecall) {
-    if (!routinecall) return {};
+    if (!routinecall) return nullptr;
     return {
             {"name",                    routinecall->name},
             {"ExpressionInRoutineCall", to_json_ExpressionInRoutineCall(routinecall->expressioninroutinecall)}
@@ -810,7 +878,7 @@ json to_json_RoutineCall(RoutineCall *routinecall) {
 }
 
 json to_json_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall) {
-    if (!expressioninroutinecall) return {};
+    if (!expressioninroutinecall) return nullptr;
     return {
             {"Expression",               to_json_Expression(expressioninroutinecall->expression)},
             {"ExpressionsInRoutineCall", to_json_ExpressionsInRoutineCall(
@@ -819,7 +887,7 @@ json to_json_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutin
 }
 
 json to_json_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall) {
-    if (!expressionsinroutinecall) return {};
+    if (!expressionsinroutinecall) return nullptr;
     return {
             {"Expression",               to_json_Expression(expressionsinroutinecall->expression)},
             {"ExpressionsInRoutineCall", to_json_ExpressionsInRoutineCall(
@@ -829,7 +897,7 @@ json to_json_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinrou
 }
 
 json to_json_WhileLoop(WhileLoop *whileloop) {
-    if (!whileloop) return {};
+    if (!whileloop) return nullptr;
     return {
             {"Expression", to_json_Expression(whileloop->expression)},
             {"Body",       to_json_Body(whileloop->body)}
@@ -837,7 +905,7 @@ json to_json_WhileLoop(WhileLoop *whileloop) {
 }
 
 json to_json_ForLoop(ForLoop *forloop) {
-    if (!forloop) return {};
+    if (!forloop) return nullptr;
     return {
             {"name",    forloop->name},
             {"Reverse", to_json_Reverse(forloop->reverse)},
@@ -847,7 +915,7 @@ json to_json_ForLoop(ForLoop *forloop) {
 }
 
 json to_json_Range(Range *range) {
-    if (!range) return {};
+    if (!range) return nullptr;
     return {
             {"Expression1", to_json_Expression(range->expression1)},
             {"Expression2", to_json_Expression(range->expression2)}
@@ -855,14 +923,14 @@ json to_json_Range(Range *range) {
 }
 
 json to_json_Reverse(Reverse *reverse) {
-    if (!reverse) return {};
+    if (!reverse) return nullptr;
     return {
             {"is_reverse", reverse->isreverse}
     };
 }
 
 json to_json_IfStatement(IfStatement *ifstatement) {
-    if (!ifstatement) return {};
+    if (!ifstatement) return nullptr;
     return {
             {"Expression",        to_json_Expression(ifstatement->expression)},
             {"Body",              to_json_Body(ifstatement->body)},
@@ -871,14 +939,14 @@ json to_json_IfStatement(IfStatement *ifstatement) {
 }
 
 json to_json_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
-    if (!elseinifstatement) return {};
+    if (!elseinifstatement) return nullptr;
     return {
             {"Body", to_json_Body(elseinifstatement->body)}
     };
 }
 
 json to_json_Expression(Expression *expression) {
-    if (!expression) return {};
+    if (!expression) return nullptr;
     return {
             {"Relation",                      to_json_Relation(expression->relation)},
             {"MultipleRelationsInExpression", to_json_MultipleRelationsInExpression(
@@ -888,7 +956,7 @@ json to_json_Expression(Expression *expression) {
 }
 
 json to_json_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression) {
-    if (!multiplerelationsinexpression) return {};
+    if (!multiplerelationsinexpression) return nullptr;
     return {
             {"LogicalOperator",               to_json_LogicalOperator(multiplerelationsinexpression->logicaloperator)},
             {"Relation",                      to_json_Relation(multiplerelationsinexpression->relation)},
@@ -898,14 +966,14 @@ json to_json_MultipleRelationsInExpression(MultipleRelationsInExpression *multip
 }
 
 json to_json_LogicalOperator(LogicalOperator *logicaloperator) {
-    if (!logicaloperator) return {};
+    if (!logicaloperator) return nullptr;
     return {
             {"op", logicaloperator->op}
     };
 }
 
 json to_json_Relation(Relation *relation) {
-    if (!relation) return {};
+    if (!relation) return nullptr;
     return {
             {"Simple",               to_json_Simple(relation->simple)},
             {"ComparisonInRelation", to_json_ComparisonInRelation(relation->comparisoninrelation)}
@@ -913,7 +981,7 @@ json to_json_Relation(Relation *relation) {
 }
 
 json to_json_ComparisonInRelation(ComparisonInRelation *comparisoninrelation) {
-    if (!comparisoninrelation) return {};
+    if (!comparisoninrelation) return nullptr;
     return {
             {"ComparisonOperator", to_json_ComparisonOperator(comparisoninrelation->comparisonoperator)},
             {"Simple",             to_json_Simple(comparisoninrelation->simple)}
@@ -921,14 +989,14 @@ json to_json_ComparisonInRelation(ComparisonInRelation *comparisoninrelation) {
 }
 
 json to_json_ComparisonOperator(ComparisonOperator *comparisonoperator) {
-    if (!comparisonoperator) return {};
+    if (!comparisonoperator) return nullptr;
     return {
             {"op", comparisonoperator->op},
     };
 }
 
 json to_json_Simple(Simple *simple) {
-    if (!simple) return {};
+    if (!simple) return nullptr;
     return {
             {"Factor",  to_json_Factor(simple->factor)},
             {"Factors", to_json_Factors(simple->factors)}
@@ -936,7 +1004,7 @@ json to_json_Simple(Simple *simple) {
 }
 
 json to_json_Factors(Factors *factors) {
-    if (!factors) return {};
+    if (!factors) return nullptr;
     return {
             {"SimpleOperator", to_json_SimpleOperator(factors->simpleOperator)},
             {"Factor",         to_json_Factor(factors->factor)},
@@ -945,14 +1013,14 @@ json to_json_Factors(Factors *factors) {
 }
 
 json to_json_SimpleOperator(SimpleOperator *simpleoperator) {
-    if (!simpleoperator) return {};
+    if (!simpleoperator) return nullptr;
     return {
             {"op", simpleoperator->op}
     };
 }
 
 json to_json_Factor(Factor *factor) {
-    if (!factor) return {};
+    if (!factor) return nullptr;
     return {
             {"Summand",  to_json_Summand(factor->summand)},
             {"Summands", to_json_Summands(factor->summands)}
@@ -960,7 +1028,7 @@ json to_json_Factor(Factor *factor) {
 }
 
 json to_json_Summands(Summands *summands) {
-    if (!summands) return {};
+    if (!summands) return nullptr;
     return {
             {"Sign",     to_json_Sign(summands->sign)},
             {"Summand",  to_json_Summand(summands->summand)},
@@ -969,7 +1037,7 @@ json to_json_Summands(Summands *summands) {
 }
 
 json to_json_Summand(Summand *summand) {
-    if (!summand) return {};
+    if (!summand) return nullptr;
     return {
             {"Primary",    to_json_Primary(summand->primary)},
             {"Expression", to_json_Expression(summand->expression)}
@@ -977,7 +1045,7 @@ json to_json_Summand(Summand *summand) {
 }
 
 json to_json_Primary(Primary *primary) {
-    if (!primary) return {};
+    if (!primary) return nullptr;
     return {
             {"type",              primary->type},
             {"value",             primary->value},
@@ -987,14 +1055,14 @@ json to_json_Primary(Primary *primary) {
 }
 
 json to_json_Sign(Sign *sign) {
-    if (!sign) return {};
+    if (!sign) return nullptr;
     return {
             {"op", sign->op}
     };
 }
 
 json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
-    if (!modifiableprimary) return {};
+    if (!modifiableprimary) return nullptr;
     return {
             {"name",        modifiableprimary->name},
             {"Identifiers", to_json_Identifiers(modifiableprimary->identifiers)}
@@ -1002,7 +1070,7 @@ json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
 }
 
 json to_json_Identifiers(Identifiers *identifiers) {
-    if (!identifiers) return {};
+    if (!identifiers) return nullptr;
     return {
             {"name",        identifiers->name},
             {"Expression",  to_json_Expression(identifiers->expression)},

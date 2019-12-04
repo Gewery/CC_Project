@@ -1,8 +1,0 @@
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/bin/Debug/netcoreapp3.0/CodeGeneration.deps.json
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/bin/Debug/netcoreapp3.0/CodeGeneration.dll
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/bin/Debug/netcoreapp3.0/CodeGeneration.pdb
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/obj/Debug/netcoreapp3.0/CodeGeneration.csprojAssemblyReference.cache
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/obj/Debug/netcoreapp3.0/CodeGeneration.AssemblyInfoInputs.cache
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/obj/Debug/netcoreapp3.0/CodeGeneration.AssemblyInfo.cs
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/obj/Debug/netcoreapp3.0/CodeGeneration.dll
-/Users/aygulmalikova/CLionProjects/CC_Project/src/CodeGeneration/obj/Debug/netcoreapp3.0/CodeGeneration.pdb
