@@ -1,8 +1,6 @@
-var b : Integer is 5
-var rec : record 
-var temp : Integer is 5
+var arr2 : array[10] Boolean
+var b : array[12] Integer is arr2
+
+routine main is
+b := arr2
 end
-routine main (a : Integer, c : record var temp : Integer is 5 end) : Boolean is
-rec := c
-end
-return true

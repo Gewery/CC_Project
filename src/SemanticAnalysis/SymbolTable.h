@@ -14,6 +14,7 @@ struct Identifier {
     Identifier(string identifier_type, string value_type, bool read_only = false): identifier_type(identifier_type), value_type(value_type), read_only(read_only), can_redeclare(false) {}
 };
 
+bool run_Semantic_Analyzer(Program *program);
 void check_Program(Program *program, map<string, Identifier*> declared_identifiers);
 map<string, Identifier*> check_Declaration(Declaration *declaration, map<string, Identifier*> declared_identifiers);
 map<string, Identifier*> check_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Identifier*> declared_identifiers);
@@ -52,5 +53,5 @@ string check_Factor(Factor *factor, map<string, Identifier*> declared_identifier
 string check_Summands(Summands *summands, map<string, Identifier*> declared_identifiers);
 string check_Summand(Summand *summand, map<string, Identifier*> declared_identifiers);
 string check_Primary(Primary *primary, map<string, Identifier*> declared_identifiers);
-string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers, bool check_read_only=false);
-string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string, Identifier*> declared_identifiers);
+string check_ModifiablePrimary(ModifiablePrimary *modifiableprimary, map<string, Identifier*> declared_identifiers, bool check_read_only = false, string type_change_to = "");
+string check_Identifiers(Identifiers *identifiers, Identifier* ident, map<string, Identifier*> declared_identifiers, string type_change_to = "");

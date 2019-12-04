@@ -34,6 +34,12 @@
 *.idea
 .vscode
 
+src/CodeGeneration/bin/
+src/CodeGeneration/obj/
+src/CodeGeneration/obj/CodeGeneration.csproj.nuget.g.props
+src/CodeGeneration/obj/CodeGeneration.csproj.nuget.dgspec.json
+src/CodeGeneration/obj/CodeGeneration.csproj.nuget.cache
+
 yacc.cpp
 yacc.hpp
 parser

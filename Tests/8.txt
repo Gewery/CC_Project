@@ -1,0 +1,6 @@
+var arr2 : array[10] Integer
+var b : array[12] Boolean
+
+routine main is
+b := arr2
+end
