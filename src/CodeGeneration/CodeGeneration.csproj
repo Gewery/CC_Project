@@ -3,10 +3,12 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseNETCoreGenerator>true</UseNETCoreGenerator>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.11.1" />
     <PackageReference Include="System" Version="4.1.0311.2" />
+    <PackageReference Include="System.Security.Permissions" Version="4.7.0" />
   </ItemGroup>
 </Project>

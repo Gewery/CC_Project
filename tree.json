@@ -1,60 +1,67 @@
 {
-  "Program": [
+  "type": "Program",
+  "children": [
     {
-      "RoutineDeclaration": null,
-      "SimpleDeclaration": {
-        "TypeDeclaration": null,
-        "VariableDeclaration": {
-          "Expression": null,
-          "InitialValue": {
-            "Expression": {
-              "MultipleRelationsInExpression": null,
-              "Relation": {
-                "ComparisonInRelation": null,
-                "Simple": {
-                  "Factor": {
-                    "Summand": {
-                      "Expression": null,
-                      "Primary": {
-                        "ModifiablePrimary": null,
-                        "is_not": false,
-                        "type": "integer",
-                        "value": 5.0
-                      }
-                    },
-                    "Summands": null
-                  },
-                  "Factors": null
+      "type": "Declaration",
+      "children": [
+        {
+          "type": "SimpleDeclaration",
+          "children": [
+            {
+              "type": "VariableDeclaration",
+              "name": "b",
+              "children": [
+                {
+                  "type": "InitialValue",
+                  "value": null,
+                  "children": [
+                    {
+                      "type": "Expression",
+                      "value": null,
+                      "children": [
+                        {
+                          "type": "Relation",
+                          "value": null,
+                          "children": [
+                            {
+                              "type": "Simple",
+                              "value": null,
+                              "children": [
+                                {
+                                  "type": "Factor",
+                                  "value": null,
+                                  "children": [
+                                    {
+                                      "type": "Summand",
+                                      "value": null,
+                                      "children": [
+                                        {
+                                          "type": "Primary",
+                                          "value": 5.0,
+                                          "is_not": false,
+                                          "value_type": "integer"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Type",
+                  "name": "Integer"
                 }
-              }
+              ]
             }
-          },
-          "Type": {
-            "ArrayType": null,
-            "PrimitiveType": null,
-            "RecordType": null,
-            "name": "Integer"
-          },
-          "name": "b"
+          ]
         }
-      }
-    },
-    {
-      "RoutineDeclaration": null,
-      "SimpleDeclaration": {
-        "TypeDeclaration": null,
-        "VariableDeclaration": {
-          "Expression": null,
-          "InitialValue": null,
-          "Type": {
-            "ArrayType": null,
-            "PrimitiveType": null,
-            "RecordType": null,
-            "name": "Boolean"
-          },
-          "name": "c"
-        }
-      }
+      ]
     }
   ]
 }
