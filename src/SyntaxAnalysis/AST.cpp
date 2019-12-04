@@ -13,8 +13,13 @@
 
 using namespace std;
 
+#ifdef DANYA
+#define NEW_PREFIX (prefix + (is_last ? "   " : "|  "))
+#define PRINT_INFO(INFO) printf("%s%s%s\n", prefix.c_str(), (is_last ? "\\--" : "|--"), INFO)
+#else
 #define NEW_PREFIX (prefix + (is_last ? "   " : "│  "))
 #define PRINT_INFO(INFO) printf("%s%s%s\n", prefix.c_str(), (is_last ? "└──" : "├──"), INFO)
+#endif
 
 string format(const char *fmt, ...) {
     va_list args;
@@ -194,11 +199,7 @@ void print_RoutineDeclaration(string prefix, RoutineDeclaration *routinedeclarat
             !routinedeclaration->bodyinroutinedeclaration);
     print_BodyInRoutineDeclaration(
             NEW_PREFIX,
-            routinedeclaration->bodyinroutinedeclaration,
-            !routinedeclaration->returnInRoutine);
-    print_ReturnInRoutine(
-            NEW_PREFIX,
-            routinedeclaration->returnInRoutine, 1);
+            routinedeclaration->bodyinroutinedeclaration, 1);
 }
 
 void print_ReturnInRoutine(string prefix, ReturnInRoutine *returnInRoutine, bool is_last) {
@@ -259,7 +260,11 @@ void print_BodyInRoutineDeclaration(string prefix, BodyInRoutineDeclaration *bod
 
     print_Body(
             NEW_PREFIX,
-            bodyinroutinedeclaration->body, 1);
+            bodyinroutinedeclaration->body, 
+            !bodyinroutinedeclaration->returnInRoutine);
+        print_ReturnInRoutine(
+            NEW_PREFIX,
+            bodyinroutinedeclaration->returnInRoutine, 1);
 }
 
 void print_Body(string prefix, Body *body, bool is_last) {
@@ -802,7 +807,6 @@ json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     append_non_null(&children, to_json_Parameters(routinedeclaration->parameters));
     append_non_null(&children, to_json_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration));
     append_non_null(&children, to_json_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration));
-    append_non_null(&children, to_json_ReturnInRoutine(routinedeclaration->returnInRoutine));
     return json{{TYPE,     "RoutineDeclaration"},
                 {VALUE,    routinedeclaration->name},
                 {CHILDREN, json(children)}};
@@ -895,6 +899,7 @@ json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedec
 
     std::vector<json> children;
     append_non_null(&children, to_json_Body(bodyinroutinedeclaration->body));
+    append_non_null(&children, to_json_ReturnInRoutine(bodyinroutinedeclaration->returnInRoutine));
     return json{{TYPE,     "BodyInRoutineDeclaration"},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};

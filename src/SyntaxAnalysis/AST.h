@@ -108,14 +108,12 @@ struct RoutineDeclaration {
     struct Parameters *parameters;
     struct TypeInRoutineDeclaration *typeinroutinedeclaration;
     struct BodyInRoutineDeclaration *bodyinroutinedeclaration;
-    struct ReturnInRoutine *returnInRoutine;
     RoutineDeclaration(string name, Parameters *parameters, TypeInRoutineDeclaration *typeinroutinedeclaration,
-                       BodyInRoutineDeclaration *bodyinroutinedeclaration, struct ReturnInRoutine *returnInRoutine):
+                       BodyInRoutineDeclaration *bodyinroutinedeclaration):
             name(name),
             parameters(parameters),
             typeinroutinedeclaration(typeinroutinedeclaration),
-            bodyinroutinedeclaration(bodyinroutinedeclaration),
-            returnInRoutine(returnInRoutine) {};
+            bodyinroutinedeclaration(bodyinroutinedeclaration) {};
 };
 
 struct ReturnInRoutine {
@@ -158,8 +156,10 @@ struct TypeInRoutineDeclaration {
 
 struct BodyInRoutineDeclaration {
     struct Body *body;
-    BodyInRoutineDeclaration(Body *body):
-            body(body) {};
+    struct ReturnInRoutine *returnInRoutine;
+    BodyInRoutineDeclaration(Body *body, struct ReturnInRoutine *returnInRoutine):
+            body(body),
+            returnInRoutine(returnInRoutine) {};
 };
 
 struct Body {

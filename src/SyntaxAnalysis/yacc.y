@@ -216,8 +216,8 @@ VariableDeclarations
     ;
 
 RoutineDeclaration
-    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration ReturnInRoutine  { $$ = new RoutineDeclaration(get_yyextra_string(), $3, $4, $5, $6); }
-    | ROUTINE IDENTIFIER Parameters BodyInRoutineDeclaration  { $$ = new RoutineDeclaration(get_yyextra_string(), $3, NULL, $4, NULL); }
+    : ROUTINE IDENTIFIER Parameters TypeInRoutineDeclaration BodyInRoutineDeclaration { $$ = new RoutineDeclaration(get_yyextra_string(), $3, $4, $5); }
+    | ROUTINE IDENTIFIER Parameters BodyInRoutineDeclaration  { $$ = new RoutineDeclaration(get_yyextra_string(), $3, NULL, $4); }
     ;
 
 ReturnInRoutine
@@ -243,7 +243,7 @@ TypeInRoutineDeclaration
     ;
 
 BodyInRoutineDeclaration
-    : IS Body END                                   { $$ = new BodyInRoutineDeclaration($2); }
+    : IS Body ReturnInRoutine END                                   { $$ = new BodyInRoutineDeclaration($2, $3); }
     |                                               { $$ = NULL; }
     ;
 
