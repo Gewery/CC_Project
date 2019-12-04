@@ -1,3 +1,5 @@
-var b : Integer is 5
-var d : Boolean
-var c is 7
+var b : Boolean
+routine main(a : Boolean, d : Real) : Integer is
+    var b : Real
+    return 8
+end

@@ -17,18 +17,18 @@ namespace CodeGeneration
 
         public void EmitRoot(JsonEntity el)
         {
-            var nameDef = new AssemblyNameDefinition("CodeGenerator", new Version(1, 0, 0, 0));
-            var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.dll", ModuleKind.Console);
+            var nameDef = new AssemblyNameDefinition("SuperGreeterBinary", new Version(1, 0, 0, 0));
+            var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
             this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
 //            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
 //            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
-//            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
-//            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
+            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
+            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
             Console.WriteLine(this.Types["Void"]);
 
-            bootstrap = new MethodDefinition("Context",
+            bootstrap = new MethodDefinition("Main",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
 
             foreach (JsonEntity declaration in el.Children)
@@ -42,12 +42,12 @@ namespace CodeGeneration
             ip.Emit(OpCodes.Ret);
             
             var type = new TypeDefinition("supergreeter", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
-//            type = this.ImportStuffIntoModule(type);
+            type = this.ImportStuffIntoModule(type);
             asm.MainModule.Types.Add(type);
             type.Methods.Add(bootstrap);
 
             asm.EntryPoint = bootstrap;
-            asm.Write("./result.dll");
+            asm.Write("./result.exe");
         }
 
         private TypeDefinition ImportStuffIntoModule(TypeDefinition type)
@@ -92,12 +92,12 @@ namespace CodeGeneration
         {
             var ivasiq = declaration.Children[1];
             String type = null;
-
+            
             if (ivasiq.Type == "Type")
             {
                 type = this.GetType(ivasiq);
             }
-
+            
             if (type == null)
             {
                 throw new Exception("sosi joopy");
@@ -122,9 +122,9 @@ namespace CodeGeneration
             switch (type)
             {
                 case "Integer":
-//                    Console.Write("Storing whatever is on the stack into a field named: ");
-//                    Console.WriteLine(declaration.Name);
-//                    bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
+                    Console.Write("Storing whatever is on the stack into a field named: ");
+                    Console.WriteLine(declaration.Name);
+                    bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
                     break;
             }
         }
@@ -220,10 +220,10 @@ namespace CodeGeneration
 
         private void EmitPrimary(JsonEntity declaration)
         {
-//            Console.Write("Storing this onto the stack: ");
-//            Console.WriteLine(declaration.Value);
-//            this.bootstrap.Body.GetILProcessor().Emit(
-//                OpCodes.Ldc_I4, int.Parse(declaration.Value));
+            Console.Write("Storing this onto the stack: ");
+            Console.WriteLine(declaration.Value);
+            this.bootstrap.Body.GetILProcessor().Emit(
+                OpCodes.Ldc_I4, int.Parse(declaration.Value));
         }
     }
 }
