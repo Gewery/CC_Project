@@ -1,2 +1,3 @@
 var b : Integer is 5
-var c : Boolean
+var d : Boolean
+var c is 7

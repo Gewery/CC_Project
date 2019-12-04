@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using CodeGeneration.BuiltIns;
 using CodeGeneration.Parser;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -21,18 +20,17 @@ namespace CodeGeneration
             var nameDef = new AssemblyNameDefinition("CodeGenerator", new Version(1, 0, 0, 0));
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "CodeGenerator", ModuleKind.Console);
 
-//            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
-//            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
+//            this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
+            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
+            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
 //            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
 //            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
 //            this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
             
 
-            bootstrap = new MethodDefinition("Main",
+            bootstrap = new MethodDefinition("Context",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
 
-            this.Types.Add("Integer", new IntegerBuiltInUnitDefinition(bootstrap).NativeTypeDefinition);
-            
             foreach (JsonEntity declaration in el.Children)
             {
                 this.EmitDeclaration(declaration);
@@ -41,13 +39,7 @@ namespace CodeGeneration
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
             
-            TypeReference baseType = asm.MainModule.ImportReference(
-                new TypeReference(
-                    asm.MainModule.TypeSystem.Object.Namespace,
-                    nameof(ValueType),
-                    null,
-                    asm.MainModule.TypeSystem.CoreLibrary));
-            var type = new TypeDefinition("CodeGenerator", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, baseType);
+            var type = new TypeDefinition("CodeGenerator", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
             asm.MainModule.Types.Add(type);
             type.Methods.Add(bootstrap);
 
@@ -241,64 +233,6 @@ namespace CodeGeneration
                 OpCodes.Ldc_I4, int.Parse(declaration.Value));
 
             // 00))0)000)0)0))00)))0)0)0)0))0))0)))00))0))0)0))))))))))
-        }
-    }
-    
-    public abstract class UnitDefinition
-    {
-        public string Name { get; }
-        public TypeDefinition NativeTypeDefinition { get; protected set; }
-    }
-
-    /// <summary>
-    /// Special primitive types which wrap around another native platform type, usually using struct.
-    /// </summary>
-    public abstract class BuiltInUnitDefinition : UnitDefinition
-    {
-        public const string SLangBuiltInUnitDotNETNamespace = "SLang.NET";
-        public const string ValueFieldName = "value";
-
-        public TypeReference WrappedNativeType { get; }
-        public FieldDefinition ValueField { get; }
-        public MethodDefinition Ctor { get; set; }
-
-        /// <summary>
-        /// Indirect proxy to the underlying wrapped type. Contains single <see cref="ValueField"/> of <see cref="WrappedNativeType"/>.
-        /// </summary>
-        protected BuiltInUnitDefinition(MethodDefinition bootstrap, string name, TypeReference wrappedType)
-        {
-            var module = bootstrap.Module;
-
-            // 1. underlying wrapped type
-            WrappedNativeType = module.ImportReference(wrappedType);
-
-            // 2. exposed public type
-            const TypeAttributes typeAttributes =
-                TypeAttributes.Public |
-                TypeAttributes.Sealed |
-                TypeAttributes.SequentialLayout |
-                TypeAttributes.Class;
-
-            TypeReference baseType = module.ImportReference(
-                new TypeReference(
-                    module.TypeSystem.Object.Namespace,
-                    nameof(ValueType),
-                    null,
-                    module.TypeSystem.CoreLibrary));
-
-            NativeTypeDefinition = new TypeDefinition(
-                SLangBuiltInUnitDotNETNamespace,
-                Name,
-                typeAttributes,
-                baseType
-            );
-
-            // 2.1 the only field, containing underlying wrapped value
-            const FieldAttributes fieldAttributes =
-                FieldAttributes.Public;
-
-            ValueField = new FieldDefinition(ValueFieldName, fieldAttributes, WrappedNativeType);
-            NativeTypeDefinition.Fields.Add(ValueField);
         }
     }
 }
