@@ -615,397 +615,733 @@ void print_Identifiers(string prefix, Identifiers *identifiers, bool is_last) {
 /* ========== SERIALISE TO JSON ========== */
 /* ======================================= */
 
+const string TYPE = "type";
+const string VALUE = "value";
+const string CHILDREN = "children";
+
+void append_non_null(std::vector<json> *v, json j) {
+    if (j != nullptr) v->push_back(j);
+}
+
 string serialize_Tree(Program *program) {
-    return json{{"Program", to_json_Program(program)}}.dump(2);
+    return to_json_Program(program).dump(2);
 }
 
 json to_json_Program(Program *program) {
-    if (!program) return {};
-    Program *cur = program;
-    std::vector <json> declarations;
+    if (!program) return nullptr;
+
+    auto *cur = program;
+    std::vector<json> children;
     while (cur) {
-        declarations.push_back(to_json_Declaration(cur->declaration));
+        append_non_null(&children, to_json_Declaration(cur->declaration));
         cur = cur->program;
     }
-    return json(declarations);
+    return json{{TYPE,     "Program"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Declaration", to_json_Declaration(program->declaration)},
+//            {"Program",     to_json_Program(program->program)}
+//    };
 }
 
 json to_json_Declaration(Declaration *declaration) {
-    if (!declaration) return {};
-    return {
-            {"SimpleDeclaration",  to_json_SimpleDeclaration(declaration->simpledeclaration)},
-            {"RoutineDeclaration", to_json_RoutineDeclaration(declaration->routinedeclaration)}
-    };
+    if (!declaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_SimpleDeclaration(declaration->simpledeclaration));
+    append_non_null(&children, to_json_RoutineDeclaration(declaration->routinedeclaration));
+    return json{{TYPE,     "Declaration"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"SimpleDeclaration",  to_json_SimpleDeclaration(declaration->simpledeclaration)},
+//            {"RoutineDeclaration", to_json_RoutineDeclaration(declaration->routinedeclaration)}
+//    };
 }
 
 json to_json_SimpleDeclaration(SimpleDeclaration *simpledeclaration) {
-    if (!simpledeclaration) return {};
-    return {
-            {"VariableDeclaration", to_json_VariableDeclaration(simpledeclaration->variabledeclaration)},
-            {"TypeDeclaration",     to_json_TypeDeclaration(simpledeclaration->typedeclaration)}
-    };
+    if (!simpledeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_VariableDeclaration(simpledeclaration->variabledeclaration));
+    append_non_null(&children, to_json_TypeDeclaration(simpledeclaration->typedeclaration));
+    return json{{TYPE,     "SimpleDeclaration"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"VariableDeclaration", to_json_VariableDeclaration(simpledeclaration->variabledeclaration)},
+//            {"TypeDeclaration",     to_json_TypeDeclaration(simpledeclaration->typedeclaration)}
+//    };
 }
 
 json to_json_VariableDeclaration(VariableDeclaration *variabledeclaration) {
-    if (!variabledeclaration) return {};
-    return {
-            {"name",         variabledeclaration->name},
-            {"Type",         to_json_Type(variabledeclaration->type)},
-            {"InitialValue", to_json_InitialValue(variabledeclaration->initialvalue)},
-            {"Expression",   to_json_Expression(variabledeclaration->expression)}
-    };
+    if (!variabledeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Type(variabledeclaration->type));
+    append_non_null(&children, to_json_InitialValue(variabledeclaration->initialvalue));
+    append_non_null(&children, to_json_Expression(variabledeclaration->expression));
+    return json{{TYPE,     "VariableDeclaration"},
+                {VALUE,    variabledeclaration->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name",         variabledeclaration->name},
+//            {TYPE,         to_json_Type(variabledeclaration->type)},
+//            {"InitialValue", to_json_InitialValue(variabledeclaration->initialvalue)},
+//            {"Expression",   to_json_Expression(variabledeclaration->expression)}
+//    };
 }
 
 json to_json_InitialValue(InitialValue *initialvalue) {
-    if (!initialvalue) return {};
-    return {
-            {"Expression", to_json_Expression(initialvalue->expression)}
-    };
+    if (!initialvalue) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(initialvalue->expression));
+    return json{{TYPE,     "InitialValue"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression", to_json_Expression(initialvalue->expression)}
+//    };
 }
 
 json to_json_TypeDeclaration(TypeDeclaration *typedeclaration) {
-    if (!typedeclaration) return {};
-    return {
-            {"name", typedeclaration->name},
-            {"Type", to_json_Type(typedeclaration->type)}
-    };
+    if (!typedeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Type(typedeclaration->type));
+    return json{{TYPE,     "TypeDeclaration"},
+                {VALUE,    typedeclaration->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name", typedeclaration->name},
+//            {TYPE, to_json_Type(typedeclaration->type)}
+//    };
 }
 
 json to_json_Type(Type *type) {
-    if (!type) return {};
-    return {
-            {"name",          type->name},
-            {"PrimitiveType", to_json_PrimitiveType(type->primitivetype)},
-            {"ArrayType",     to_json_ArrayType(type->arraytype)},
-            {"RecordType",    to_json_RecordType(type->recordtype)}
-    };
+    if (!type) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_PrimitiveType(type->primitivetype));
+    append_non_null(&children, to_json_ArrayType(type->arraytype));
+    append_non_null(&children, to_json_RecordType(type->recordtype));
+    return json{{TYPE,     TYPE},
+                {VALUE,    type->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name",          type->name},
+//            {"PrimitiveType", to_json_PrimitiveType(type->primitivetype)},
+//            {"ArrayType",     to_json_ArrayType(type->arraytype)},
+//            {"RecordType",    to_json_RecordType(type->recordtype)}
+//    };
 }
 
 json to_json_PrimitiveType(PrimitiveType *primitivetype) {
-    if (!primitivetype) return {};
-    return {
-            {"is_int",  primitivetype->isint},
-            {"is_real", primitivetype->isreal},
-            {"is_bool", primitivetype->isboolean}
-    };
+    if (!primitivetype) return nullptr;
+
+    std::vector<json> children;
+    return json{{TYPE,     "PrimitiveType"},
+                {VALUE,    primitivetype->isint ? "int" : primitivetype->isreal ? "real" : "bool"},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"is_int",  primitivetype->isint},
+//            {"is_real", primitivetype->isreal},
+//            {"is_bool", primitivetype->isboolean}
+//    };
 }
 
 json to_json_ArrayType(ArrayType *arraytype) {
-    if (!arraytype) return {};
-    return {
-            {"Expression", to_json_Expression(arraytype->expression)},
-            {"Type",       to_json_Type(arraytype->type)}
-    };
+    if (!arraytype) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(arraytype->expression));
+    append_non_null(&children, to_json_Type(arraytype->type));
+    return json{{TYPE,     "ArrayType"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression", to_json_Expression(arraytype->expression)},
+//            {TYPE,       to_json_Type(arraytype->type)}
+//    };
 }
 
 json to_json_RecordType(RecordType *recordtype) {
-    if (!recordtype) return {};
-    return {
-            {"VariableDeclarations", to_json_VariableDeclarations(recordtype->variabledeclarations)},
-    };
+    if (!recordtype) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_VariableDeclarations(recordtype->variabledeclarations));
+    return json{{TYPE,     "RecordType"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"VariableDeclarations", to_json_VariableDeclarations(recordtype->variabledeclarations)},
+//    };
 }
 
 json to_json_VariableDeclarations(VariableDeclarations *variabledeclarations) {
-    if (!variabledeclarations) return {};
-    return {
-            {"VariableDeclaration",  to_json_VariableDeclaration(variabledeclarations->variabledeclaration)},
-            {"VariableDeclarations", to_json_VariableDeclarations(variabledeclarations->variabledeclarations)}
-    };
+    if (!variabledeclarations) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_VariableDeclaration(variabledeclarations->variabledeclaration));
+    append_non_null(&children, to_json_VariableDeclarations(variabledeclarations->variabledeclarations));
+    return json{{TYPE,     "VariableDeclarations"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"VariableDeclaration",  to_json_VariableDeclaration(variabledeclarations->variabledeclaration)},
+//            {"VariableDeclarations", to_json_VariableDeclarations(variabledeclarations->variabledeclarations)}
+//  };
 }
 
 json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
-    if (!routinedeclaration) return {};
-    return {
-            {"name",                     routinedeclaration->name},
-            {"Parameters",               to_json_Parameters(routinedeclaration->parameters)},
-            {"TypeInRoutineDeclaration", to_json_TypeInRoutineDeclaration(
-                    routinedeclaration->typeinroutinedeclaration)},
-            {"BodyInRoutineDeclaration", to_json_BodyInRoutineDeclaration(
-                    routinedeclaration->bodyinroutinedeclaration)},
-            {"ReturnInRoutine",          to_json_ReturnInRoutine(routinedeclaration->returnInRoutine)}
-    };
+    if (!routinedeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Parameters(routinedeclaration->parameters));
+    append_non_null(&children, to_json_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration));
+    append_non_null(&children, to_json_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration));
+    append_non_null(&children, to_json_ReturnInRoutine(routinedeclaration->returnInRoutine));
+    return json{{TYPE,     "RoutineDeclaration"},
+                {VALUE,    routinedeclaration->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name",                     routinedeclaration->name},
+//            {"Parameters",               to_json_Parameters(routinedeclaration->parameters)},
+//            {"TypeInRoutineDeclaration", to_json_TypeInRoutineDeclaration(
+//                    routinedeclaration->typeinroutinedeclaration)},
+//            {"BodyInRoutineDeclaration", to_json_BodyInRoutineDeclaration(
+//                    routinedeclaration->bodyinroutinedeclaration)},
+//            {"ReturnInRoutine",          to_json_ReturnInRoutine(routinedeclaration->returnInRoutine)}
+//    };
 }
 
 json to_json_ReturnInRoutine(ReturnInRoutine *returnInRoutine) {
-    if (!returnInRoutine) return {};
-    return {
-            {"Expression", to_json_Expression(returnInRoutine->expression)}
-    };
+    if (!returnInRoutine) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(returnInRoutine->expression));
+    return json{{TYPE,     "ReturnInRoutine"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression", to_json_Expression(returnInRoutine->expression)}
+//    };
 }
 
 json to_json_Parameters(Parameters *parameters) {
-    if (!parameters) return {};
-    return {
-            {"ParameterDeclaration",  to_json_ParameterDeclaration(parameters->parameterdeclaration)},
-            {"ParametersDeclaration", to_json_ParametersDeclaration(parameters->parametersdeclaration)}
-    };
+    if (!parameters) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_ParameterDeclaration(parameters->parameterdeclaration));
+    append_non_null(&children, to_json_ParametersDeclaration(parameters->parametersdeclaration));
+    return json{{TYPE,     "Parameters"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"ParameterDeclaration",  to_json_ParameterDeclaration(parameters->parameterdeclaration)},
+//            {"ParametersDeclaration", to_json_ParametersDeclaration(parameters->parametersdeclaration)}
+//    };
 }
 
 json to_json_ParameterDeclaration(ParameterDeclaration *parameterdeclaration) {
-    if (!parameterdeclaration) return {};
-    return {
-            {"name", parameterdeclaration->name},
-            {"Type", to_json_Type(parameterdeclaration->type)}
-    };
+    if (!parameterdeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Type(parameterdeclaration->type));
+    return json{{TYPE,     "ParameterDeclaration"},
+                {VALUE,    parameterdeclaration->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name", parameterdeclaration->name},
+//            {TYPE, to_json_Type(parameterdeclaration->type)}
+//    };
 }
 
 json to_json_ParametersDeclaration(ParametersDeclaration *parametersdeclaration) {
-    if (!parametersdeclaration) return {};
-    return {
-            {"ParameterDeclaration",  to_json_ParameterDeclaration(parametersdeclaration->parameterdeclaration)},
-            {"ParametersDeclaration", to_json_ParametersDeclaration(parametersdeclaration->parametersdeclaration)}
-    };
+    if (!parametersdeclaration) return nullptr;
+
+    auto *cur = parametersdeclaration;
+    std::vector<json> children;
+    while (cur) {
+        append_non_null(&children, to_json_ParameterDeclaration(parametersdeclaration->parameterdeclaration));
+        cur = cur->parametersdeclaration;
+    }
+    return json{{TYPE,     "ParametersDeclaration"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"ParameterDeclaration",  to_json_ParameterDeclaration(parametersdeclaration->parameterdeclaration)},
+//            {"ParametersDeclaration", to_json_ParametersDeclaration(parametersdeclaration->parametersdeclaration)}
+//    };
 }
 
 json to_json_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration) {
-    if (!typeinroutinedeclaration) return {};
-    return {
-            {"Type", to_json_Type(typeinroutinedeclaration->type)}
-    };
+    if (!typeinroutinedeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Type(typeinroutinedeclaration->type));
+    return json{{TYPE,     "TypeInRoutineDeclaration"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {TYPE, to_json_Type(typeinroutinedeclaration->type)}
+//    };
 }
 
 json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration) {
-    if (!bodyinroutinedeclaration) return {};
-    return {
-            {"Body", to_json_Body(bodyinroutinedeclaration->body)}
-    };
+    if (!bodyinroutinedeclaration) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Body(bodyinroutinedeclaration->body));
+    return json{{TYPE,     "BodyInRoutineDeclaration"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Body", to_json_Body(bodyinroutinedeclaration->body)}
+//    };
 }
 
 json to_json_Body(Body *body) {
-    if (!body) return {};
-    return {
-            {"SimpleDeclaration", to_json_SimpleDeclaration(body->simpledeclaration)},
-            {"Statement",         to_json_Statement(body->statement)},
-            {"Body",              to_json_Body(body->body)}
-    };
+    if (!body) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_SimpleDeclaration(body->simpledeclaration));
+    append_non_null(&children, to_json_Statement(body->statement));
+    append_non_null(&children, to_json_Body(body->body));
+    return json{{TYPE,     "Body"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"SimpleDeclaration", to_json_SimpleDeclaration(body->simpledeclaration)},
+//            {"Statement",         to_json_Statement(body->statement)},
+//            {"Body",              to_json_Body(body->body)}
+//    };
 }
 
 json to_json_Statement(Statement *statement) {
-    if (!statement) return {};
-    return {
-            {"Assignment",  to_json_Assignment(statement->assignment)},
-            {"RoutineCall", to_json_RoutineCall(statement->routinecall)},
-            {"WhileLoop",   to_json_WhileLoop(statement->whileloop)},
-            {"ForLoop",     to_json_ForLoop(statement->forloop)},
-            {"IfStatement", to_json_IfStatement(statement->ifstatement)}
-    };
+    if (!statement) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Assignment(statement->assignment));
+    append_non_null(&children, to_json_RoutineCall(statement->routinecall));
+    append_non_null(&children, to_json_WhileLoop(statement->whileloop));
+    append_non_null(&children, to_json_WhileLoop(statement->whileloop));
+    append_non_null(&children, to_json_IfStatement(statement->ifstatement));
+    return json{{TYPE,     "Statement"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Assignment",  to_json_Assignment(statement->assignment)},
+//            {"RoutineCall", to_json_RoutineCall(statement->routinecall)},
+//            {"WhileLoop",   to_json_WhileLoop(statement->whileloop)},
+//            {"ForLoop",     to_json_ForLoop(statement->forloop)},
+//            {"IfStatement", to_json_IfStatement(statement->ifstatement)}
+//    };
 }
 
 json to_json_Assignment(Assignment *assignment) {
-    if (!assignment) return {};
-    return {
-            {"ModifiablePrimary", to_json_ModifiablePrimary(assignment->modifiableprimary)},
-            {"Expression",        to_json_Expression(assignment->expression)}
-    };
+    if (!assignment) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_ModifiablePrimary(assignment->modifiableprimary));
+    append_non_null(&children, to_json_Expression(assignment->expression));
+    return json{{TYPE,     "Assignment"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"ModifiablePrimary", to_json_ModifiablePrimary(assignment->modifiableprimary)},
+//            {"Expression",        to_json_Expression(assignment->expression)}
+//    };
 }
 
 json to_json_RoutineCall(RoutineCall *routinecall) {
-    if (!routinecall) return {};
-    return {
-            {"name",                    routinecall->name},
-            {"ExpressionInRoutineCall", to_json_ExpressionInRoutineCall(routinecall->expressioninroutinecall)}
-    };
+    if (!routinecall) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_ExpressionInRoutineCall(routinecall->expressioninroutinecall));
+    return json{{TYPE,     "RoutineCall"},
+                {VALUE,    routinecall->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name",                    routinecall->name},
+//            {"ExpressionInRoutineCall", to_json_ExpressionInRoutineCall(routinecall->expressioninroutinecall)}
+//    };
 }
 
 json to_json_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall) {
-    if (!expressioninroutinecall) return {};
-    return {
-            {"Expression",               to_json_Expression(expressioninroutinecall->expression)},
-            {"ExpressionsInRoutineCall", to_json_ExpressionsInRoutineCall(
-                    expressioninroutinecall->expressionsinroutinecall)}
-    };
+    if (!expressioninroutinecall) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(expressioninroutinecall->expression));
+    append_non_null(&children, to_json_ExpressionsInRoutineCall(expressioninroutinecall->expressionsinroutinecall));
+    return json{{TYPE,     "ExpressionInRoutineCall"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression",               to_json_Expression(expressioninroutinecall->expression)},
+//            {"ExpressionsInRoutineCall", to_json_ExpressionsInRoutineCall(
+//                    expressioninroutinecall->expressionsinroutinecall)}
+//    };
 }
 
 json to_json_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall) {
-    if (!expressionsinroutinecall) return {};
-    return {
-            {"Expression",               to_json_Expression(expressionsinroutinecall->expression)},
-            {"ExpressionsInRoutineCall", to_json_ExpressionsInRoutineCall(
-                    expressionsinroutinecall->expressionsinroutinecall)
-            }
-    };
+    if (!expressionsinroutinecall) return nullptr;
+
+    auto *cur = expressionsinroutinecall;
+    std::vector<json> children;
+    while (cur) {
+        append_non_null(&children, to_json_Expression(expressionsinroutinecall->expression));
+        cur = cur->expressionsinroutinecall;
+    }
+    return json{{TYPE,     "ExpressionsInRoutineCall"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression",               to_json_Expression(expressionsinroutinecall->expression)},
+//            {"ExpressionsInRoutineCall", to_json_ExpressionsInRoutineCall(
+//                    expressionsinroutinecall->expressionsinroutinecall)
+//            }
+//    };
 }
 
 json to_json_WhileLoop(WhileLoop *whileloop) {
-    if (!whileloop) return {};
-    return {
-            {"Expression", to_json_Expression(whileloop->expression)},
-            {"Body",       to_json_Body(whileloop->body)}
-    };
+    if (!whileloop) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(whileloop->expression));
+    append_non_null(&children, to_json_Body(whileloop->body));
+    return json{{TYPE,     "WhileLoop"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression", to_json_Expression(whileloop->expression)},
+//            {"Body",       to_json_Body(whileloop->body)}
+//    };
 }
 
 json to_json_ForLoop(ForLoop *forloop) {
-    if (!forloop) return {};
-    return {
-            {"name",    forloop->name},
-            {"Reverse", to_json_Reverse(forloop->reverse)},
-            {"Range",   to_json_Range(forloop->range)},
-            {"Body",    to_json_Body(forloop->body)}
-    };
+    if (!forloop) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Reverse(forloop->reverse));
+    append_non_null(&children, to_json_Range(forloop->range));
+    append_non_null(&children, to_json_Body(forloop->body));
+    return json{{TYPE,     "ForLoop"},
+                {VALUE,    forloop->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name",    forloop->name},
+//            {"Reverse", to_json_Reverse(forloop->reverse)},
+//            {"Range",   to_json_Range(forloop->range)},
+//            {"Body",    to_json_Body(forloop->body)}
+//    };
 }
 
 json to_json_Range(Range *range) {
-    if (!range) return {};
-    return {
-            {"Expression1", to_json_Expression(range->expression1)},
-            {"Expression2", to_json_Expression(range->expression2)}
-    };
+    if (!range) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(range->expression1));
+    append_non_null(&children, to_json_Expression(range->expression2));
+    return json{{TYPE,     "Range"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression1", to_json_Expression(range->expression1)},
+//            {"Expression2", to_json_Expression(range->expression2)}
+//    };
 }
 
 json to_json_Reverse(Reverse *reverse) {
-    if (!reverse) return {};
-    return {
-            {"is_reverse", reverse->isreverse}
-    };
+    if (!reverse) return nullptr;
+
+    std::vector<json> children;
+    return json{{TYPE,     "Reverse"},
+                {VALUE,    reverse->isreverse},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"is_reverse", reverse->isreverse}
+//    };
 }
 
 json to_json_IfStatement(IfStatement *ifstatement) {
-    if (!ifstatement) return {};
-    return {
-            {"Expression",        to_json_Expression(ifstatement->expression)},
-            {"Body",              to_json_Body(ifstatement->body)},
-            {"ElseInIfStatement", to_json_ElseInIfStatement(ifstatement->elseinifstatement)}
-    };
+    if (!ifstatement) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(ifstatement->expression));
+    append_non_null(&children, to_json_Body(ifstatement->body));
+    append_non_null(&children, to_json_ElseInIfStatement(ifstatement->elseinifstatement));
+    return json{{TYPE,     "IfStatement"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Expression",        to_json_Expression(ifstatement->expression)},
+//            {"Body",              to_json_Body(ifstatement->body)},
+//            {"ElseInIfStatement", to_json_ElseInIfStatement(ifstatement->elseinifstatement)}
+//    };
 }
 
 json to_json_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
-    if (!elseinifstatement) return {};
-    return {
-            {"Body", to_json_Body(elseinifstatement->body)}
-    };
+    if (!elseinifstatement) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Body(elseinifstatement->body));
+    return json{{TYPE,     "ElseInIfStatement"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Body", to_json_Body(elseinifstatement->body)}
+//    };
 }
 
 json to_json_Expression(Expression *expression) {
-    if (!expression) return {};
-    return {
-            {"Relation",                      to_json_Relation(expression->relation)},
-            {"MultipleRelationsInExpression", to_json_MultipleRelationsInExpression(
-                    expression->multiplerelationsinexpression)
-            }
-    };
+    if (!expression) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Relation(expression->relation));
+    append_non_null(&children, to_json_MultipleRelationsInExpression(expression->multiplerelationsinexpression));
+    return json{{TYPE,     "Expression"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Relation",                      to_json_Relation(expression->relation)},
+//            {"MultipleRelationsInExpression", to_json_MultipleRelationsInExpression(
+//                    expression->multiplerelationsinexpression)
+//            }
+//    };
 }
 
 json to_json_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression) {
-    if (!multiplerelationsinexpression) return {};
-    return {
-            {"LogicalOperator",               to_json_LogicalOperator(multiplerelationsinexpression->logicaloperator)},
-            {"Relation",                      to_json_Relation(multiplerelationsinexpression->relation)},
-            {"MultipleRelationsInExpression", to_json_MultipleRelationsInExpression(
-                    multiplerelationsinexpression->multiplerelationsinexpression)}
-    };
+    if (!multiplerelationsinexpression) return nullptr;
+
+    auto *cur = multiplerelationsinexpression;
+    std::vector<json> children;
+    while (cur) {
+        append_non_null(&children, to_json_LogicalOperator(multiplerelationsinexpression->logicaloperator));
+        append_non_null(&children, to_json_Relation(multiplerelationsinexpression->relation));
+        cur = cur->multiplerelationsinexpression;
+    }
+    return json{{TYPE,     "MultipleRelationsInExpression"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"LogicalOperator",               to_json_LogicalOperator(
+//                    multiplerelationsinexpression->logicaloperator)},
+//            {"Relation",                      to_json_Relation(multiplerelationsinexpression->relation)},
+//            {"MultipleRelationsInExpression", to_json_MultipleRelationsInExpression(
+//                    multiplerelationsinexpression->multiplerelationsinexpression)}
+//    };
 }
 
 json to_json_LogicalOperator(LogicalOperator *logicaloperator) {
-    if (!logicaloperator) return {};
-    return {
-            {"op", logicaloperator->op}
-    };
+    if (!logicaloperator) return nullptr;
+
+    std::vector<json> children;
+    return json{{TYPE,     "LogicalOperator"},
+                {VALUE,    logicaloperator->op},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"op", logicaloperator->op}
+//    };
 }
 
 json to_json_Relation(Relation *relation) {
-    if (!relation) return {};
-    return {
-            {"Simple",               to_json_Simple(relation->simple)},
-            {"ComparisonInRelation", to_json_ComparisonInRelation(relation->comparisoninrelation)}
-    };
+    if (!relation) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Simple(relation->simple));
+    append_non_null(&children, to_json_ComparisonInRelation(relation->comparisoninrelation));
+    return json{{TYPE,     "Relation"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Simple",               to_json_Simple(relation->simple)},
+//            {"ComparisonInRelation", to_json_ComparisonInRelation(relation->comparisoninrelation)}
+//    };
 }
 
 json to_json_ComparisonInRelation(ComparisonInRelation *comparisoninrelation) {
-    if (!comparisoninrelation) return {};
-    return {
-            {"ComparisonOperator", to_json_ComparisonOperator(comparisoninrelation->comparisonoperator)},
-            {"Simple",             to_json_Simple(comparisoninrelation->simple)}
-    };
+    if (!comparisoninrelation) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_ComparisonOperator(comparisoninrelation->comparisonoperator));
+    append_non_null(&children, to_json_Simple(comparisoninrelation->simple));
+    return json{{TYPE,     "ComparisonInRelation"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"ComparisonOperator", to_json_ComparisonOperator(comparisoninrelation->comparisonoperator)},
+//            {"Simple",             to_json_Simple(comparisoninrelation->simple)}
+//    };
 }
 
 json to_json_ComparisonOperator(ComparisonOperator *comparisonoperator) {
-    if (!comparisonoperator) return {};
-    return {
-            {"op", comparisonoperator->op},
-    };
+    if (!comparisonoperator) return nullptr;
+
+    std::vector<json> children;
+    return json{{TYPE,     "ComparisonOperator"},
+                {VALUE,    comparisonoperator->op},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"op", comparisonoperator->op},
+//    };
 }
 
 json to_json_Simple(Simple *simple) {
-    if (!simple) return {};
-    return {
-            {"Factor",  to_json_Factor(simple->factor)},
-            {"Factors", to_json_Factors(simple->factors)}
-    };
+    if (!simple) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Factor(simple->factor));
+    append_non_null(&children, to_json_Factors(simple->factors));
+    return json{{TYPE,     "Simple"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Factor",  to_json_Factor(simple->factor)},
+//            {"Factors", to_json_Factors(simple->factors)}
+//    };
 }
 
 json to_json_Factors(Factors *factors) {
-    if (!factors) return {};
-    return {
-            {"SimpleOperator", to_json_SimpleOperator(factors->simpleOperator)},
-            {"Factor",         to_json_Factor(factors->factor)},
-            {"Factors",        to_json_Factors(factors->factors)}
-    };
+    if (!factors) return nullptr;
+
+    auto *cur = factors;
+    std::vector<json> children;
+    while (cur) {
+        append_non_null(&children, to_json_SimpleOperator(factors->simpleOperator));
+        append_non_null(&children, to_json_Factor(factors->factor));
+        cur = cur->factors;
+    }
+    return json{{TYPE,     "Factors"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"SimpleOperator", to_json_SimpleOperator(factors->simpleOperator)},
+//            {"Factor",         to_json_Factor(factors->factor)},
+//            {"Factors",        to_json_Factors(factors->factors)}
+//    };
 }
 
 json to_json_SimpleOperator(SimpleOperator *simpleoperator) {
-    if (!simpleoperator) return {};
-    return {
-            {"op", simpleoperator->op}
-    };
+    if (!simpleoperator) return nullptr;
+
+    std::vector<json> children;
+    return json{{TYPE,     "SimpleOperator"},
+                {VALUE,    simpleoperator->op},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"op", simpleoperator->op}
+//    };
 }
 
 json to_json_Factor(Factor *factor) {
-    if (!factor) return {};
-    return {
-            {"Summand",  to_json_Summand(factor->summand)},
-            {"Summands", to_json_Summands(factor->summands)}
-    };
+    if (!factor) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Summand(factor->summand));
+    append_non_null(&children, to_json_Summands(factor->summands));
+    return json{{TYPE,     "Factor"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Summand",  to_json_Summand(factor->summand)},
+//            {"Summands", to_json_Summands(factor->summands)}
+//    };
 }
 
 json to_json_Summands(Summands *summands) {
-    if (!summands) return {};
-    return {
-            {"Sign",     to_json_Sign(summands->sign)},
-            {"Summand",  to_json_Summand(summands->summand)},
-            {"Summands", to_json_Summands(summands->summands)}
-    };
+    if (!summands) return nullptr;
+
+    auto *cur = summands;
+    std::vector<json> children;
+    while (cur) {
+        append_non_null(&children, to_json_Sign(summands->sign));
+        append_non_null(&children, to_json_Summand(summands->summand));
+        cur = cur->summands;
+    }
+    return json{{TYPE,     "Summands"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Sign",     to_json_Sign(summands->sign)},
+//            {"Summand",  to_json_Summand(summands->summand)},
+//            {"Summands", to_json_Summands(summands->summands)}
+//    };
 }
 
 json to_json_Summand(Summand *summand) {
-    if (!summand) return {};
-    return {
-            {"Primary",    to_json_Primary(summand->primary)},
-            {"Expression", to_json_Expression(summand->expression)}
-    };
+    if (!summand) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Primary(summand->primary));
+    append_non_null(&children, to_json_Expression(summand->expression));
+    return json{{TYPE,     "Summand"},
+                {VALUE,    nullptr},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"Primary",    to_json_Primary(summand->primary)},
+//            {"Expression", to_json_Expression(summand->expression)}
+//    };
 }
 
 json to_json_Primary(Primary *primary) {
-    if (!primary) return {};
-    return {
-            {"type",              primary->type},
-            {"value",             primary->value},
-            {"is_not",            primary->isNot},
-            {"ModifiablePrimary", to_json_ModifiablePrimary(primary->modifiablePrimary)}
-    };
+    if (!primary) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_ModifiablePrimary(primary->modifiablePrimary));
+    return json{{TYPE,     "Primary"},
+                {VALUE,    primary->value},
+                {CHILDREN, json(children)}};
+//    return {
+//            {TYPE,                primary->type},
+//            {VALUE,               primary->value},
+//            {"is_not",            primary->isNot},
+//            {"ModifiablePrimary", to_json_ModifiablePrimary(primary->modifiablePrimary)}
+//    };
 }
 
 json to_json_Sign(Sign *sign) {
-    if (!sign) return {};
-    return {
-            {"op", sign->op}
-    };
+    if (!sign) return nullptr;
+
+    std::vector<json> children;
+    return json{{TYPE,     "Sign"},
+                {VALUE,    sign->op},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"op", sign->op}
+//    };
 }
 
 json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
-    if (!modifiableprimary) return {};
-    return {
-            {"name",        modifiableprimary->name},
-            {"Identifiers", to_json_Identifiers(modifiableprimary->identifiers)}
-    };
+    if (!modifiableprimary) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Identifiers(modifiableprimary->identifiers));
+    return json{{TYPE,     "Primary"},
+                {VALUE,    modifiableprimary->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name",        modifiableprimary->name},
+//            {"Identifiers", to_json_Identifiers(modifiableprimary->identifiers)}
+//    };
 }
 
 json to_json_Identifiers(Identifiers *identifiers) {
-    if (!identifiers) return {};
-    return {
-            {"name",        identifiers->name},
-            {"Expression",  to_json_Expression(identifiers->expression)},
-            {"Identifiers", to_json_Identifiers(identifiers->identifiers)}
-    };
+    if (!identifiers) return nullptr;
+
+    std::vector<json> children;
+    append_non_null(&children, to_json_Expression(identifiers->expression));
+    append_non_null(&children, to_json_Identifiers(identifiers->identifiers));
+    return json{{TYPE,     "Primary"},
+                {VALUE,    identifiers->name},
+                {CHILDREN, json(children)}};
+//    return {
+//            {"name",        identifiers->name},
+//            {"Expression",  to_json_Expression(identifiers->expression)},
+//            {"Identifiers", to_json_Identifiers(identifiers->identifiers)}
+//    };
 }
 
 
