@@ -1,175 +1,67 @@
 {
-  "Program": {
-    "Declaration": {
-      "RoutineDeclaration": null,
-      "SimpleDeclaration": {
-        "TypeDeclaration": null,
-        "VariableDeclaration": {
-          "Expression": null,
-          "InitialValue": null,
-          "Type": {
-            "ArrayType": {
-              "Expression": {
-                "MultipleRelationsInExpression": null,
-                "Relation": {
-                  "ComparisonInRelation": null,
-                  "Simple": {
-                    "Factor": {
-                      "Summand": {
-                        "Expression": null,
-                        "Primary": {
-                          "ModifiablePrimary": null,
-                          "is_not": false,
-                          "type": "integer",
-                          "value": 10.0
+  "type": "Program",
+  "children": [
+    {
+      "type": "Declaration",
+      "children": [
+        {
+          "type": "SimpleDeclaration",
+          "children": [
+            {
+              "type": "VariableDeclaration",
+              "name": "b",
+              "children": [
+                {
+                  "type": "InitialValue",
+                  "value": null,
+                  "children": [
+                    {
+                      "type": "Expression",
+                      "value": null,
+                      "children": [
+                        {
+                          "type": "Relation",
+                          "value": null,
+                          "children": [
+                            {
+                              "type": "Simple",
+                              "value": null,
+                              "children": [
+                                {
+                                  "type": "Factor",
+                                  "value": null,
+                                  "children": [
+                                    {
+                                      "type": "Summand",
+                                      "value": null,
+                                      "children": [
+                                        {
+                                          "type": "Primary",
+                                          "value": 5.0,
+                                          "is_not": false,
+                                          "value_type": "integer"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
                         }
-                      },
-                      "Summands": null
-                    },
-                    "Factors": null
-                  }
-                }
-              },
-              "Type": {
-                "ArrayType": null,
-                "PrimitiveType": null,
-                "RecordType": null,
-                "name": "Boolean"
-              }
-            },
-            "PrimitiveType": null,
-            "RecordType": null,
-            "name": ""
-          },
-          "name": "arr2"
-        }
-      }
-    },
-    "Program": {
-      "Declaration": {
-        "RoutineDeclaration": null,
-        "SimpleDeclaration": {
-          "TypeDeclaration": null,
-          "VariableDeclaration": {
-            "Expression": null,
-            "InitialValue": {
-              "Expression": {
-                "MultipleRelationsInExpression": null,
-                "Relation": {
-                  "ComparisonInRelation": null,
-                  "Simple": {
-                    "Factor": {
-                      "Summand": {
-                        "Expression": null,
-                        "Primary": {
-                          "ModifiablePrimary": {
-                            "Identifiers": null,
-                            "name": "arr2"
-                          },
-                          "is_not": false,
-                          "type": "",
-                          "value": 0.0
-                        }
-                      },
-                      "Summands": null
-                    },
-                    "Factors": null
-                  }
-                }
-              }
-            },
-            "Type": {
-              "ArrayType": {
-                "Expression": {
-                  "MultipleRelationsInExpression": null,
-                  "Relation": {
-                    "ComparisonInRelation": null,
-                    "Simple": {
-                      "Factor": {
-                        "Summand": {
-                          "Expression": null,
-                          "Primary": {
-                            "ModifiablePrimary": null,
-                            "is_not": false,
-                            "type": "integer",
-                            "value": 12.0
-                          }
-                        },
-                        "Summands": null
-                      },
-                      "Factors": null
+                      ]
                     }
-                  }
+                  ]
                 },
-                "Type": {
-                  "ArrayType": null,
-                  "PrimitiveType": null,
-                  "RecordType": null,
+                {
+                  "type": "Type",
                   "name": "Integer"
                 }
-              },
-              "PrimitiveType": null,
-              "RecordType": null,
-              "name": ""
-            },
-            "name": "b"
-          }
+              ]
+            }
+          ]
         }
-      },
-      "Program": {
-        "Declaration": {
-          "RoutineDeclaration": {
-            "BodyInRoutineDeclaration": {
-              "Body": {
-                "Body": null,
-                "SimpleDeclaration": null,
-                "Statement": {
-                  "Assignment": {
-                    "Expression": {
-                      "MultipleRelationsInExpression": null,
-                      "Relation": {
-                        "ComparisonInRelation": null,
-                        "Simple": {
-                          "Factor": {
-                            "Summand": {
-                              "Expression": null,
-                              "Primary": {
-                                "ModifiablePrimary": {
-                                  "Identifiers": null,
-                                  "name": "arr2"
-                                },
-                                "is_not": false,
-                                "type": "",
-                                "value": 0.0
-                              }
-                            },
-                            "Summands": null
-                          },
-                          "Factors": null
-                        }
-                      }
-                    },
-                    "ModifiablePrimary": {
-                      "Identifiers": null,
-                      "name": "b"
-                    }
-                  },
-                  "ForLoop": null,
-                  "IfStatement": null,
-                  "RoutineCall": null,
-                  "WhileLoop": null
-                }
-              }
-            },
-            "Parameters": null,
-            "ReturnInRoutine": null,
-            "TypeInRoutineDeclaration": null,
-            "name": "main"
-          },
-          "SimpleDeclaration": null
-        },
-        "Program": null
-      }
+      ]
     }
-  }
+  ]
 }
