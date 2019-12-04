@@ -1339,7 +1339,7 @@ json to_json_Primary(Primary *primary) {
 
     std::vector<json> children;
     append_non_null(&children, to_json_ModifiablePrimary(primary->modifiablePrimary));
-    return json{{TYPE,     Primary},
+    return json{{TYPE,     "Primary"},
                 {NAME,     primary->type},
                 {VALUE,    primary->value},
                 {CHILDREN, json(children)}};
