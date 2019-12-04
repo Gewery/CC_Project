@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using CodeGeneration.Parser;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -68,10 +69,21 @@ namespace CodeGeneration
                 case "SimpleDeclaration":
                     this.EmitSimpleDeclaration(ivasiq);
                     break;
-
+                
+                case "RoutineDeclaration":
+                    this.EmitRoutineDeclaration(ivasiq);
+                    break;
+                
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Declaration Error");
             }
+        }
+
+        public void EmitRoutineDeclaration(JsonEntity declaration)
+        {
+            var ivasiq = declaration.Children[0];
+            String functionName = declaration.Value;
+            Console.WriteLine(functionName);
         }
 
         public void EmitSimpleDeclaration(JsonEntity declaration)
@@ -84,14 +96,13 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Simple Declaration Error");
             }
         }
 
         private void EmitVariableDeclaration(JsonEntity declaration)
         {
             var ivasiq = declaration.Children[0];
-           
             String type = null;
             
             if (ivasiq.Type == "type")
@@ -100,11 +111,12 @@ namespace CodeGeneration
             }
             if (type == null)
             {
-                throw new Exception("sosi joopy");
+                throw new Exception("Variable Decalrarion Error");
             }
+            Console.WriteLine(declaration.Value);
 
-            var fieldDefinition = new FieldDefinition(declaration.Name, FieldAttributes.Private, this.Types[type]);
-            this.Variables.Add(declaration.Name, fieldDefinition);
+            var fieldDefinition = new FieldDefinition(declaration.Value, FieldAttributes.Private, this.Types[type]);
+            this.Variables.Add(declaration.Value, fieldDefinition);
 
             ivasiq = declaration.Children[0];
 
@@ -115,7 +127,7 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Error");
             }
 
             var bootstrapIP = this.bootstrap.Body.GetILProcessor();
@@ -144,7 +156,7 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Initial Value Error");
             }
         }
 
@@ -158,7 +170,7 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Expression Error");
             }
         }
 
@@ -172,7 +184,7 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Relation Error");
             }
         }
 
@@ -186,7 +198,7 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Simple error");
             }
         }
 
@@ -200,7 +212,7 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Factor error");
             }
         }
 
@@ -214,7 +226,7 @@ namespace CodeGeneration
                     break;
 
                 default:
-                    throw new Exception("sosi jopy");
+                    throw new Exception("Summand Error");
             }
         }
 

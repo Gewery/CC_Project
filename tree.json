@@ -9,11 +9,52 @@
                 {
                   "children": [],
                   "type": "type",
-                  "value": "Boolean"
+                  "value": "Integer"
+                },
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "children": [],
+                                          "type": "integer",
+                                          "value": 10.0
+                                        }
+                                      ],
+                                      "type": "Summand",
+                                      "value": null
+                                    }
+                                  ],
+                                  "type": "Factor",
+                                  "value": null
+                                }
+                              ],
+                              "type": "Simple",
+                              "value": null
+                            }
+                          ],
+                          "type": "Relation",
+                          "value": null
+                        }
+                      ],
+                      "type": "Expression",
+                      "value": null
+                    }
+                  ],
+                  "type": "InitialValue",
+                  "value": null
                 }
               ],
               "type": "VariableDeclaration",
-              "value": "b"
+              "value": "c"
             }
           ],
           "type": "SimpleDeclaration",
