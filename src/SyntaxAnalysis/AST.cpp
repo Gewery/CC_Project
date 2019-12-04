@@ -623,6 +623,7 @@ void print_Identifiers(string prefix, Identifiers *identifiers, bool is_last) {
 const string TYPE = "type";
 const string VALUE = "value";
 const string CHILDREN = "children";
+const string NAME = "name";
 
 void append_non_null(std::vector<json> *v, json j) {
     if (j != nullptr) v->push_back(j);
@@ -642,6 +643,7 @@ json to_json_Program(Program *program) {
         cur = cur->program;
     }
     return json{{TYPE,     "Program"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -657,6 +659,7 @@ json to_json_Declaration(Declaration *declaration) {
     append_non_null(&children, to_json_SimpleDeclaration(declaration->simpledeclaration));
     append_non_null(&children, to_json_RoutineDeclaration(declaration->routinedeclaration));
     return json{{TYPE,     "Declaration"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -672,6 +675,7 @@ json to_json_SimpleDeclaration(SimpleDeclaration *simpledeclaration) {
     append_non_null(&children, to_json_VariableDeclaration(simpledeclaration->variabledeclaration));
     append_non_null(&children, to_json_TypeDeclaration(simpledeclaration->typedeclaration));
     return json{{TYPE,     "SimpleDeclaration"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -688,7 +692,8 @@ json to_json_VariableDeclaration(VariableDeclaration *variabledeclaration) {
     append_non_null(&children, to_json_InitialValue(variabledeclaration->initialvalue));
     append_non_null(&children, to_json_Expression(variabledeclaration->expression));
     return json{{TYPE,     "VariableDeclaration"},
-                {VALUE,    variabledeclaration->name},
+                {NAME,     variabledeclaration->name},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"name",         variabledeclaration->name},
@@ -704,6 +709,7 @@ json to_json_InitialValue(InitialValue *initialvalue) {
     std::vector<json> children;
     append_non_null(&children, to_json_Expression(initialvalue->expression));
     return json{{TYPE,     "InitialValue"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -717,7 +723,8 @@ json to_json_TypeDeclaration(TypeDeclaration *typedeclaration) {
     std::vector<json> children;
     append_non_null(&children, to_json_Type(typedeclaration->type));
     return json{{TYPE,     "TypeDeclaration"},
-                {VALUE,    typedeclaration->name},
+                {NAME,     typedeclaration->name},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"name", typedeclaration->name},
@@ -733,7 +740,8 @@ json to_json_Type(Type *type) {
     append_non_null(&children, to_json_ArrayType(type->arraytype));
     append_non_null(&children, to_json_RecordType(type->recordtype));
     return json{{TYPE,     TYPE},
-                {VALUE,    type->name},
+                {NAME,     type->name},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"name",          type->name},
@@ -748,7 +756,8 @@ json to_json_PrimitiveType(PrimitiveType *primitivetype) {
 
     std::vector<json> children;
     return json{{TYPE,     "PrimitiveType"},
-                {VALUE,    primitivetype->isint ? "int" : primitivetype->isreal ? "real" : "bool"},
+                {NAME,     primitivetype->isint ? "int" : primitivetype->isreal ? "real" : "bool"},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"is_int",  primitivetype->isint},
@@ -764,6 +773,7 @@ json to_json_ArrayType(ArrayType *arraytype) {
     append_non_null(&children, to_json_Expression(arraytype->expression));
     append_non_null(&children, to_json_Type(arraytype->type));
     return json{{TYPE,     "ArrayType"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -778,6 +788,7 @@ json to_json_RecordType(RecordType *recordtype) {
     std::vector<json> children;
     append_non_null(&children, to_json_VariableDeclarations(recordtype->variabledeclarations));
     return json{{TYPE,     "RecordType"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -792,6 +803,7 @@ json to_json_VariableDeclarations(VariableDeclarations *variabledeclarations) {
     append_non_null(&children, to_json_VariableDeclaration(variabledeclarations->variabledeclaration));
     append_non_null(&children, to_json_VariableDeclarations(variabledeclarations->variabledeclarations));
     return json{{TYPE,     "VariableDeclarations"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -808,7 +820,8 @@ json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration) {
     append_non_null(&children, to_json_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration));
     append_non_null(&children, to_json_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration));
     return json{{TYPE,     "RoutineDeclaration"},
-                {VALUE,    routinedeclaration->name},
+                {NAME,     routinedeclaration->name},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"name",                     routinedeclaration->name},
@@ -827,6 +840,7 @@ json to_json_ReturnInRoutine(ReturnInRoutine *returnInRoutine) {
     std::vector<json> children;
     append_non_null(&children, to_json_Expression(returnInRoutine->expression));
     return json{{TYPE,     "ReturnInRoutine"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -841,6 +855,7 @@ json to_json_Parameters(Parameters *parameters) {
     append_non_null(&children, to_json_ParameterDeclaration(parameters->parameterdeclaration));
     append_non_null(&children, to_json_ParametersDeclaration(parameters->parametersdeclaration));
     return json{{TYPE,     "Parameters"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -855,7 +870,8 @@ json to_json_ParameterDeclaration(ParameterDeclaration *parameterdeclaration) {
     std::vector<json> children;
     append_non_null(&children, to_json_Type(parameterdeclaration->type));
     return json{{TYPE,     "ParameterDeclaration"},
-                {VALUE,    parameterdeclaration->name},
+                {NAME,     parameterdeclaration->name},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"name", parameterdeclaration->name},
@@ -873,6 +889,7 @@ json to_json_ParametersDeclaration(ParametersDeclaration *parametersdeclaration)
         cur = cur->parametersdeclaration;
     }
     return json{{TYPE,     "ParametersDeclaration"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -887,6 +904,7 @@ json to_json_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedec
     std::vector<json> children;
     append_non_null(&children, to_json_Type(typeinroutinedeclaration->type));
     return json{{TYPE,     "TypeInRoutineDeclaration"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -901,6 +919,7 @@ json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedec
     append_non_null(&children, to_json_Body(bodyinroutinedeclaration->body));
     append_non_null(&children, to_json_ReturnInRoutine(bodyinroutinedeclaration->returnInRoutine));
     return json{{TYPE,     "BodyInRoutineDeclaration"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -916,6 +935,7 @@ json to_json_Body(Body *body) {
     append_non_null(&children, to_json_Statement(body->statement));
     append_non_null(&children, to_json_Body(body->body));
     return json{{TYPE,     "Body"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -935,6 +955,7 @@ json to_json_Statement(Statement *statement) {
     append_non_null(&children, to_json_WhileLoop(statement->whileloop));
     append_non_null(&children, to_json_IfStatement(statement->ifstatement));
     return json{{TYPE,     "Statement"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -953,6 +974,7 @@ json to_json_Assignment(Assignment *assignment) {
     append_non_null(&children, to_json_ModifiablePrimary(assignment->modifiableprimary));
     append_non_null(&children, to_json_Expression(assignment->expression));
     return json{{TYPE,     "Assignment"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -967,7 +989,8 @@ json to_json_RoutineCall(RoutineCall *routinecall) {
     std::vector<json> children;
     append_non_null(&children, to_json_ExpressionInRoutineCall(routinecall->expressioninroutinecall));
     return json{{TYPE,     "RoutineCall"},
-                {VALUE,    routinecall->name},
+                {NAME,     routinecall->name},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"name",                    routinecall->name},
@@ -982,6 +1005,7 @@ json to_json_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutin
     append_non_null(&children, to_json_Expression(expressioninroutinecall->expression));
     append_non_null(&children, to_json_ExpressionsInRoutineCall(expressioninroutinecall->expressionsinroutinecall));
     return json{{TYPE,     "ExpressionInRoutineCall"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1001,6 +1025,7 @@ json to_json_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinrou
         cur = cur->expressionsinroutinecall;
     }
     return json{{TYPE,     "ExpressionsInRoutineCall"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1018,6 +1043,7 @@ json to_json_WhileLoop(WhileLoop *whileloop) {
     append_non_null(&children, to_json_Expression(whileloop->expression));
     append_non_null(&children, to_json_Body(whileloop->body));
     return json{{TYPE,     "WhileLoop"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1034,7 +1060,8 @@ json to_json_ForLoop(ForLoop *forloop) {
     append_non_null(&children, to_json_Range(forloop->range));
     append_non_null(&children, to_json_Body(forloop->body));
     return json{{TYPE,     "ForLoop"},
-                {VALUE,    forloop->name},
+                {NAME,     forloop->name},
+                {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
 //            {"name",    forloop->name},
@@ -1051,6 +1078,7 @@ json to_json_Range(Range *range) {
     append_non_null(&children, to_json_Expression(range->expression1));
     append_non_null(&children, to_json_Expression(range->expression2));
     return json{{TYPE,     "Range"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1064,6 +1092,7 @@ json to_json_Reverse(Reverse *reverse) {
 
     std::vector<json> children;
     return json{{TYPE,     "Reverse"},
+                {NAME,     nullptr},
                 {VALUE,    reverse->isreverse},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1079,6 +1108,7 @@ json to_json_IfStatement(IfStatement *ifstatement) {
     append_non_null(&children, to_json_Body(ifstatement->body));
     append_non_null(&children, to_json_ElseInIfStatement(ifstatement->elseinifstatement));
     return json{{TYPE,     "IfStatement"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1094,6 +1124,7 @@ json to_json_ElseInIfStatement(ElseInIfStatement *elseinifstatement) {
     std::vector<json> children;
     append_non_null(&children, to_json_Body(elseinifstatement->body));
     return json{{TYPE,     "ElseInIfStatement"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1108,6 +1139,7 @@ json to_json_Expression(Expression *expression) {
     append_non_null(&children, to_json_Relation(expression->relation));
     append_non_null(&children, to_json_MultipleRelationsInExpression(expression->multiplerelationsinexpression));
     return json{{TYPE,     "Expression"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1129,6 +1161,7 @@ json to_json_MultipleRelationsInExpression(MultipleRelationsInExpression *multip
         cur = cur->multiplerelationsinexpression;
     }
     return json{{TYPE,     "MultipleRelationsInExpression"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1145,6 +1178,7 @@ json to_json_LogicalOperator(LogicalOperator *logicaloperator) {
 
     std::vector<json> children;
     return json{{TYPE,     "LogicalOperator"},
+                {NAME,     nullptr},
                 {VALUE,    logicaloperator->op},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1159,6 +1193,7 @@ json to_json_Relation(Relation *relation) {
     append_non_null(&children, to_json_Simple(relation->simple));
     append_non_null(&children, to_json_ComparisonInRelation(relation->comparisoninrelation));
     return json{{TYPE,     "Relation"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1174,6 +1209,7 @@ json to_json_ComparisonInRelation(ComparisonInRelation *comparisoninrelation) {
     append_non_null(&children, to_json_ComparisonOperator(comparisoninrelation->comparisonoperator));
     append_non_null(&children, to_json_Simple(comparisoninrelation->simple));
     return json{{TYPE,     "ComparisonInRelation"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1187,6 +1223,7 @@ json to_json_ComparisonOperator(ComparisonOperator *comparisonoperator) {
 
     std::vector<json> children;
     return json{{TYPE,     "ComparisonOperator"},
+                {NAME,     nullptr},
                 {VALUE,    comparisonoperator->op},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1201,6 +1238,7 @@ json to_json_Simple(Simple *simple) {
     append_non_null(&children, to_json_Factor(simple->factor));
     append_non_null(&children, to_json_Factors(simple->factors));
     return json{{TYPE,     "Simple"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1220,6 +1258,7 @@ json to_json_Factors(Factors *factors) {
         cur = cur->factors;
     }
     return json{{TYPE,     "Factors"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1234,6 +1273,7 @@ json to_json_SimpleOperator(SimpleOperator *simpleoperator) {
 
     std::vector<json> children;
     return json{{TYPE,     "SimpleOperator"},
+                {NAME,     nullptr},
                 {VALUE,    simpleoperator->op},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1248,6 +1288,7 @@ json to_json_Factor(Factor *factor) {
     append_non_null(&children, to_json_Summand(factor->summand));
     append_non_null(&children, to_json_Summands(factor->summands));
     return json{{TYPE,     "Factor"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1267,6 +1308,7 @@ json to_json_Summands(Summands *summands) {
         cur = cur->summands;
     }
     return json{{TYPE,     "Summands"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1283,6 +1325,7 @@ json to_json_Summand(Summand *summand) {
     append_non_null(&children, to_json_Primary(summand->primary));
     append_non_null(&children, to_json_Expression(summand->expression));
     return json{{TYPE,     "Summand"},
+                {NAME,     nullptr},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1296,7 +1339,8 @@ json to_json_Primary(Primary *primary) {
 
     std::vector<json> children;
     append_non_null(&children, to_json_ModifiablePrimary(primary->modifiablePrimary));
-    return json{{TYPE,     primary->type},
+    return json{{TYPE,     Primary},
+                {NAME,     primary->type},
                 {VALUE,    primary->value},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1312,6 +1356,7 @@ json to_json_Sign(Sign *sign) {
 
     std::vector<json> children;
     return json{{TYPE,     "Sign"},
+                {NAME,     nullptr},
                 {VALUE,    sign->op},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1325,6 +1370,7 @@ json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
     std::vector<json> children;
     append_non_null(&children, to_json_Identifiers(modifiableprimary->identifiers));
     return json{{TYPE,     "ModifiablePrimary"},
+                {NAME,     nullptr},
                 {VALUE,    modifiableprimary->name},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1340,6 +1386,7 @@ json to_json_Identifiers(Identifiers *identifiers) {
     append_non_null(&children, to_json_Expression(identifiers->expression));
     append_non_null(&children, to_json_Identifiers(identifiers->identifiers));
     return json{{TYPE,     "Identifiers"},
+                {NAME,     nullptr},
                 {VALUE,    identifiers->name},
                 {CHILDREN, json(children)}};
 //    return {
