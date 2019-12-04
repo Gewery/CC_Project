@@ -1,6 +1,2 @@
-var arr2 : array[10] Boolean
-var b : array[12] Integer is arr2
-
-routine main is
-b := arr2
-end
+var b : Integer is 5
+var c : Boolean

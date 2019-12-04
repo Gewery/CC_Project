@@ -16,8 +16,6 @@ using namespace std;
 #define NEW_PREFIX (prefix + (is_last ? "   " : "│  "))
 #define PRINT_INFO(INFO) printf("%s%s%s\n", prefix.c_str(), (is_last ? "└──" : "├──"), INFO)
 
-json c;
-
 string format(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -618,35 +616,22 @@ void print_Identifiers(string prefix, Identifiers *identifiers, bool is_last) {
 /* ======================================= */
 
 string serialize_Tree(Program *program) {
-    return to_json_Program(program).dump(2);
-//    return json{{"Program", to_json_Program(program)}}.dump(2);
+    return json{{"Program", to_json_Program(program)}}.dump(2);
 }
 
 json to_json_Program(Program *program) {
     if (!program) return {};
-    std::vector<json> children{};
-//    if (json c = to_json_Declaration(program->declaration)) children.push_back(c);
-    if ((c = to_json_Program(program->program)) != NULL) children.push_back(c);
-    return json{{"type",     "PROGRAM"},
-                {"value",    {}},
-                {"children", json(children)
-            }
-    };
-//    return {
-//            {"Declaration", to_json_Declaration(program->declaration)},
-//            {"Program",     to_json_Program(program->program)}
-//    };
+    Program *cur = program;
+    std::vector <json> declarations;
+    while (cur) {
+        declarations.push_back(to_json_Declaration(cur->declaration));
+        cur = cur->program;
+    }
+    return json(declarations);
 }
 
 json to_json_Declaration(Declaration *declaration) {
     if (!declaration) return {};
-//    return json{{"type",     "PROGRAM"},
-//                {"value",    {}},
-//                {"children", [
-//                                     to_json_Declaration(program->declaration),
-//                                     to_json_Program(program->program)
-//                             ]}
-//    };
     return {
             {"SimpleDeclaration",  to_json_SimpleDeclaration(declaration->simpledeclaration)},
             {"RoutineDeclaration", to_json_RoutineDeclaration(declaration->routinedeclaration)}
