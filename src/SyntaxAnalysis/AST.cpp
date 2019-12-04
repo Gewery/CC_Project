@@ -260,9 +260,9 @@ void print_BodyInRoutineDeclaration(string prefix, BodyInRoutineDeclaration *bod
 
     print_Body(
             NEW_PREFIX,
-            bodyinroutinedeclaration->body, 
+            bodyinroutinedeclaration->body,
             !bodyinroutinedeclaration->returnInRoutine);
-        print_ReturnInRoutine(
+    print_ReturnInRoutine(
             NEW_PREFIX,
             bodyinroutinedeclaration->returnInRoutine, 1);
 }
@@ -1296,7 +1296,7 @@ json to_json_Primary(Primary *primary) {
 
     std::vector<json> children;
     append_non_null(&children, to_json_ModifiablePrimary(primary->modifiablePrimary));
-    return json{{TYPE,     "Primary"},
+    return json{{TYPE,     primary->type},
                 {VALUE,    primary->value},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1324,7 +1324,7 @@ json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary) {
 
     std::vector<json> children;
     append_non_null(&children, to_json_Identifiers(modifiableprimary->identifiers));
-    return json{{TYPE,     "Primary"},
+    return json{{TYPE,     "ModifiablePrimary"},
                 {VALUE,    modifiableprimary->name},
                 {CHILDREN, json(children)}};
 //    return {
@@ -1339,7 +1339,7 @@ json to_json_Identifiers(Identifiers *identifiers) {
     std::vector<json> children;
     append_non_null(&children, to_json_Expression(identifiers->expression));
     append_non_null(&children, to_json_Identifiers(identifiers->identifiers));
-    return json{{TYPE,     "Primary"},
+    return json{{TYPE,     "Identifiers"},
                 {VALUE,    identifiers->name},
                 {CHILDREN, json(children)}};
 //    return {
