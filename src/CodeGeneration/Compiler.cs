@@ -111,14 +111,13 @@ namespace CodeGeneration
             }
             if (type == null)
             {
-                throw new Exception("Variable Decalrarion Error");
+                throw new Exception("Variable Declaration Error");
             }
-            Console.WriteLine(declaration.Value);
 
-            var fieldDefinition = new FieldDefinition(declaration.Value, FieldAttributes.Private, this.Types[type]);
-            this.Variables.Add(declaration.Value, fieldDefinition);
+            var fieldDefinition = new FieldDefinition(declaration.Name, FieldAttributes.Private, this.Types[type]);
+            this.Variables.Add(declaration.Name, fieldDefinition);
 
-            ivasiq = declaration.Children[0];
+            ivasiq = declaration.Children[1];
 
             switch (ivasiq.Type)
             {
@@ -143,7 +142,7 @@ namespace CodeGeneration
 
         private string GetType(JsonEntity declaration)
         {
-            return declaration.Value;
+            return declaration.Name;
         }
 
         private void EmitInitialValue(JsonEntity declaration)
