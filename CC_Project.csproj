@@ -1,0 +1,138 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{076E4E8A-29CD-4439-A371-D52D121226AF}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ConsoleApplication</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>CC_Project</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Mono.Cecil, Version=0.11.1.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>packages\Mono.Cecil.0.11.1\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.11.1.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>packages\Mono.Cecil.0.11.1\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.11.1.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>packages\Mono.Cecil.0.11.1\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.11.1.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <HintPath>packages\Mono.Cecil.0.11.1\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include=".git\config" />
+    <None Include=".git\description" />
+    <None Include=".git\HEAD" />
+    <None Include=".git\hooks\applypatch-msg.sample" />
+    <None Include=".git\hooks\commit-msg.sample" />
+    <None Include=".git\hooks\fsmonitor-watchman.sample" />
+    <None Include=".git\hooks\post-update.sample" />
+    <None Include=".git\hooks\pre-applypatch.sample" />
+    <None Include=".git\hooks\pre-commit.sample" />
+    <None Include=".git\hooks\pre-push.sample" />
+    <None Include=".git\hooks\pre-rebase.sample" />
+    <None Include=".git\hooks\pre-receive.sample" />
+    <None Include=".git\hooks\prepare-commit-msg.sample" />
+    <None Include=".git\hooks\update.sample" />
+    <None Include=".git\index" />
+    <None Include=".git\info\exclude" />
+    <None Include=".git\logs\HEAD" />
+    <None Include=".git\logs\refs\heads\master" />
+    <None Include=".git\logs\refs\remotes\origin\HEAD" />
+    <None Include=".git\objects\pack\pack-1a6bfe5f0c16e8c7d8c4a641ce5f180e81ea962f.idx" />
+    <None Include=".git\objects\pack\pack-1a6bfe5f0c16e8c7d8c4a641ce5f180e81ea962f.pack" />
+    <None Include=".git\packed-refs" />
+    <None Include=".git\refs\heads\master" />
+    <None Include=".git\refs\remotes\origin\HEAD" />
+    <None Include="docker-compose.yml" />
+    <None Include="packages.config" />
+    <None Include="README.md" />
+    <None Include="run.sh" />
+    <None Include="src\CodeGeneration.deps.json" />
+    <None Include="src\CodeGeneration\.gitignore" />
+    <None Include="src\CodeGeneration\bin\Debug\netcoreapp3.0\CodeGeneration.deps.json" />
+    <None Include="src\CodeGeneration\CodeGeneration.csproj" />
+    <None Include="src\CodeGeneration\CodeGeneration.runtimeconfig.json" />
+    <None Include="src\CodeGeneration\create_dll.sh" />
+    <None Include="src\CodeGeneration\create_exe.bat" />
+    <None Include="src\SyntaxAnalysis\yacc.y" />
+    <None Include="tree.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="input.txt" />
+    <Content Include="src\CodeGeneration\bin\Debug\netcoreapp3.0\CodeGeneration.pdb" />
+    <Content Include="src\LexicalAnalysis\lex.cpp" />
+    <Content Include="src\LexicalAnalysis\lexems.h" />
+    <Content Include="src\SemanticAnalysis\Semantic.cpp" />
+    <Content Include="src\SemanticAnalysis\SymbolTable.cpp" />
+    <Content Include="src\SemanticAnalysis\SymbolTable.h" />
+    <Content Include="src\SyntaxAnalysis\AST.cpp" />
+    <Content Include="src\SyntaxAnalysis\AST.h" />
+    <Content Include="src\ThirdParty\json.hpp" />
+    <Content Include="src\TraceLogger\TraceLogger.cpp" />
+    <Content Include="src\TraceLogger\TraceLogger.h" />
+    <Content Include="Tests\1.txt" />
+    <Content Include="Tests\2.txt" />
+    <Content Include="Tests\3.txt" />
+    <Content Include="Tests\4.txt" />
+    <Content Include="Tests\5.txt" />
+    <Content Include="Tests\6.txt" />
+    <Content Include="Tests\7.txt" />
+    <Content Include="Tests\8.txt" />
+    <Content Include="Tests\done.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\CodeGeneration\AstEntities\VariableDeclaration.cs" />
+    <Compile Include="src\CodeGeneration\Compiler.cs" />
+    <Compile Include="src\CodeGeneration\Context.cs" />
+    <Compile Include="src\CodeGeneration\Parser\JsonEntity.cs" />
+    <Compile Include="src\CodeGeneration\Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".git\objects\info\" />
+    <Folder Include=".git\refs\tags\" />
+    <Folder Include=".vs\CC_Project\v16\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>

@@ -22,10 +22,10 @@ namespace CodeGeneration
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
             this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
-//            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
-//            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
-            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
-            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
+            //            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
+            //            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
+            //this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
+            //this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
             Console.WriteLine(this.Types["Void"]);
 
@@ -36,16 +36,18 @@ namespace CodeGeneration
             {
                 this.EmitDeclaration(declaration);
             }
-            
             var ip = bootstrap.Body.GetILProcessor();
-            
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
+
             
+
             var type = new TypeDefinition("supergreeter", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
             type = this.ImportStuffIntoModule(type);
             asm.MainModule.Types.Add(type);
             type.Methods.Add(bootstrap);
+
+   
 
             asm.EntryPoint = bootstrap;
             asm.Write("./result.exe");
@@ -53,6 +55,7 @@ namespace CodeGeneration
 
         private TypeDefinition ImportStuffIntoModule(TypeDefinition type)
         {
+            Console.WriteLine("3");
             foreach (var variable in this.Variables)
             {
                 type.Fields.Add(variable.Value);

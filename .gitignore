@@ -35,6 +35,10 @@ tree.json
 
 *.idea
 .vscode
+.vs
+packages
+obj
+bin
 
 src/CodeGeneration/bin/
 src/CodeGeneration/obj/
@@ -46,3 +50,5 @@ yacc.cpp
 yacc.hpp
 /parser
 input.txt
+CC_Project.csproj.user
+tree.json
