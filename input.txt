@@ -1,5 +1,4 @@
-var c : Integer is 10
-routine main(a : Boolean, d : Real) : Integer is
-    var b : Real
-    return 8
+var b : Real
+routine main is
+b:=5.7
 end

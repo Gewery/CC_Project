@@ -28,7 +28,7 @@ namespace CodeGeneration
             
             var compiler = new Compiler();
             compiler.EmitRoot(ir);
-            
+//            Console.ReadLine();
         }
     }
 }
