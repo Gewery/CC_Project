@@ -1,67 +1,82 @@
 {
-  "type": "Program",
   "children": [
     {
-      "type": "Declaration",
       "children": [
         {
-          "type": "SimpleDeclaration",
           "children": [
             {
-              "type": "VariableDeclaration",
-              "name": "b",
               "children": [
                 {
-                  "type": "InitialValue",
-                  "value": null,
-                  "children": [
-                    {
-                      "type": "Expression",
-                      "value": null,
-                      "children": [
-                        {
-                          "type": "Relation",
-                          "value": null,
-                          "children": [
-                            {
-                              "type": "Simple",
-                              "value": null,
-                              "children": [
-                                {
-                                  "type": "Factor",
-                                  "value": null,
-                                  "children": [
-                                    {
-                                      "type": "Summand",
-                                      "value": null,
-                                      "children": [
-                                        {
-                                          "type": "Primary",
-                                          "value": 5.0,
-                                          "is_not": false,
-                                          "value_type": "integer"
-                                        }
-                                      ]
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ]
-                    }
-                  ]
+                  "children": [],
+                  "name": "Real",
+                  "type": "type",
+                  "value": null
                 },
                 {
-                  "type": "Type",
-                  "name": "Integer"
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "children": [],
+                                          "name": "integer",
+                                          "type": "Primary",
+                                          "value": 9.0
+                                        }
+                                      ],
+                                      "name": null,
+                                      "type": "Summand",
+                                      "value": null
+                                    }
+                                  ],
+                                  "name": null,
+                                  "type": "Factor",
+                                  "value": null
+                                }
+                              ],
+                              "name": null,
+                              "type": "Simple",
+                              "value": null
+                            }
+                          ],
+                          "name": null,
+                          "type": "Relation",
+                          "value": null
+                        }
+                      ],
+                      "name": null,
+                      "type": "Expression",
+                      "value": null
+                    }
+                  ],
+                  "name": null,
+                  "type": "InitialValue",
+                  "value": null
                 }
-              ]
+              ],
+              "name": "c",
+              "type": "VariableDeclaration",
+              "value": null
             }
-          ]
+          ],
+          "name": null,
+          "type": "SimpleDeclaration",
+          "value": null
         }
-      ]
+      ],
+      "name": null,
+      "type": "Declaration",
+      "value": null
     }
-  ]
+  ],
+  "name": null,
+  "type": "Program",
+  "value": null
 }
