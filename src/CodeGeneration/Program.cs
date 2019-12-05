@@ -16,7 +16,6 @@ namespace CodeGeneration
                         new FileStream("../../tree.json", FileMode.Open, FileAccess.Read, FileShare.Read)));
 
             JsonEntity ir;
-            Console.WriteLine("Im ok");
 
             using (inputStream)
             {
@@ -29,7 +28,7 @@ namespace CodeGeneration
             
             var compiler = new Compiler();
             compiler.EmitRoot(ir);
-            Console.ReadLine();
+//            Console.ReadLine();
         }
     }
 }

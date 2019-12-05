@@ -52,7 +52,6 @@ namespace CodeGeneration
 
         private TypeDefinition ImportStuffIntoModule(TypeDefinition type)
         {
-            Console.WriteLine("3");
             foreach (var variable in this.Variables)
             {
                 type.Fields.Add(variable.Value);
@@ -82,12 +81,66 @@ namespace CodeGeneration
         public void EmitRoutineDeclaration(JsonEntity declaration)
         {
             var ivasiq = declaration.Children[0];
-            String functionName = declaration.Value;
+            String functionName = declaration.Name;
             Console.WriteLine(functionName);
+            //if function is main - execute it
             if (functionName == "main")
             {
-                
+                if (ivasiq.Type == "BodyInRoutineDeclaration")
+                {
+                    this.EmitBodyInRoutineDeclaration(ivasiq);
+                }
             }
+        }
+
+        private void EmitBodyInRoutineDeclaration(JsonEntity declaration)
+        {
+            var ivasiq = declaration.Children[0];
+            switch (ivasiq.Type)
+            {
+                case "Body":
+                    this.EmitBody(ivasiq);
+                    break;
+                case "ReturnInRoutine":
+                    this.EmitReturnInRoutine(ivasiq);
+                    break;
+                default:
+                    throw new Exception("Body in Routine Declaration Error");
+            }
+        }
+
+        private void EmitReturnInRoutine(JsonEntity declaration)
+        {
+            var ivasiq = declaration.Children[0];
+            //TODO 
+        }
+
+        private void EmitBody(JsonEntity declaration)
+        {
+            Console.WriteLine("Ya zashel suda");
+
+            foreach (var ivasiq in declaration.Children)
+            {
+                if (ivasiq.Type == "SimpleDeclaration")
+                {
+                    this.EmitSimpleDeclaration(ivasiq);
+                }
+
+                if (ivasiq.Type == "Statement")
+                {
+                    this.EmitStatement(ivasiq);
+                }
+
+                if (ivasiq.Type == "Body")
+                {
+                    this.EmitBody(ivasiq);
+                }
+            }
+        }
+
+        private void EmitStatement(JsonEntity ivasiq)
+        {
+            throw new NotImplementedException();
         }
 
         public void EmitSimpleDeclaration(JsonEntity declaration)
@@ -139,20 +192,22 @@ namespace CodeGeneration
             var fieldDefinition = new FieldDefinition(declaration.Name, FieldAttributes.Public, this.Types[type]);
             this.Variables.Add(declaration.Name, fieldDefinition);
 
-            ivasiq = declaration.Children[1];
-
-            switch (ivasiq.Type)
+            if (declaration.Children.Count > 1)
             {
-                case "InitialValue":
-                    this.EmitInitialValue(ivasiq, type);
-                    break;
-                case "Expression":
-                    this.EmitExpression(ivasiq, type);
-                    break;
-                default:
-                    throw new Exception("Error");
-            }
+                ivasiq = declaration.Children[1];
 
+                switch (ivasiq.Type)
+                {
+                    case "InitialValue":
+                        this.EmitInitialValue(ivasiq, type);
+                        break;
+                    case "Expression":
+                        this.EmitExpression(ivasiq, type);
+                        break;
+                    default:
+                        throw new Exception("Error");
+                }
+            }
             var bootstrapIP = this.bootstrap.Body.GetILProcessor();
             Console.Write("Storing whatever is on the stack into a field named: ");
             Console.WriteLine(declaration.Name);

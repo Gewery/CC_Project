@@ -7,134 +7,6 @@
             {
               "children": [
                 {
-                  "children": [],
-                  "name": "Integer",
-                  "type": "type",
-                  "value": null
-                },
-                {
-                  "children": [
-                    {
-                      "children": [
-                        {
-                          "children": [
-                            {
-                              "children": [
-                                {
-                                  "children": [
-                                    {
-                                      "children": [
-                                        {
-                                          "children": [],
-                                          "name": "integer",
-                                          "type": "Primary",
-                                          "value": 5.0
-                                        }
-                                      ],
-                                      "name": null,
-                                      "type": "Summand",
-                                      "value": null
-                                    }
-                                  ],
-                                  "name": null,
-                                  "type": "Factor",
-                                  "value": null
-                                }
-                              ],
-                              "name": null,
-                              "type": "Simple",
-                              "value": null
-                            }
-                          ],
-                          "name": null,
-                          "type": "Relation",
-                          "value": null
-                        }
-                      ],
-                      "name": null,
-                      "type": "Expression",
-                      "value": null
-                    }
-                  ],
-                  "name": null,
-                  "type": "InitialValue",
-                  "value": null
-                }
-              ],
-              "name": "b",
-              "type": "VariableDeclaration",
-              "value": null
-            }
-          ],
-          "name": null,
-          "type": "SimpleDeclaration",
-          "value": null
-        }
-      ],
-      "name": null,
-      "type": "Declaration",
-      "value": null
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "children": [
-                {
-                  "children": [
-                    {
-                      "children": [],
-                      "name": "Integer",
-                      "type": "type",
-                      "value": null
-                    }
-                  ],
-                  "name": "a",
-                  "type": "ParameterDeclaration",
-                  "value": null
-                },
-                {
-                  "children": [
-                    {
-                      "children": [
-                        {
-                          "children": [],
-                          "name": "Boolean",
-                          "type": "type",
-                          "value": null
-                        }
-                      ],
-                      "name": "c",
-                      "type": "ParameterDeclaration",
-                      "value": null
-                    }
-                  ],
-                  "name": null,
-                  "type": "ParametersDeclaration",
-                  "value": null
-                }
-              ],
-              "name": null,
-              "type": "Parameters",
-              "value": null
-            },
-            {
-              "children": [
-                {
-                  "children": [],
-                  "name": "Boolean",
-                  "type": "type",
-                  "value": null
-                }
-              ],
-              "name": null,
-              "type": "TypeInRoutineDeclaration",
-              "value": null
-            },
-            {
-              "children": [
-                {
                   "children": [
                     {
                       "children": [
@@ -142,12 +14,60 @@
                           "children": [
                             {
                               "children": [],
-                              "name": "Boolean",
+                              "name": "Integer",
                               "type": "type",
+                              "value": null
+                            },
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "children": [
+                                            {
+                                              "children": [
+                                                {
+                                                  "children": [
+                                                    {
+                                                      "children": [],
+                                                      "name": "integer",
+                                                      "type": "Primary",
+                                                      "value": 5.0
+                                                    }
+                                                  ],
+                                                  "name": null,
+                                                  "type": "Summand",
+                                                  "value": null
+                                                }
+                                              ],
+                                              "name": null,
+                                              "type": "Factor",
+                                              "value": null
+                                            }
+                                          ],
+                                          "name": null,
+                                          "type": "Simple",
+                                          "value": null
+                                        }
+                                      ],
+                                      "name": null,
+                                      "type": "Relation",
+                                      "value": null
+                                    }
+                                  ],
+                                  "name": null,
+                                  "type": "Expression",
+                                  "value": null
+                                }
+                              ],
+                              "name": null,
+                              "type": "InitialValue",
                               "value": null
                             }
                           ],
-                          "name": "b",
+                          "name": "c",
                           "type": "VariableDeclaration",
                           "value": null
                         }
@@ -164,134 +84,18 @@
                               "children": [
                                 {
                                   "children": [],
-                                  "name": "Real",
+                                  "name": "Boolean",
                                   "type": "type",
-                                  "value": null
-                                },
-                                {
-                                  "children": [
-                                    {
-                                      "children": [
-                                        {
-                                          "children": [
-                                            {
-                                              "children": [
-                                                {
-                                                  "children": [
-                                                    {
-                                                      "children": [
-                                                        {
-                                                          "children": [],
-                                                          "name": "real",
-                                                          "type": "Primary",
-                                                          "value": 6.800000190734863
-                                                        }
-                                                      ],
-                                                      "name": null,
-                                                      "type": "Summand",
-                                                      "value": null
-                                                    }
-                                                  ],
-                                                  "name": null,
-                                                  "type": "Factor",
-                                                  "value": null
-                                                }
-                                              ],
-                                              "name": null,
-                                              "type": "Simple",
-                                              "value": null
-                                            }
-                                          ],
-                                          "name": null,
-                                          "type": "Relation",
-                                          "value": null
-                                        }
-                                      ],
-                                      "name": null,
-                                      "type": "Expression",
-                                      "value": null
-                                    }
-                                  ],
-                                  "name": null,
-                                  "type": "InitialValue",
                                   "value": null
                                 }
                               ],
-                              "name": "y",
+                              "name": "b",
                               "type": "VariableDeclaration",
                               "value": null
                             }
                           ],
                           "name": null,
                           "type": "SimpleDeclaration",
-                          "value": null
-                        },
-                        {
-                          "children": [
-                            {
-                              "children": [
-                                {
-                                  "children": [
-                                    {
-                                      "children": [],
-                                      "name": null,
-                                      "type": "ModifiablePrimary",
-                                      "value": "y"
-                                    },
-                                    {
-                                      "children": [
-                                        {
-                                          "children": [
-                                            {
-                                              "children": [
-                                                {
-                                                  "children": [
-                                                    {
-                                                      "children": [
-                                                        {
-                                                          "children": [],
-                                                          "name": "real",
-                                                          "type": "Primary",
-                                                          "value": 6.199999809265137
-                                                        }
-                                                      ],
-                                                      "name": null,
-                                                      "type": "Summand",
-                                                      "value": null
-                                                    }
-                                                  ],
-                                                  "name": null,
-                                                  "type": "Factor",
-                                                  "value": null
-                                                }
-                                              ],
-                                              "name": null,
-                                              "type": "Simple",
-                                              "value": null
-                                            }
-                                          ],
-                                          "name": null,
-                                          "type": "Relation",
-                                          "value": null
-                                        }
-                                      ],
-                                      "name": null,
-                                      "type": "Expression",
-                                      "value": null
-                                    }
-                                  ],
-                                  "name": null,
-                                  "type": "Assignment",
-                                  "value": null
-                                }
-                              ],
-                              "name": null,
-                              "type": "Statement",
-                              "value": null
-                            }
-                          ],
-                          "name": null,
-                          "type": "Body",
                           "value": null
                         }
                       ],
@@ -302,54 +106,6 @@
                   ],
                   "name": null,
                   "type": "Body",
-                  "value": null
-                },
-                {
-                  "children": [
-                    {
-                      "children": [
-                        {
-                          "children": [
-                            {
-                              "children": [
-                                {
-                                  "children": [
-                                    {
-                                      "children": [
-                                        {
-                                          "children": [],
-                                          "name": "boolean",
-                                          "type": "Primary",
-                                          "value": 1.0
-                                        }
-                                      ],
-                                      "name": null,
-                                      "type": "Summand",
-                                      "value": null
-                                    }
-                                  ],
-                                  "name": null,
-                                  "type": "Factor",
-                                  "value": null
-                                }
-                              ],
-                              "name": null,
-                              "type": "Simple",
-                              "value": null
-                            }
-                          ],
-                          "name": null,
-                          "type": "Relation",
-                          "value": null
-                        }
-                      ],
-                      "name": null,
-                      "type": "Expression",
-                      "value": null
-                    }
-                  ],
-                  "name": null,
-                  "type": "ReturnInRoutine",
                   "value": null
                 }
               ],
