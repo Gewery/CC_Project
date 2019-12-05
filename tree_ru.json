@@ -90,6 +90,26 @@
           "children": [
             {
               "name": null,
+              "type": "Parameters",
+              "value": null,
+              "children": [
+                {
+                  "name": "a",
+                  "type": "ParameterDeclaration",
+                  "value": null,
+                  "children": [
+                    {
+                      "name": "Integer",
+                      "type": "type",
+                      "value": null,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": null,
               "type": "BodyInRoutineDeclaration",
               "value": null,
               "children": [
