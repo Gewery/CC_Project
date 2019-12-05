@@ -119,7 +119,7 @@ namespace CodeGeneration
             {
                 if (ivasiq.Type == "SimpleDeclaration")
                 {
-                    this.EmitSimpleDeclaration(ivasiq);
+                    this.EmitSimpleDeclaration(ivasiq, true);
                 }
 
                 if (ivasiq.Type == "Statement")
@@ -165,7 +165,7 @@ namespace CodeGeneration
             {
                 if (ivasiq.Type == "Expression")
                 {
-                    this.EmitExpression(ivasiq, "");
+                    this.EmitExpression(ivasiq);
                 }
 
                 if (ivasiq.Type == "Body")
@@ -311,7 +311,7 @@ namespace CodeGeneration
             return type.Name;
         }
 
-        private void EmitInitialValue(JsonEntity initialValue, string type)
+        private void EmitInitialValue(JsonEntity initialValue)
         {
             var ivasiq = initialValue.Children[0];
             switch (ivasiq.Type)
@@ -333,6 +333,7 @@ namespace CodeGeneration
                 this.EmitMultipleRelationsInExpression(declaration.Children[1]);
                 var operation = declaration.Children[1].Children[0].Value; // operation = expression->multiplerelationsinexpression->logicaloperator
 
+                var ip = this.bootstrap.Body.GetILProcessor();
                 // lhs.value
                 ip.Emit(OpCodes.Ldarg_0);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
@@ -360,7 +361,7 @@ namespace CodeGeneration
             if (declaration.Children.Count > 1) {
                 this.EmitMultipleRelationsInExpression(declaration.Children[2]);
                 var operation = declaration.Children[2].Children[0].Value; // operation = multiplerelationsinexpression->multiplerelationsinexpression->logicaloperator
-
+                var ip = this.bootstrap.Body.GetILProcessor();
                 // lhs.value
                 ip.Emit(OpCodes.Ldarg_0);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
@@ -391,6 +392,7 @@ namespace CodeGeneration
                 var lhs = new ArgumentVariable(integer, 0);
                 var rhs = new ArgumentVariable(integer, 1);
 
+                var ip = this.bootstrap.Body.GetILProcessor();
                 // prepare lhs
                 lhs.Load(ip);
                 integer.Unboxed(ip);
@@ -404,16 +406,16 @@ namespace CodeGeneration
                 else if (operation == "<=") {
                     //TODO
                 }
-                else if (opearation == ">") {
+                else if (operation == ">") {
                     ip.Emit(OpCodes.Cgt);
                 }
-                else if (opearation == ">=") {
+                else if (operation == ">=") {
                     //TODO
                 }
-                else if (opearation == "=") {
+                else if (operation == "=") {
                     ip.Emit(OpCodes.Ceq);
                 }
-                else if (opearation == "/=") {
+                else if (operation == "/=") {
                     //TODO
                 }
 
@@ -435,20 +437,21 @@ namespace CodeGeneration
             if (declaration.Children.Count > 1) {
                 this.EmitFactors(declaration.Children[1]);
                 var operation = declaration.Children[1].Children[0].Value; // operation = declaration->factors->sign
-                
+
+                var ip = this.bootstrap.Body.GetILProcessor();
                 ip.Emit(OpCodes.Ldarg_0);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
                 ip.Emit(OpCodes.Ldarg_1);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
 
                 if (operation == "*") {
-                    ip.Emit(OpCodes.mul);
+                    ip.Emit(OpCodes.Mul);
                 }
                 else if (operation == "/") {
-                    ip.Emit(OpCodes.div);
+                    ip.Emit(OpCodes.Div);
                 }
                 else if (operation == "%") {
-                    ip.Emit(OpCodes.rem);
+                    ip.Emit(OpCodes.Rem);
                 }  
             }
         }
@@ -460,20 +463,21 @@ namespace CodeGeneration
             if (declaration.Children.Count > 1) {
                 this.EmitFactors(declaration.Children[1]);
                 var operation = declaration.Children[1].Children[0].Value; // operation = declaration->factors->sign
-                
+
+                var ip = this.bootstrap.Body.GetILProcessor();
                 ip.Emit(OpCodes.Ldarg_0);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
                 ip.Emit(OpCodes.Ldarg_1);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
 
                 if (operation == "*") {                        
-                    ip.Emit(OpCodes.mul);
+                    ip.Emit(OpCodes.Mul);
                 }
                 else if (operation == "/") {
-                    ip.Emit(OpCodes.div);
+                    ip.Emit(OpCodes.Div);
                 }
                 else if (operation == "%") {
-                    ip.Emit(OpCodes.rem);
+                    ip.Emit(OpCodes.Rem);
                 }   
             }
         }
@@ -485,6 +489,7 @@ namespace CodeGeneration
             if (declaration.Children.Count > 1) {
                 var sign = declaration.Children[1].Children[0].Value; // sign = summands->summands->sign
                 this.EmitSummands(declaration.Children[1]);
+                var ip = this.bootstrap.Body.GetILProcessor();
                 // lhs.value
                 ip.Emit(OpCodes.Ldarg_0);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
@@ -508,6 +513,7 @@ namespace CodeGeneration
             if (declaration.Children.Count > 2) {
                 var sign = declaration.Children[2].Children[0].Value; // sign = summands->summands->sign
                 this.EmitSummands(declaration.Children[2]);
+                var ip = this.bootstrap.Body.GetILProcessor();
                 // lhs.value
                 ip.Emit(OpCodes.Ldarg_0);
                 ip.Emit(OpCodes.Ldfld, integer.ValueField);
