@@ -13,7 +13,7 @@ namespace CodeGeneration
         {
             TextReader inputStream = new StreamReader(
                     new BufferedStream(
-                        new FileStream("../../tree.json", FileMode.Open, FileAccess.Read, FileShare.Read)));
+                        new FileStream("./tree.json", FileMode.Open, FileAccess.Read, FileShare.Read)));
 
             JsonEntity ir;
 
