@@ -1262,13 +1262,17 @@ json to_json_Simple(Simple *simple) {
 json to_json_Factors(Factors *factors) {
     if (!factors) return nullptr;
 
-    auto *cur = factors;
+//    auto *cur = factors;
+//    std::vector<json> children;
+//    while (cur) {
+//        append_non_null(&children, to_json_SimpleOperator(factors->simpleOperator));
+//        append_non_null(&children, to_json_Factor(factors->factor));
+//        cur = cur->factors;
+//    }
     std::vector<json> children;
-    while (cur) {
-        append_non_null(&children, to_json_SimpleOperator(factors->simpleOperator));
-        append_non_null(&children, to_json_Factor(factors->factor));
-        cur = cur->factors;
-    }
+    append_non_null(&children, to_json_SimpleOperator(factors->simpleOperator));
+    append_non_null(&children, to_json_Factor(factors->factor));
+    append_non_null(&children, to_json_Factors(factors->factors));
     return json{{TYPE,     "Factors"},
                 {NAME,     nullptr},
                 {VALUE,    nullptr},
@@ -1312,13 +1316,17 @@ json to_json_Factor(Factor *factor) {
 json to_json_Summands(Summands *summands) {
     if (!summands) return nullptr;
 
-    auto *cur = summands;
+//    auto *cur = summands;
+//    std::vector<json> children;
+//    while (cur) {
+//        append_non_null(&children, to_json_Sign(summands->sign));
+//        append_non_null(&children, to_json_Summand(summands->summand));
+//        cur = cur->summands;
+//    }
     std::vector<json> children;
-    while (cur) {
-        append_non_null(&children, to_json_Sign(summands->sign));
-        append_non_null(&children, to_json_Summand(summands->summand));
-        cur = cur->summands;
-    }
+    append_non_null(&children, to_json_Sign(summands->sign));
+    append_non_null(&children, to_json_Summand(summands->summand));
+    append_non_null(&children, to_json_Summands(summands->summands));
     return json{{TYPE,     "Summands"},
                 {NAME,     nullptr},
                 {VALUE,    nullptr},

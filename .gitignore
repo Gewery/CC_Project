@@ -1,4 +1,5 @@
 tree.json
+tree_ru.json
 
 .vs
 *.csproj
@@ -61,4 +62,3 @@ yacc.hpp
 /parser
 input.txt
 CC_Project.csproj.user
-tree.json
