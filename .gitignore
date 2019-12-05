@@ -1,5 +1,15 @@
 tree.json
 
+.vs
+*.csproj
+*.csproj.user
+bin
+packages
+obj
+packages.config
+*.sln
+
+
 # Prerequisites
 *.d
 

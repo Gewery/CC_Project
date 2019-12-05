@@ -45,9 +45,10 @@ namespace CodeGeneration
 //            type = this.ImportStuffIntoModule(type);
             asm.MainModule.Types.Add(type);
             type.Methods.Add(bootstrap);
+            Console.WriteLine("Compiler.cs: Im ok");
 
             asm.EntryPoint = bootstrap;
-            asm.Write("./result.dll");
+            asm.Write("./result.exe");
         }
 
         private TypeDefinition ImportStuffIntoModule(TypeDefinition type)
