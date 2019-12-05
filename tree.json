@@ -8,7 +8,7 @@
               "children": [
                 {
                   "children": [],
-                  "name": "Integer",
+                  "name": "Real",
                   "type": "type",
                   "value": null
                 },
@@ -28,7 +28,7 @@
                                           "children": [],
                                           "name": "integer",
                                           "type": "Primary",
-                                          "value": 10.0
+                                          "value": 9.0
                                         }
                                       ],
                                       "name": null,
@@ -68,155 +68,6 @@
           ],
           "name": null,
           "type": "SimpleDeclaration",
-          "value": null
-        }
-      ],
-      "name": null,
-      "type": "Declaration",
-      "value": null
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "children": [
-                {
-                  "children": [
-                    {
-                      "children": [],
-                      "name": "Boolean",
-                      "type": "type",
-                      "value": null
-                    }
-                  ],
-                  "name": "a",
-                  "type": "ParameterDeclaration",
-                  "value": null
-                },
-                {
-                  "children": [
-                    {
-                      "children": [
-                        {
-                          "children": [],
-                          "name": "Real",
-                          "type": "type",
-                          "value": null
-                        }
-                      ],
-                      "name": "d",
-                      "type": "ParameterDeclaration",
-                      "value": null
-                    }
-                  ],
-                  "name": null,
-                  "type": "ParametersDeclaration",
-                  "value": null
-                }
-              ],
-              "name": null,
-              "type": "Parameters",
-              "value": null
-            },
-            {
-              "children": [
-                {
-                  "children": [],
-                  "name": "Integer",
-                  "type": "type",
-                  "value": null
-                }
-              ],
-              "name": null,
-              "type": "TypeInRoutineDeclaration",
-              "value": null
-            },
-            {
-              "children": [
-                {
-                  "children": [
-                    {
-                      "children": [
-                        {
-                          "children": [
-                            {
-                              "children": [],
-                              "name": "Real",
-                              "type": "type",
-                              "value": null
-                            }
-                          ],
-                          "name": "b",
-                          "type": "VariableDeclaration",
-                          "value": null
-                        }
-                      ],
-                      "name": null,
-                      "type": "SimpleDeclaration",
-                      "value": null
-                    }
-                  ],
-                  "name": null,
-                  "type": "Body",
-                  "value": null
-                },
-                {
-                  "children": [
-                    {
-                      "children": [
-                        {
-                          "children": [
-                            {
-                              "children": [
-                                {
-                                  "children": [
-                                    {
-                                      "children": [
-                                        {
-                                          "children": [],
-                                          "name": "integer",
-                                          "type": "Primary",
-                                          "value": 8.0
-                                        }
-                                      ],
-                                      "name": null,
-                                      "type": "Summand",
-                                      "value": null
-                                    }
-                                  ],
-                                  "name": null,
-                                  "type": "Factor",
-                                  "value": null
-                                }
-                              ],
-                              "name": null,
-                              "type": "Simple",
-                              "value": null
-                            }
-                          ],
-                          "name": null,
-                          "type": "Relation",
-                          "value": null
-                        }
-                      ],
-                      "name": null,
-                      "type": "Expression",
-                      "value": null
-                    }
-                  ],
-                  "name": null,
-                  "type": "ReturnInRoutine",
-                  "value": null
-                }
-              ],
-              "name": null,
-              "type": "BodyInRoutineDeclaration",
-              "value": null
-            }
-          ],
-          "name": "main",
-          "type": "RoutineDeclaration",
           "value": null
         }
       ],
