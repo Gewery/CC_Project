@@ -578,8 +578,8 @@ void print_Summand(string prefix, Summand *summand, bool is_last) {
 
 void print_Primary(string prefix, Primary *primary, bool is_last) {
     if (!primary) return;
-    PRINT_INFO(format("Primary (%s, %f, %s)",
-                      primary->type.c_str(), primary->value, primary->isNot ? "is_not" : "not_is_not").c_str());
+    PRINT_INFO(format("Primary (%s, %s, %s)",
+                      primary->type.c_str(), (primary->value).c_str(), primary->isNot ? "is_not" : "not_is_not").c_str());
 
     print_ModifiablePrimary(
             NEW_PREFIX,
