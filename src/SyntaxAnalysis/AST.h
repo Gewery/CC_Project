@@ -374,14 +374,16 @@ struct Sign {
 
 struct Primary {
     string type;
-    float value;
+    string value;
     bool isNot;
     struct ModifiablePrimary* modifiablePrimary;
     Primary(string type, float value,  bool isNot, struct Sign* sign, struct ModifiablePrimary* modifiablePrimary):
             type(type),
-            value(value),
             isNot(isNot),
-            modifiablePrimary(modifiablePrimary) { if (sign) this->value *= sign->op == "-" ? -1 : 1; };
+            modifiablePrimary(modifiablePrimary) {
+        if (sign) value *= sign->op == "-" ? -1 : 1;
+        this->value = std::to_string(value);
+    };
 };
 
 struct ModifiablePrimary {
