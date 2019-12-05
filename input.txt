@@ -1,5 +1,2 @@
-var c : Integer is 10
-routine main(a : Boolean, d : Real) : Integer is
-    var b : Real
-    return 8
-end
+type irek is Integer
+type cat is irek

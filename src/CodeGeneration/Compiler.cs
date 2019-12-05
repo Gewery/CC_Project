@@ -18,7 +18,7 @@ namespace CodeGeneration
 
         public void EmitRoot(JsonEntity el)
         {
-            var nameDef = new AssemblyNameDefinition("SuperGreeterBinary", new Version(1, 0, 0, 0));
+            var nameDef = new AssemblyNameDefinition("CodeGeneration", new Version(1, 0, 0, 0));
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
             this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
@@ -27,7 +27,6 @@ namespace CodeGeneration
             this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
             this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
-            Console.WriteLine(this.Types["Void"]);
 
             bootstrap = new MethodDefinition("Main",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
@@ -42,7 +41,7 @@ namespace CodeGeneration
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
             
-            var type = new TypeDefinition("supergreeter", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
+            var type = new TypeDefinition("CodeGenerationResult", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
             type = this.ImportStuffIntoModule(type);
             asm.MainModule.Types.Add(type);
             type.Methods.Add(bootstrap);
@@ -94,10 +93,28 @@ namespace CodeGeneration
                 case "VariableDeclaration":
                     this.EmitVariableDeclaration(ivasiq);
                     break;
-
+                case "TypeDeclaration":
+                    this.EmitTypeDeclarationn(ivasiq);
+                    break;
                 default:
                     throw new Exception("Simple Declaration Error");
             }
+        }
+
+        //TODO 
+        public void EmitTypeDeclarationn(JsonEntity declaration)
+        {
+            var ivasiq = declaration.Children[0];
+            String type = null;
+            String nameOfType = declaration.Name;
+            if (ivasiq.Type == "type")
+            {
+                type = this.GetType(ivasiq);
+            }
+            Console.Write("Name of type: ");
+            Console.WriteLine(nameOfType);
+            Console.Write("Type of type: ");
+            Console.WriteLine(type);
         }
 
         private void EmitVariableDeclaration(JsonEntity declaration)
@@ -114,7 +131,7 @@ namespace CodeGeneration
                 throw new Exception("Variable Declaration Error");
             }
 
-            var fieldDefinition = new FieldDefinition(declaration.Name, FieldAttributes.Private, this.Types[type]);
+            var fieldDefinition = new FieldDefinition(declaration.Name, FieldAttributes.Public, this.Types[type]);
             this.Variables.Add(declaration.Name, fieldDefinition);
 
             ivasiq = declaration.Children[1];
