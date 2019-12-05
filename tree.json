@@ -8,7 +8,7 @@
               "children": [
                 {
                   "children": [],
-                  "name": "Real",
+                  "name": "Integer",
                   "type": "type",
                   "value": null
                 },
@@ -28,7 +28,7 @@
                                           "children": [],
                                           "name": "integer",
                                           "type": "Primary",
-                                          "value": 9.0
+                                          "value": 5.0
                                         }
                                       ],
                                       "name": null,

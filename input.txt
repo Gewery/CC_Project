@@ -1,1 +1,1 @@
-var c : Real is 9
+var c : Integer is 5
