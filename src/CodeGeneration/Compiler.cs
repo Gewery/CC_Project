@@ -22,15 +22,13 @@ namespace CodeGeneration
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
             this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
-            //            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
-            //            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
-            //this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
+            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
             this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
 
             bootstrap = new MethodDefinition("Main",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
-
+            
             foreach (JsonEntity declaration in el.Children)
             {
                 this.EmitDeclaration(declaration);
@@ -50,23 +48,24 @@ namespace CodeGeneration
             asm.Write("./result.exe");
         }
 
-        private TypeDefinition ImportStuffIntoModule(TypeDefinition type)
+        private TypeDefinition ImportStuffIntoModule(TypeDefinition typeDefinition)
         {
             foreach (var variable in this.Variables)
             {
-                type.Fields.Add(variable.Value);
+                typeDefinition.Fields.Add(variable.Value);
             }
 
-            return type;
+            return typeDefinition;
         }
 
         public void EmitDeclaration(JsonEntity declaration)
         {
             var ivasiq = declaration.Children[0];
+            var scope = false; //0 - global, 1 - local
             switch (ivasiq.Type)
             {
                 case "SimpleDeclaration":
-                    this.EmitSimpleDeclaration(ivasiq);
+                    this.EmitSimpleDeclaration(ivasiq, scope);
                     break;
                 
                 case "RoutineDeclaration":
@@ -78,12 +77,11 @@ namespace CodeGeneration
             }
         }
 
-        public void EmitRoutineDeclaration(JsonEntity declaration)
+        public void EmitRoutineDeclaration(JsonEntity routineDeclaration)
         {
-            var ivasiq = declaration.Children[0];
-            String functionName = declaration.Name;
+            var ivasiq = routineDeclaration.Children[0];
+            String functionName = routineDeclaration.Name;
             Console.WriteLine(functionName);
-            //if function is main - execute it
             if (functionName == "main")
             {
                 if (ivasiq.Type == "BodyInRoutineDeclaration")
@@ -93,9 +91,9 @@ namespace CodeGeneration
             }
         }
 
-        private void EmitBodyInRoutineDeclaration(JsonEntity declaration)
+        private void EmitBodyInRoutineDeclaration(JsonEntity bobyInRoutineDeclararion)
         {
-            var ivasiq = declaration.Children[0];
+            var ivasiq = bobyInRoutineDeclararion.Children[0];
             switch (ivasiq.Type)
             {
                 case "Body":
@@ -109,17 +107,15 @@ namespace CodeGeneration
             }
         }
 
-        private void EmitReturnInRoutine(JsonEntity declaration)
+        private void EmitReturnInRoutine(JsonEntity returnInRoutine)
         {
-            var ivasiq = declaration.Children[0];
+            var ivasiq = returnInRoutine.Children[0];
             //TODO 
         }
 
-        private void EmitBody(JsonEntity declaration)
+        private void EmitBody(JsonEntity body)
         {
-            Console.WriteLine("Ya zashel suda");
-
-            foreach (var ivasiq in declaration.Children)
+            foreach (var ivasiq in body.Children)
             {
                 if (ivasiq.Type == "SimpleDeclaration")
                 {
@@ -138,21 +134,112 @@ namespace CodeGeneration
             }
         }
 
-        private void EmitStatement(JsonEntity ivasiq)
+        private void EmitStatement(JsonEntity statement)
+        {
+            var ivasiq = statement.Children[0];
+            switch (ivasiq.Type)
+            {
+                case "Assignment":
+                    this.EmitAssignment(ivasiq);
+                    break;
+                case "RoutineCall":
+                    this.EmitRoutineCall(ivasiq);
+                    break;
+                case "WhileLoop":
+                    this.EmitWhileLoop(ivasiq);
+                    break;
+                case "ForLoop":
+                    this.EmitForLoop(ivasiq);
+                    break;
+                case "IfStatement":
+                    this.EmitIfStatement(ivasiq);
+                    break;
+                default:
+                    throw new Exception("Statement Error");
+            }
+        }
+
+        private void EmitIfStatement(JsonEntity ifStatement)
+        {
+            foreach (var ivasiq in ifStatement.Children)
+            {
+                if (ivasiq.Type == "Expression")
+                {
+                    this.EmitExpression(ivasiq, "");
+                }
+
+                if (ivasiq.Type == "Body")
+                {
+                    this.EmitBody(ivasiq);
+                }
+
+                if (ivasiq.Type == "ElseInIfStatement")
+                {
+                    this.EmitElseInIfStatement(ivasiq);
+                }
+            }
+        }
+
+        private void EmitElseInIfStatement(JsonEntity elseInIfStatement)
+        {
+            var ivasiq = elseInIfStatement.Children[0];
+            switch (ivasiq.Type)
+            {
+                case "Body":
+                    this.EmitBody(ivasiq);
+                    break;
+                default:
+                    throw new Exception("Body Error");
+            }
+        }
+
+        private void EmitForLoop(JsonEntity forLoop)
+        {
+            foreach (var ivasiq in forLoop.Children)
+            {
+                if (ivasiq.Type == "Reverse")
+                {
+//                    this.EmitReverse(ivasiq, "");
+                }
+
+                if (ivasiq.Type == "Range")
+                {
+//                    this.EmitRange(ivasiq);
+                }
+
+                if (ivasiq.Type == "Body")
+                {
+                    this.EmitBody(ivasiq);
+                }
+            }
+            
+        }
+
+        private void EmitWhileLoop(JsonEntity whileLoop)
         {
             throw new NotImplementedException();
         }
 
-        public void EmitSimpleDeclaration(JsonEntity declaration)
+        private void EmitRoutineCall(JsonEntity routineCall)
         {
-            var ivasiq = declaration.Children[0];
+            throw new NotImplementedException();
+        }
+
+        private void EmitAssignment(JsonEntity assigment)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EmitSimpleDeclaration(JsonEntity simpleDeclaration, bool scope)
+        {
+            var ivasiq = simpleDeclaration.Children[0];
             switch (ivasiq.Type)
             {
                 case "VariableDeclaration":
-                    this.EmitVariableDeclaration(ivasiq);
+                    this.EmitVariableDeclaration(ivasiq, scope);
                     break;
                 case "TypeDeclaration":
-                    this.EmitTypeDeclarationn(ivasiq);
+                    this.EmitTypeDeclaration(ivasiq);
                     break;
                 default:
                     throw new Exception("Simple Declaration Error");
@@ -160,11 +247,11 @@ namespace CodeGeneration
         }
 
         //TODO 
-        public void EmitTypeDeclarationn(JsonEntity declaration)
+        public void EmitTypeDeclaration(JsonEntity typeDeclaration)
         {
-            var ivasiq = declaration.Children[0];
+            var ivasiq = typeDeclaration.Children[0];
             String type = null;
-            String nameOfType = declaration.Name;
+            String nameOfType = typeDeclaration.Name;
             if (ivasiq.Type == "type")
             {
                 type = this.GetType(ivasiq);
@@ -175,9 +262,9 @@ namespace CodeGeneration
             Console.WriteLine(type);
         }
 
-        private void EmitVariableDeclaration(JsonEntity declaration)
+        private void EmitVariableDeclaration(JsonEntity variableDeclaration, bool scope)
         {
-            var ivasiq = declaration.Children[0];
+            var ivasiq = variableDeclaration.Children[0];
             string type = null;
             
             if (ivasiq.Type == "type")
@@ -189,12 +276,17 @@ namespace CodeGeneration
                 throw new Exception("Variable Declaration Error");
             }
 
-            var fieldDefinition = new FieldDefinition(declaration.Name, FieldAttributes.Public, this.Types[type]);
-            this.Variables.Add(declaration.Name, fieldDefinition);
-
-            if (declaration.Children.Count > 1)
+            if (scope)
             {
-                ivasiq = declaration.Children[1];
+//                var typeDefinition = new TypeDefinition();
+//                var variabelDefinition = new VariableDefinition(typeDefinition);
+            }
+            var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Static | FieldAttributes.Public, this.Types[type]);
+            this.Variables.Add(variableDeclaration.Name, fieldDefinition);
+
+            if (variableDeclaration.Children.Count > 1)
+            {
+                ivasiq = variableDeclaration.Children[1];
 
                 switch (ivasiq.Type)
                 {
@@ -210,19 +302,18 @@ namespace CodeGeneration
             }
             var bootstrapIP = this.bootstrap.Body.GetILProcessor();
             Console.Write("Storing whatever is on the stack into a field named: ");
-            Console.WriteLine(declaration.Name);
+            Console.WriteLine(variableDeclaration.Name);
             bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
         }
 
-        private string GetType(JsonEntity declaration)
+        private string GetType(JsonEntity type)
         {
-            return declaration.Name;
+            return type.Name;
         }
 
-
-        private void EmitInitialValue(JsonEntity declaration)
+        private void EmitInitialValue(JsonEntity initialValue, string type)
         {
-            var ivasiq = declaration.Children[0];
+            var ivasiq = initialValue.Children[0];
             switch (ivasiq.Type)
             {
                 case "Expression":

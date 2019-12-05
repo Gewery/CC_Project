@@ -1,4 +1,4 @@
+var b : Real is 7.0
 routine main is
-    var c : Integer is 5
-    var b : Boolean
+var c : Integer is 9
 end

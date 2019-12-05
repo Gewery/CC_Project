@@ -578,8 +578,8 @@ void print_Summand(string prefix, Summand *summand, bool is_last) {
 
 void print_Primary(string prefix, Primary *primary, bool is_last) {
     if (!primary) return;
-    PRINT_INFO(format("Primary (%s, %f, %s)",
-                      primary->type.c_str(), primary->value, primary->isNot ? "is_not" : "not_is_not").c_str());
+    PRINT_INFO(format("Primary (%s, %s, %s)",
+                      primary->type.c_str(), (primary->value).c_str(), primary->isNot ? "is_not" : "not_is_not").c_str());
 
     print_ModifiablePrimary(
             NEW_PREFIX,
@@ -622,15 +622,27 @@ void print_Identifiers(string prefix, Identifiers *identifiers, bool is_last) {
 
 const string TYPE = "type";
 const string VALUE = "value";
-const string CHILDREN = "children";
+const string CHILDREN = "zzz_children";
 const string NAME = "name";
+
+void findAndReplaceAll(std::string & data, std::string toSearch, std::string replaceStr)
+{
+    size_t pos = data.find(toSearch);
+    while( pos != std::string::npos)
+    {
+        data.replace(pos, toSearch.size(), replaceStr);
+        pos =data.find(toSearch, pos + replaceStr.size());
+    }
+}
 
 void append_non_null(std::vector<json> *v, json j) {
     if (j != nullptr) v->push_back(j);
 }
 
 string serialize_Tree(Program *program) {
-    return to_json_Program(program).dump(2);
+    string res = to_json_Program(program).dump(2);
+    findAndReplaceAll(res, "\"zzz_children\"", "\"children\"");
+    return res;
 }
 
 json to_json_Program(Program *program) {
