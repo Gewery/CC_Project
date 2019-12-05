@@ -222,6 +222,7 @@ RoutineDeclaration
 
 ReturnInRoutine
     : RETURN Expression                                                          { $$ = new ReturnInRoutine($2); }
+    |                                                                            { $$ = NULL; }
     ;
 
 Parameters
@@ -244,7 +245,7 @@ TypeInRoutineDeclaration
 
 BodyInRoutineDeclaration
     : IS Body ReturnInRoutine END                                   { $$ = new BodyInRoutineDeclaration($2, $3); }
-    |                                               { $$ = NULL; }
+    |                                                               { $$ = NULL; }
     ;
 
 Body

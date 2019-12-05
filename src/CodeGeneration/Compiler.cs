@@ -36,6 +36,8 @@ namespace CodeGeneration
                 this.EmitDeclaration(declaration);
             }
             var ip = bootstrap.Body.GetILProcessor();
+//            ip.Emit(OpCodes.Pop, a);
+//            Console.WriteLine(a);
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
             
@@ -44,8 +46,6 @@ namespace CodeGeneration
             asm.MainModule.Types.Add(type);
             type.Methods.Add(bootstrap);
             Console.WriteLine("Compiler.cs: Im ok");
-            
-
             asm.EntryPoint = bootstrap;
             asm.Write("./result.exe");
         }
@@ -84,6 +84,10 @@ namespace CodeGeneration
             var ivasiq = declaration.Children[0];
             String functionName = declaration.Value;
             Console.WriteLine(functionName);
+            if (functionName == "main")
+            {
+                
+            }
         }
 
         public void EmitSimpleDeclaration(JsonEntity declaration)

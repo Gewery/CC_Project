@@ -13,8 +13,6 @@
 
 using namespace std;
 
-#define DANYA
-
 #ifdef DANYA
 #define NEW_PREFIX (prefix + (is_last ? "   " : "|  "))
 #define PRINT_INFO(INFO) printf("%s%s%s\n", prefix.c_str(), (is_last ? "\\--" : "|--"), INFO)

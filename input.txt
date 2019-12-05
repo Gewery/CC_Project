@@ -1,1 +1,6 @@
-var c : Integer is 6+8
+var b : Integer is 5
+routine main (a : Integer, c : Boolean) : Boolean is
+var b : Boolean
+var y : Real is 6.8
+y := 6.2
+end
