@@ -22,9 +22,6 @@ namespace CodeGeneration
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
             this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
-            //            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
-            //            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
-            //this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
             this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
 
@@ -36,6 +33,8 @@ namespace CodeGeneration
                 this.EmitDeclaration(declaration);
             }
             var ip = bootstrap.Body.GetILProcessor();
+            ip.Emit(OpCodes.Ldstr, "Hello, ");
+            ip.Emit(OpCodes.Call, asm.MainModule.Import(typeof(Console).GetMethod("WriteLine", new Type[] { typeof(string) })));
 //            ip.Emit(OpCodes.Pop, a);
 //            Console.WriteLine(a);
             ip.Emit(OpCodes.Pop);
@@ -83,7 +82,6 @@ namespace CodeGeneration
             var ivasiq = routineDeclaration.Children[0];
             String functionName = routineDeclaration.Name;
             Console.WriteLine(functionName);
-            //if function is main - execute it
             if (functionName == "main")
             {
                 if (ivasiq.Type == "BodyInRoutineDeclaration")
@@ -157,20 +155,64 @@ namespace CodeGeneration
                     this.EmitIfStatement(ivasiq);
                     break;
                 default:
-                    throw new Exception("Body in Routine Declaration Error");
+                    throw new Exception("Statement Error");
             }
-            
-            throw new NotImplementedException();
         }
 
         private void EmitIfStatement(JsonEntity ifStatement)
         {
-            throw new NotImplementedException();
+            foreach (var ivasiq in ifStatement.Children)
+            {
+                if (ivasiq.Type == "Expression")
+                {
+                    this.EmitExpression(ivasiq, "");
+                }
+
+                if (ivasiq.Type == "Body")
+                {
+                    this.EmitBody(ivasiq);
+                }
+
+                if (ivasiq.Type == "ElseInIfStatement")
+                {
+                    this.EmitElseInIfStatement(ivasiq);
+                }
+            }
+        }
+
+        private void EmitElseInIfStatement(JsonEntity elseInIfStatement)
+        {
+            var ivasiq = elseInIfStatement.Children[0];
+            switch (ivasiq.Type)
+            {
+                case "Body":
+                    this.EmitBody(ivasiq);
+                    break;
+                default:
+                    throw new Exception("Body Error");
+            }
         }
 
         private void EmitForLoop(JsonEntity forLoop)
         {
-            throw new NotImplementedException();
+            foreach (var ivasiq in forLoop.Children)
+            {
+                if (ivasiq.Type == "Reverse")
+                {
+//                    this.EmitReverse(ivasiq, "");
+                }
+
+                if (ivasiq.Type == "Range")
+                {
+//                    this.EmitRange(ivasiq);
+                }
+
+                if (ivasiq.Type == "Body")
+                {
+                    this.EmitBody(ivasiq);
+                }
+            }
+            
         }
 
         private void EmitWhileLoop(JsonEntity whileLoop)
@@ -234,7 +276,7 @@ namespace CodeGeneration
                 throw new Exception("Variable Declaration Error");
             }
 
-            var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Public, this.Types[type]);
+            var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Static | FieldAttributes.Public, this.Types[type]);
             this.Variables.Add(variableDeclaration.Name, fieldDefinition);
 
             if (variableDeclaration.Children.Count > 1)
@@ -256,7 +298,7 @@ namespace CodeGeneration
             var bootstrapIP = this.bootstrap.Body.GetILProcessor();
             Console.Write("Storing whatever is on the stack into a field named: ");
             Console.WriteLine(variableDeclaration.Name);
-            bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
+            bootstrapIP.Emit(OpCodes.Stsfld, fieldDefinition);
         }
 
         private string GetType(JsonEntity type)
