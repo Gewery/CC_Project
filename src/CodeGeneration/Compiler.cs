@@ -351,7 +351,7 @@ namespace CodeGeneration
             {
                 case "Integer":
                     this.bootstrap.Body.GetILProcessor().Emit(
-                        OpCodes.Ldc_I4, int.Parse(declaration.Value)); //Store value of type int32 into memory at address
+                        OpCodes.Ldc_I4, (int)Math.Floor(float.Parse(declaration.Value))); //Store value of type int32 into memory at address
                     break;
                 case "Real":
                     this.bootstrap.Body.GetILProcessor().Emit(
@@ -359,7 +359,7 @@ namespace CodeGeneration
                     break;
                 case "Boolean":
                     this.bootstrap.Body.GetILProcessor().Emit(
-                        OpCodes.Ldc_I4, int.Parse(declaration.Value)); //Store value of type int32 into memory at address
+                        OpCodes.Ldc_I4, (int)Math.Floor(float.Parse(declaration.Value))); //Store value of type int32 into memory at address
                     break;
             }
         }
