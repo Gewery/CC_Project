@@ -398,7 +398,9 @@ Identifiers
 
 int main(int argc, char **argv){
     cout << "\nLexical Analyzer\n======###========\n\n";
-    yyparse();
+    if (yyparse())
+        exit(EXIT_FAILURE);
+
     cout << "\n\nAST\n======###========\n\n";
     print_Tree(root);
 
