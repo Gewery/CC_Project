@@ -61,10 +61,11 @@ namespace CodeGeneration
         public void EmitDeclaration(JsonEntity declaration)
         {
             var ivasiq = declaration.Children[0];
+            var scope = false; //0 - global, 1 - local
             switch (ivasiq.Type)
             {
                 case "SimpleDeclaration":
-                    this.EmitSimpleDeclaration(ivasiq);
+                    this.EmitSimpleDeclaration(ivasiq, scope);
                     break;
                 
                 case "RoutineDeclaration":
@@ -229,13 +230,13 @@ namespace CodeGeneration
             throw new NotImplementedException();
         }
 
-        public void EmitSimpleDeclaration(JsonEntity simpleDeclaration)
+        public void EmitSimpleDeclaration(JsonEntity simpleDeclaration, bool scope)
         {
             var ivasiq = simpleDeclaration.Children[0];
             switch (ivasiq.Type)
             {
                 case "VariableDeclaration":
-                    this.EmitVariableDeclaration(ivasiq);
+                    this.EmitVariableDeclaration(ivasiq, scope);
                     break;
                 case "TypeDeclaration":
                     this.EmitTypeDeclaration(ivasiq);
@@ -261,7 +262,7 @@ namespace CodeGeneration
             Console.WriteLine(type);
         }
 
-        private void EmitVariableDeclaration(JsonEntity variableDeclaration)
+        private void EmitVariableDeclaration(JsonEntity variableDeclaration, bool scope)
         {
             var ivasiq = variableDeclaration.Children[0];
             string type = null;
@@ -275,6 +276,11 @@ namespace CodeGeneration
                 throw new Exception("Variable Declaration Error");
             }
 
+            if (scope)
+            {
+//                var typeDefinition = new TypeDefinition();
+//                var variabelDefinition = new VariableDefinition(typeDefinition);
+            }
             var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Static | FieldAttributes.Public, this.Types[type]);
             this.Variables.Add(variableDeclaration.Name, fieldDefinition);
 
