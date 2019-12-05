@@ -12,7 +12,6 @@ namespace CodeGeneration
     {
         public Dictionary<string, MethodDefinition> Methods = new Dictionary<string, MethodDefinition>();
         public Dictionary<string, FieldDefinition> Variables = new Dictionary<string, FieldDefinition>();
-
         public Dictionary<string, TypeReference> Types = new Dictionary<string, TypeReference>();
 
         private MethodDefinition bootstrap = null;
@@ -499,6 +498,7 @@ namespace CodeGeneration
                 var sign = declaration.Children[1].Children[0].Value; // sign = summands->summands->sign
                 this.EmitSummands(declaration.Children[1]);
                 var ip = this.bootstrap.Body.GetILProcessor();
+
                 // lhs.value
                 ip.Emit(OpCodes.Ldarg_0);
                 ip.Emit(OpCodes.Ldfld, declaration.Value);
