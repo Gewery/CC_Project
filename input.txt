@@ -1,4 +1,4 @@
-var b : Real
+var b : Real is 7.0
 routine main is
-b:=5.7
+var c : Integer is 9
 end

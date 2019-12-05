@@ -22,12 +22,13 @@ namespace CodeGeneration
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
             this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
+            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
             this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
 
             bootstrap = new MethodDefinition("Main",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
-
+            
             foreach (JsonEntity declaration in el.Children)
             {
                 this.EmitDeclaration(declaration);

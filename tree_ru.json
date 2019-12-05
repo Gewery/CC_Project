@@ -57,7 +57,7 @@
                                         {
                                           "name": "real",
                                           "type": "Primary",
-                                          "value": "7.000000",
+                                          "value": "7,000000",
                                           "children": []
                                         }
                                       ]
@@ -147,7 +147,7 @@
                                                     {
                                                       "name": "integer",
                                                       "type": "Primary",
-                                                      "value": "9.000000",
+                                                      "value": "9,000000",
                                                       "children": []
                                                     }
                                                   ]
