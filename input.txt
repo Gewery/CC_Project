@@ -1,1 +1,1 @@
-var c : Integer is 5
+var c : Integer is 6+8

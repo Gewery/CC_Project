@@ -28,11 +28,37 @@
                                           "children": [],
                                           "name": "integer",
                                           "type": "Primary",
-                                          "value": 5.0
+                                          "value": 6.0
                                         }
                                       ],
                                       "name": null,
                                       "type": "Summand",
+                                      "value": null
+                                    },
+                                    {
+                                      "children": [
+                                        {
+                                          "children": [],
+                                          "name": null,
+                                          "type": "Sign",
+                                          "value": "+"
+                                        },
+                                        {
+                                          "children": [
+                                            {
+                                              "children": [],
+                                              "name": "integer",
+                                              "type": "Primary",
+                                              "value": 8.0
+                                            }
+                                          ],
+                                          "name": null,
+                                          "type": "Summand",
+                                          "value": null
+                                        }
+                                      ],
+                                      "name": null,
+                                      "type": "Summands",
                                       "value": null
                                     }
                                   ],
