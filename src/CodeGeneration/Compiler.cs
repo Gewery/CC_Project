@@ -33,8 +33,6 @@ namespace CodeGeneration
                 this.EmitDeclaration(declaration);
             }
             var ip = bootstrap.Body.GetILProcessor();
-            ip.Emit(OpCodes.Ldstr, "Hello, ");
-            ip.Emit(OpCodes.Call, asm.MainModule.Import(typeof(Console).GetMethod("WriteLine", new Type[] { typeof(string) })));
 //            ip.Emit(OpCodes.Pop, a);
 //            Console.WriteLine(a);
             ip.Emit(OpCodes.Pop);
@@ -298,7 +296,7 @@ namespace CodeGeneration
             var bootstrapIP = this.bootstrap.Body.GetILProcessor();
             Console.Write("Storing whatever is on the stack into a field named: ");
             Console.WriteLine(variableDeclaration.Name);
-            bootstrapIP.Emit(OpCodes.Stsfld, fieldDefinition);
+            bootstrapIP.Emit(OpCodes.Stfld, fieldDefinition);
         }
 
         private string GetType(JsonEntity type)
