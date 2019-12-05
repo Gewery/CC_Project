@@ -8,7 +8,7 @@
               "children": [
                 {
                   "children": [],
-                  "name": "Real",
+                  "name": "Integer",
                   "type": "type",
                   "value": null
                 },
@@ -28,37 +28,11 @@
                                           "children": [],
                                           "name": "integer",
                                           "type": "Primary",
-                                          "value": 8.0
+                                          "value": 5.0
                                         }
                                       ],
                                       "name": null,
                                       "type": "Summand",
-                                      "value": null
-                                    },
-                                    {
-                                      "children": [
-                                        {
-                                          "children": [],
-                                          "name": null,
-                                          "type": "Sign",
-                                          "value": "+"
-                                        },
-                                        {
-                                          "children": [
-                                            {
-                                              "children": [],
-                                              "name": "integer",
-                                              "type": "Primary",
-                                              "value": 6.0
-                                            }
-                                          ],
-                                          "name": null,
-                                          "type": "Summand",
-                                          "value": null
-                                        }
-                                      ],
-                                      "name": null,
-                                      "type": "Summands",
                                       "value": null
                                     }
                                   ],

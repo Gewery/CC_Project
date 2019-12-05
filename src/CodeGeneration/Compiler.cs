@@ -25,7 +25,7 @@ namespace CodeGeneration
             //            this.Types.Add("Integer", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Int32));
             //            this.Types.Add("Void", asm.MainModule.ImportReference(asm.MainModule.TypeSystem.Void));
             //this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
-            //this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
+            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
 
             bootstrap = new MethodDefinition("Main",
@@ -38,7 +38,6 @@ namespace CodeGeneration
             var ip = bootstrap.Body.GetILProcessor();
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
-
             
             var type = new TypeDefinition("CodeGenerationResult", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
             type = this.ImportStuffIntoModule(type);
@@ -46,6 +45,7 @@ namespace CodeGeneration
             type.Methods.Add(bootstrap);
             Console.WriteLine("Compiler.cs: Im ok");
             
+
             asm.EntryPoint = bootstrap;
             asm.Write("./result.exe");
         }

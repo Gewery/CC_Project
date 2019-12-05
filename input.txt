@@ -1,1 +1,1 @@
-var c : Real is 8+6
+var c : Integer is 5
