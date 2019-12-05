@@ -199,10 +199,10 @@ namespace CodeGeneration
                 switch (ivasiq.Type)
                 {
                     case "InitialValue":
-                        this.EmitInitialValue(ivasiq, type);
+                        this.EmitInitialValue(ivasiq);
                         break;
                     case "Expression":
-                        this.EmitExpression(ivasiq, type);
+                        this.EmitExpression(ivasiq);
                         break;
                     default:
                         throw new Exception("Error");
@@ -219,13 +219,14 @@ namespace CodeGeneration
             return declaration.Name;
         }
 
-        private void EmitInitialValue(JsonEntity declaration, string type)
+
+        private void EmitInitialValue(JsonEntity declaration)
         {
             var ivasiq = declaration.Children[0];
             switch (ivasiq.Type)
             {
                 case "Expression":
-                    this.EmitExpression(ivasiq, type);
+                    this.EmitExpression(ivasiq);
                     break;
 
                 default:
@@ -233,192 +234,221 @@ namespace CodeGeneration
             }
         }
 
-        //TODO Danya
-        private void EmitExpression(JsonEntity declaration, string type)
+        // DanyaDone
+        private void EmitExpression(JsonEntity declaration)
         {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "Relation":
-                    this.EmitRelation(ivasiq, type);
-                    break;
-                case "MultipleRelationsInExpression":
-                    this.EmitMultipleRelationsInExpression(ivasiq, type);
-                    break;
+            this.EmitRelation(declaration.Children[0]);
+            if (declaration.Children.Count > 1) {
+                this.EmitMultipleRelationsInExpression(declaration.Children[1]);
+                var operation = declaration.Children[1].Children[0].Value; // operation = expression->multiplerelationsinexpression->logicaloperator
 
-                default:
-                    throw new Exception("Expression Error");
+                // lhs.value
+                ip.Emit(OpCodes.Ldarg_0);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+                // rhs.value
+                ip.Emit(OpCodes.Ldarg_1);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+
+                if (operation == "and") {
+                    ip.Emit(OpCodes.And);
+                }
+                else if (operation == "or") {
+                    ip.Emit(OpCodes.Or);
+                }
+                else if (operation == "xor") {
+                    ip.Emit(OpCodes.Xor);
+                }
             }
         }
 
-        //TODO Danya
-        private void EmitMultipleRelationsInExpression(JsonEntity declaration, string type)
+        // DanyaDone
+        private void EmitMultipleRelationsInExpression(JsonEntity declaration)
         {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "LogicalOperator":
-                    this.EmitLogicalOperator(ivasiq, type);
-                    break;
-                case "Relation":
-                    this.EmitRelation(ivasiq, type);
-                    break;
-                case "MultipleRelationsInExpression":
-                    this.EmitMultipleRelationsInExpression(ivasiq, type);
-                    break;
+            this.EmitRelation(declaration.Children[1])
 
-                default:
-                    throw new Exception("Expression Error");
+            if (declaration.Children.Count > 1) {
+                this.EmitMultipleRelationsInExpression(declaration.Children[2]);
+                var operation = declaration.Children[2].Children[0].Value; // operation = multiplerelationsinexpression->multiplerelationsinexpression->logicaloperator
+
+                // lhs.value
+                ip.Emit(OpCodes.Ldarg_0);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+                // rhs.value
+                ip.Emit(OpCodes.Ldarg_1);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+
+                if (operation == "and") {
+                    ip.Emit(OpCodes.And);
+                }
+                else if (operation == "or") {
+                    ip.Emit(OpCodes.Or);
+                }
+                else if (operation == "xor") {
+                    ip.Emit(OpCodes.Xor);
+                }
             }
         }
 
-        //TODO Danya
-        private void EmitLogicalOperator(JsonEntity ivasiq, string type)
+        // Danya[Kind A]Done
+        private void EmitRelation(JsonEntity declaration)
         {
-            throw new NotImplementedException();
-        }
+            this.EmitSimple(declaration.Children[0]);
+            if (declaration.Children.Count > 1) {
+                this.EmitComparisonInRelation(declaration.Children[1]);
+                var operation = declaration.Children[1].Children[0].Value; // opearation = relation->comparisoninrelation->comparisonoperator
 
-        //TODO Danya
-        private void EmitRelation(JsonEntity declaration, String type)
-        {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "Simple":
-                    this.EmitSimple(ivasiq, type);
-                    break;
+                var lhs = new ArgumentVariable(integer, 0);
+                var rhs = new ArgumentVariable(integer, 1);
 
-                default:
-                    throw new Exception("Relation Error");
+                // prepare lhs
+                lhs.Load(ip);
+                integer.Unboxed(ip);
+                // prepare rhs
+                rhs.Load(ip);
+                integer.Unboxed(ip);
+
+                if (operation == "<") {
+                    ip.Emit(OpCodes.Clt);
+                }
+                else if (operation == "<=") {
+                    //TODO
+                }
+                else if (opearation == ">") {
+                    ip.Emit(OpCodes.Cgt);
+                }
+                else if (opearation == ">=") {
+                    //TODO
+                }
+                else if (opearation == "=") {
+                    ip.Emit(OpCodes.Ceq);
+                }
+                else if (opearation == "/=") {
+                    //TODO
+                }
+
+                var result = integer.Boxed(ip);
+                // return result;
+                result.Load(ip);
             }
         }
 
-        //TODO Danya
-        private void EmitSimple(JsonEntity declaration, string type)
-        {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "Factor":
-                    this.EmitFactor(ivasiq, type);
-                    break;
-                case "Factors":
-                    this.EmitFactors(ivasiq, type);
-                    break;
+        // DanyaDone
+        private void EmitComparisonInRelation(JsonEntity declaration) {
+            this.EmitSimple(declaration.Children[1]);
+        }
 
-                default:
-                    throw new Exception("Simple error");
+        // DanyaDone
+        private void EmitSimple(JsonEntity declaration)
+        {
+            this.EmitFactor(declaration.Children[0]);
+            if (declaration.Children.Count > 1) {
+                this.EmitFactors(declaration.Children[1]);
+                var operation = declaration.Children[1].Children[0].Value; // operation = declaration->factors->sign
+                
+                ip.Emit(OpCodes.Ldarg_0);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+                ip.Emit(OpCodes.Ldarg_1);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+
+                if (operation == "*") {
+                    ip.Emit(OpCodes.mul);
+                }
+                else if (operation == "/") {
+                    ip.Emit(OpCodes.div);
+                }
+                else if (operation == "%") {
+                    ip.Emit(OpCodes.rem);
+                }  
             }
         }
 
-        //TODO Danya
-        private void EmitFactors(JsonEntity declaration, string type)
+        // DanyaDone
+        private void EmitFactors(JsonEntity declaration)
         {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "SimpleOperator":
-                    this.EmitSimpleOperator(ivasiq, type);
-                    break;
-                case "Factor":
-                    this.EmitFactor(ivasiq, type);
-                    break;
-                case "Factors":
-                    this.EmitFactors(ivasiq, type);
-                    break;
+            this.EmitFactor(declaration.Children[0]);
+            if (declaration.Children.Count > 1) {
+                this.EmitFactors(declaration.Children[1]);
+                var operation = declaration.Children[1].Children[0].Value; // operation = declaration->factors->sign
+                
+                ip.Emit(OpCodes.Ldarg_0);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+                ip.Emit(OpCodes.Ldarg_1);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
 
-                default:
-                    throw new Exception("Simple error");
+                if (operation == "*") {                        
+                    ip.Emit(OpCodes.mul);
+                }
+                else if (operation == "/") {
+                    ip.Emit(OpCodes.div);
+                }
+                else if (operation == "%") {
+                    ip.Emit(OpCodes.rem);
+                }   
             }
         }
 
-        //TODO DANYA
-        private void EmitSimpleOperator(JsonEntity ivasiq, string type)
+        // DanyaDone
+        private void EmitFactor(JsonEntity declaration)
         {
-            throw new NotImplementedException();
-        }
+            this.EmitSummand(declaration.Children[0]);
+            if (declaration.Children.Count > 1) {
+                var sign = declaration.Children[1].Children[0].Value; // sign = summands->summands->sign
+                this.EmitSummands(declaration.Children[1]);
+                // lhs.value
+                ip.Emit(OpCodes.Ldarg_0);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+                // rhs.value
+                ip.Emit(OpCodes.Ldarg_1);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
 
-        //TODO DANYA
-        private void EmitFactor(JsonEntity declaration,  string type)
-        {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "Summand":
-                    this.EmitSummand(ivasiq, type);
-                    break;
-                case "Summands":
-                    this.EmitSummands(ivasiq, type);
-                    break;
-
-                default:
-                    throw new Exception("Factor error");
+                if (sign == "+") {
+                    ip.Emit(OpCodes.Add);
+                }
+                else if (sign == "-") {
+                    ip.Emit(OpCodes.Sub);
+                }
             }
         }
-        //TODO DANYA
-        private void EmitSummands(JsonEntity declaration, string type)
+        
+        // DanyaDone
+        private void EmitSummands(JsonEntity declaration)
         {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "Sign":
-                    this.EmitSign(ivasiq, type);
-                    break;
-                case "Summand":
-                    this.EmitSummand(ivasiq, type);
-                    break;
-                case "Summands":
-                    this.EmitSummands(ivasiq, type);
-                    break;
+            this.EmitSummand(declaration.Children[1]);
+            if (declaration.Children.Count > 2) {
+                var sign = declaration.Children[2].Children[0].Value; // sign = summands->summands->sign
+                this.EmitSummands(declaration.Children[2]);
+                // lhs.value
+                ip.Emit(OpCodes.Ldarg_0);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
+                // rhs.value
+                ip.Emit(OpCodes.Ldarg_1);
+                ip.Emit(OpCodes.Ldfld, integer.ValueField);
 
-                default:
-                    throw new Exception("Factor error");
-            }
-        }
-
-        //TODO DANYA
-        private void EmitSign(JsonEntity ivasiq, string type)
-        {
-            throw new NotImplementedException();
-        }
-
-        // TODO Danya
-        private void EmitSummand(JsonEntity declaration, string type)
-        {
-            var ivasiq = declaration.Children[0];
-            switch (ivasiq.Type)
-            {
-                case "Primary":
-                    this.EmitPrimary(ivasiq, type);
-                    break;
-                case "Expression":
-                    this.EmitExpression(ivasiq, type);
-                    break;
-                default:
-                    throw new Exception("Summand Error");
+                if (sign == "+") {
+                    ip.Emit(OpCodes.Add);
+                }
+                else if (sign == "-") {
+                    ip.Emit(OpCodes.Sub);
+                }
             }
         }
 
-        // TODO Danya
-        private void EmitPrimary(JsonEntity declaration, string type)
+        // DanyaDone
+        private void EmitSummand(JsonEntity declaration)
+        {
+            if (declaration.Children[0].Type == "Primary")
+                this.EmitPrimary(declaration.Children[0]);
+            else if (declaration.Children[0].Type == "Expression")
+                this.EmitExpression(declaration.Children[1]);
+        }
+
+        // DanyaDone
+        private void EmitPrimary(JsonEntity declaration)
         {
             Console.Write("Storing this onto the stack: ");
             Console.WriteLine(declaration.Value);
-            switch (type)
-            {
-                case "Integer":
-                    this.bootstrap.Body.GetILProcessor().Emit(
-                        OpCodes.Ldc_I4, (int)Math.Floor(float.Parse(declaration.Value))); //Store value of type int32 into memory at address
-                    break;
-                case "Real":
-                    this.bootstrap.Body.GetILProcessor().Emit(
+            this.bootstrap.Body.GetILProcessor().Emit(
                         OpCodes.Ldc_R4, float.Parse(declaration.Value)); //Store value of type float32 into memory at address
-                    break;
-                case "Boolean":
-                    this.bootstrap.Body.GetILProcessor().Emit(
-                        OpCodes.Ldc_I4, (int)Math.Floor(float.Parse(declaration.Value))); //Store value of type int32 into memory at address
-                    break;
-            }
         }
     }
 }
