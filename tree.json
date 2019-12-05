@@ -8,40 +8,61 @@
               "children": [
                 {
                   "children": [],
-                  "name": "Integer",
+                  "name": "Real",
                   "type": "type",
                   "value": null
-                }
-              ],
-              "name": "irek",
-              "type": "TypeDeclaration",
-              "value": null
-            }
-          ],
-          "name": null,
-          "type": "SimpleDeclaration",
-          "value": null
-        }
-      ],
-      "name": null,
-      "type": "Declaration",
-      "value": null
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "children": [
+                },
                 {
-                  "children": [],
-                  "name": "irek",
-                  "type": "type",
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "children": [
+                                    {
+                                      "children": [
+                                        {
+                                          "children": [],
+                                          "name": "integer",
+                                          "type": "Primary",
+                                          "value": 9.0
+                                        }
+                                      ],
+                                      "name": null,
+                                      "type": "Summand",
+                                      "value": null
+                                    }
+                                  ],
+                                  "name": null,
+                                  "type": "Factor",
+                                  "value": null
+                                }
+                              ],
+                              "name": null,
+                              "type": "Simple",
+                              "value": null
+                            }
+                          ],
+                          "name": null,
+                          "type": "Relation",
+                          "value": null
+                        }
+                      ],
+                      "name": null,
+                      "type": "Expression",
+                      "value": null
+                    }
+                  ],
+                  "name": null,
+                  "type": "InitialValue",
                   "value": null
                 }
               ],
-              "name": "cat",
-              "type": "TypeDeclaration",
+              "name": "c",
+              "type": "VariableDeclaration",
               "value": null
             }
           ],

@@ -1,2 +1,1 @@
-type irek is Integer
-type cat is irek
+var c : Real is 9
