@@ -15,6 +15,7 @@ namespace CodeGeneration
         public Dictionary<string, TypeReference> Types = new Dictionary<string, TypeReference>();
 
         private MethodDefinition bootstrap = null;
+        private MethodDefinition CurrentMethod = null;
 
         public void EmitRoot(JsonEntity el)
         {
@@ -28,20 +29,19 @@ namespace CodeGeneration
 
             bootstrap = new MethodDefinition("Main",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
-            
+
             foreach (JsonEntity declaration in el.Children)
             {
                 this.EmitDeclaration(declaration);
             }
             var ip = bootstrap.Body.GetILProcessor();
-//            ip.Emit(OpCodes.Pop, a);
-//            Console.WriteLine(a);
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
             
             var type = new TypeDefinition("CodeGenerationResult", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
             type = this.ImportStuffIntoModule(type);
             asm.MainModule.Types.Add(type);
+            
             type.Methods.Add(bootstrap);
             Console.WriteLine("Compiler.cs: Im ok");
             asm.EntryPoint = bootstrap;
@@ -84,6 +84,8 @@ namespace CodeGeneration
             Console.WriteLine(functionName);
             if (functionName == "main")
             {
+                CurrentMethod = new MethodDefinition(routineDeclaration.Name,
+                    MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
                 if (ivasiq.Type == "BodyInRoutineDeclaration")
                 {
                     this.EmitBodyInRoutineDeclaration(ivasiq);
@@ -277,24 +279,6 @@ namespace CodeGeneration
             }
             
             var cil = this.bootstrap.Body.GetILProcessor();
-            if (scope)
-            {
-                var local = new VariableDefinition(this.Types[type]);
-                this.bootstrap.Body.Variables.Add(local);
-
-                cil.Emit(OpCodes.Ldloca, local);
-                cil.Emit(OpCodes.Initobj, this.Types[type]);
-                cil.Emit(OpCodes.Ldloc, local);
-                cil.Emit(OpCodes.Ret);
-            }
-            else
-            {
-                var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Static | FieldAttributes.Public, this.Types[type]);
-                this.Variables.Add(variableDeclaration.Name, fieldDefinition);
-                Console.Write("Storing whatever is on the stack into a field named: ");
-                Console.WriteLine(variableDeclaration.Name);
-                cil.Emit(OpCodes.Stfld, fieldDefinition);
-            }
 
             if (variableDeclaration.Children.Count > 1)
             {
@@ -311,6 +295,27 @@ namespace CodeGeneration
                     default:
                         throw new Exception("Error");
                 }
+            }
+            if (scope)
+            {
+                var local = new VariableDefinition(this.Types[type]);
+                this.CurrentMethod.Body.Variables.Add(local);
+                
+                Console.Write("Storing whatever is on the stack into a field named: ");
+                Console.WriteLine(variableDeclaration.Name);
+                
+                cil.Emit(OpCodes.Stloc, local);
+//                cil.Emit(OpCodes.Initobj, this.Types[type]);
+//                cil.Emit(OpCodes.Ldloc, local);
+//                cil.Emit(OpCodes.Ret);
+            }
+            else
+            {
+                var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Static | FieldAttributes.Public, this.Types[type]);
+                this.Variables.Add(variableDeclaration.Name, fieldDefinition);
+                Console.Write("Storing whatever is on the stack into a field named: ");
+                Console.WriteLine(variableDeclaration.Name);
+                cil.Emit(OpCodes.Stfld, fieldDefinition);
             }
         }
 
@@ -553,8 +558,17 @@ namespace CodeGeneration
         {
             Console.Write("Storing this onto the stack: ");
             Console.WriteLine(declaration.Value);
-            this.bootstrap.Body.GetILProcessor().Emit(
-                        OpCodes.Ldc_R4, float.Parse(declaration.Value)); //Store value of type float32 into memory at address
+            if (CurrentMethod != null)
+            {
+                this.CurrentMethod.Body.GetILProcessor().Emit(
+                    OpCodes.Ldc_R4, float.Parse(declaration.Value)); //Store value of type float32 into memory at address
+            }
+            else
+            {
+                this.bootstrap.Body.GetILProcessor().Emit(
+                    OpCodes.Ldc_R4, float.Parse(declaration.Value)); //Store value of type float32 into memory at address
+            }
+           
         }
     }
 }
