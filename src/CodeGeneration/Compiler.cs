@@ -18,33 +18,50 @@ namespace CodeGeneration
 
         public void EmitRoot(JsonEntity el)
         {
+            // создаем библиотеку и задаем ее название, версию и тип: консольное приложение
             var nameDef = new AssemblyNameDefinition("CodeGeneration", new Version(1, 0, 0, 0));
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
+            // импортируем в библиотеку нужные типы
             this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
             this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
             this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
             this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
 
+            // создаем метод Main, статический, приватный, возвращающий void
             bootstrap = new MethodDefinition("Main",
                 MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
             
+            // проходимся по JSON'у, попутно вычисляя и закидывая значения в стэк
             foreach (JsonEntity declaration in el.Children)
             {
-                this.EmitDeclaration(declaration);
+                // this.EmitDeclaration(declaration);
             }
-            var ip = bootstrap.Body.GetILProcessor();
-//            ip.Emit(OpCodes.Pop, a);
-//            Console.WriteLine(a);
+
+            // сохраняем короткую ссылку на генератор кода
+            var ip = this.bootstrap.Body.GetILProcessor();
+
+            // TODO: действия для выводы итогового значения
+            ip.Emit(OpCodes.Ldc_I4, 6);
+            ip.Emit(OpCodes.Call, asm.MainModule.ImportReference(typeof(Console).GetMethod("WriteLine", new Type[] { typeof(Int32) })));
+            ip.Emit(OpCodes.Call, asm.MainModule.ImportReference(typeof(Console).GetMethod("ReadLine", new Type[] { })));
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
-            
+
+            // регистрируем тип, к которому будет привязан данный метод
             var type = new TypeDefinition("CodeGenerationResult", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
             type = this.ImportStuffIntoModule(type);
+
+            // добавляем тип в сборку
             asm.MainModule.Types.Add(type);
+
+            // привязываем метод к типу
             type.Methods.Add(bootstrap);
-            Console.WriteLine("Compiler.cs: Im ok");
+
+            // указываем точку входа для исполняемого файла
             asm.EntryPoint = bootstrap;
+
+            // сохраняем сборку на диск
             asm.Write("./result.exe");
         }
 
