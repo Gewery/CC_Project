@@ -11,65 +11,71 @@ namespace CodeGeneration
     public class Compiler
     {
         public Dictionary<string, MethodDefinition> Methods = new Dictionary<string, MethodDefinition>();
-        public Dictionary<string, FieldDefinition> Variables = new Dictionary<string, FieldDefinition>();
-        public Dictionary<string, TypeReference> Types = new Dictionary<string, TypeReference>();
+        public Dictionary<string, Type> Variables = new Dictionary<string, Type>();
+        public Dictionary<string, Type> Types = new Dictionary<string, Type>();
 
         private MethodDefinition bootstrap = null;
         private MethodDefinition CurrentMethod = null;
 
         public void EmitRoot(JsonEntity el)
         {
+            // create library and specify its name, version and type - console app
             var nameDef = new AssemblyNameDefinition("CodeGeneration", new Version(1, 0, 0, 0));
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
-            this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
-            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
-            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
-            this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
+            // import necessary types to the library
+            this.Types.Add("integer", typeof(Int32));
+            this.Types.Add("real", typeof(Double));
+            this.Types.Add("boolean", typeof(Boolean));
+            this.Types.Add("void", typeof(void));
 
+            // void create static private void Main method
             bootstrap = new MethodDefinition("Main",
-                MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
-
+                MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, asm.MainModule.ImportReference(typeof(void)));
+            
+            // go through the JSON calculating values and putting the results onto the stack
             foreach (JsonEntity declaration in el.Children)
             {
                 this.EmitDeclaration(declaration);
             }
-            var ip = bootstrap.Body.GetILProcessor();
+
+            // create variable for the code generator
+            var ip = this.bootstrap.Body.GetILProcessor();
+
+            // write final result to program output, wait until any input is received
+            ip.Emit(OpCodes.Call, asm.MainModule.ImportReference(typeof(Console).GetMethod("WriteLine", new Type[] { this.Variables["b"] })));
+            ip.Emit(OpCodes.Call, asm.MainModule.ImportReference(typeof(Console).GetMethod("ReadLine", new Type[] { })));
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
-            
+
+            // register a type which method will be connected to
             var type = new TypeDefinition("CodeGenerationResult", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
-            type = this.ImportStuffIntoModule(type);
+
+            // add type to build
             asm.MainModule.Types.Add(type);
-            
+
+            // connect method with type
             type.Methods.Add(bootstrap);
-            Console.WriteLine("Compiler.cs: Im ok");
+
+            // specify entry point for a program
             asm.EntryPoint = bootstrap;
+
+            // save the build 
             asm.Write("./result.exe");
-        }
-
-        private TypeDefinition ImportStuffIntoModule(TypeDefinition typeDefinition)
-        {
-            foreach (var variable in this.Variables)
-            {
-                typeDefinition.Fields.Add(variable.Value);
-            }
-
-            return typeDefinition;
         }
 
         public void EmitDeclaration(JsonEntity declaration)
         {
-            var ivasiq = declaration.Children[0];
+            var subDeclaration = declaration.Children[0];
             var scope = false; //0 - global, 1 - local
-            switch (ivasiq.Type)
+            switch (subDeclaration.Type)
             {
                 case "SimpleDeclaration":
-                    this.EmitSimpleDeclaration(ivasiq, scope);
+                    this.EmitSimpleDeclaration(subDeclaration, scope);
                     break;
                 
                 case "RoutineDeclaration":
-                    this.EmitRoutineDeclaration(ivasiq);
+                    // this.EmitRoutineDeclaration(ivasiq);
                     break;
                 
                 default:
@@ -234,14 +240,14 @@ namespace CodeGeneration
 
         public void EmitSimpleDeclaration(JsonEntity simpleDeclaration, bool scope)
         {
-            var ivasiq = simpleDeclaration.Children[0];
-            switch (ivasiq.Type)
+            var subSimpleDeclaration = simpleDeclaration.Children[0];
+            switch (subSimpleDeclaration.Type)
             {
                 case "VariableDeclaration":
-                    this.EmitVariableDeclaration(ivasiq, scope);
+                    this.EmitVariableDeclaration(subSimpleDeclaration, scope);
                     break;
                 case "TypeDeclaration":
-                    this.EmitTypeDeclaration(ivasiq);
+                    // this.EmitTypeDeclaration(ivasiq);
                     break;
                 default:
                     throw new Exception("Simple Declaration Error");
@@ -266,57 +272,54 @@ namespace CodeGeneration
 
         private void EmitVariableDeclaration(JsonEntity variableDeclaration, bool scope)
         {
-            var ivasiq = variableDeclaration.Children[0];
-            string type = null;
-            
-            if (ivasiq.Type == "type")
-            {
-                type = this.GetType(ivasiq);
-            }
-            if (type == null)
-            {
-                throw new Exception("Variable Declaration Error");
-            }
-            
-            var cil = this.bootstrap.Body.GetILProcessor();
+            //var ivasiq = variableDeclaration.Children[0];
+            //string type = null;
 
-            if (variableDeclaration.Children.Count > 1)
-            {
-                ivasiq = variableDeclaration.Children[1];
+            //if (ivasiq.Type == "type")
+            //{
+            //    type = this.GetType(ivasiq);
+            //}
+            //if (type == null)
+            //{
+            //    throw new Exception("Variable Declaration Error");
+            //}
 
-                switch (ivasiq.Type)
-                {
-                    case "InitialValue":
-                        this.EmitInitialValue(ivasiq);
-                        break;
-                    case "Expression":
-                        this.EmitExpression(ivasiq);
-                        break;
-                    default:
-                        throw new Exception("Error");
-                }
-            }
-            if (scope)
+            //var cil = this.bootstrap.Body.GetILProcessor();
+            //if (scope)
+            //{
+            //    var local = new VariableDefinition(this.Types[type]);
+            //    this.bootstrap.Body.Variables.Add(local);
+
+            //    cil.Emit(OpCodes.Ldloca, local);
+            //    cil.Emit(OpCodes.Initobj, this.Types[type]);
+            //    cil.Emit(OpCodes.Ldloc, local);
+            //    cil.Emit(OpCodes.Ret);
+            //}
+            //else
+            //{
+            //    var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Static | FieldAttributes.Public, this.Types[type]);
+            //    this.Variables.Add(variableDeclaration.Name, fieldDefinition);
+            //    Console.Write("Storing whatever is on the stack into a field named: ");
+            //    Console.WriteLine(variableDeclaration.Name);
+            //    cil.Emit(OpCodes.Stfld, fieldDefinition);
+            //}
+
+            //if (variableDeclaration.Children.Count > 1)
+            //{
+            var subVariableDeclaration = variableDeclaration.Children[1];
+            switch (subVariableDeclaration.Type)
             {
-                var local = new VariableDefinition(this.Types[type]);
-                this.CurrentMethod.Body.Variables.Add(local);
-                
-                Console.Write("Storing whatever is on the stack into a field named: ");
-                Console.WriteLine(variableDeclaration.Name);
-                
-                cil.Emit(OpCodes.Stloc, local);
-//                cil.Emit(OpCodes.Initobj, this.Types[type]);
-//                cil.Emit(OpCodes.Ldloc, local);
-//                cil.Emit(OpCodes.Ret);
+                case "InitialValue":
+                    this.EmitInitialValue(subVariableDeclaration);
+                    this.Variables.Add(variableDeclaration.Name, this.Types[variableDeclaration.Children[0].Children[0].Name]);
+                    break;
+                case "Expression":      // if type is not specified
+                    // this.EmitExpression(ivasiq);
+                    break;
+                default:
+                    throw new Exception("Error");
             }
-            else
-            {
-                var fieldDefinition = new FieldDefinition(variableDeclaration.Name, FieldAttributes.Static | FieldAttributes.Public, this.Types[type]);
-                this.Variables.Add(variableDeclaration.Name, fieldDefinition);
-                Console.Write("Storing whatever is on the stack into a field named: ");
-                Console.WriteLine(variableDeclaration.Name);
-                cil.Emit(OpCodes.Stfld, fieldDefinition);
-            }
+            //}
         }
 
         private string GetType(JsonEntity type)
@@ -326,44 +329,42 @@ namespace CodeGeneration
 
         private void EmitInitialValue(JsonEntity initialValue)
         {
-            var ivasiq = initialValue.Children[0];
-            switch (ivasiq.Type)
+            var expression = initialValue.Children[0];
+            if (expression.Type == "Expression")
             {
-                case "Expression":
-                    this.EmitExpression(ivasiq);
-                    break;
-
-                default:
-                    throw new Exception("Initial Value Error");
+                this.EmitExpression(expression);
+            }
+            else
+            {
+                throw new Exception("Initial Value Error");
             }
         }
 
-        // DanyaDone
-        private void EmitExpression(JsonEntity declaration)
+        private void EmitExpression(JsonEntity expression)
         {
-            this.EmitRelation(declaration.Children[0]);
-            if (declaration.Children.Count > 1) {
-                this.EmitMultipleRelationsInExpression(declaration.Children[1]);
-                var operation = declaration.Children[1].Children[0].Value; // operation = expression->multiplerelationsinexpression->logicaloperator
+            this.EmitRelation(expression.Children[0]);
+            //if (expression.Children.Count > 1) {
+            //    this.EmitMultipleRelationsInExpression(expression.Children[1]);
+            //    var operation = expression.Children[1].Children[0].Value; // operation = expression->multiplerelationsinexpression->logicaloperator
 
-                var ip = this.bootstrap.Body.GetILProcessor();
-                // lhs.value
-                ip.Emit(OpCodes.Ldarg_0);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-                // rhs.value
-                ip.Emit(OpCodes.Ldarg_1);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
+            //    var ip = this.bootstrap.Body.GetILProcessor();
+            //    // lhs.value
+            //    ip.Emit(OpCodes.Ldarg_0);
+            //    ip.Emit(OpCodes.Ldfld, expression.Value);
+            //    // rhs.value
+            //    ip.Emit(OpCodes.Ldarg_1);
+            //    ip.Emit(OpCodes.Ldfld, expression.Value);
 
-                if (operation == "and") {
-                    ip.Emit(OpCodes.And);
-                }
-                else if (operation == "or") {
-                    ip.Emit(OpCodes.Or);
-                }
-                else if (operation == "xor") {
-                    ip.Emit(OpCodes.Xor);
-                }
-            }
+            //    if (operation == "and") {
+            //        ip.Emit(OpCodes.And);
+            //    }
+            //    else if (operation == "or") {
+            //        ip.Emit(OpCodes.Or);
+            //    }
+            //    else if (operation == "xor") {
+            //        ip.Emit(OpCodes.Xor);
+            //    }
+            //}
         }
 
         // DanyaDone
@@ -395,9 +396,9 @@ namespace CodeGeneration
         }
 
         // Danya[Kind A]Done
-        private void EmitRelation(JsonEntity declaration)
+        private void EmitRelation(JsonEntity relation)
         {
-            this.EmitSimple(declaration.Children[0]);
+            this.EmitSimple(relation.Children[0]);
 //            if (declaration.Children.Count > 1) {
 //                this.EmitComparisonInRelation(declaration.Children[1]);
 //                var operation = declaration.Children[1].Children[0].Value; // opearation = relation->comparisoninrelation->comparisonoperator
@@ -444,131 +445,104 @@ namespace CodeGeneration
         }
 
         // DanyaDone
-        private void EmitSimple(JsonEntity declaration)
+        private void EmitSimple(JsonEntity simple)
         {
-            this.EmitFactor(declaration.Children[0]);
-            if (declaration.Children.Count > 1) {
-                this.EmitFactors(declaration.Children[1]);
-                var operation = declaration.Children[1].Children[0].Value; // operation = declaration->factors->sign
-
-                var ip = this.bootstrap.Body.GetILProcessor();
-                ip.Emit(OpCodes.Ldarg_0);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-                ip.Emit(OpCodes.Ldarg_1);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-
-                if (operation == "*") {
-                    ip.Emit(OpCodes.Mul);
-                }
-                else if (operation == "/") {
-                    ip.Emit(OpCodes.Div);
-                }
-                else if (operation == "%") {
-                    ip.Emit(OpCodes.Rem);
-                }  
+            this.EmitFactor(simple.Children[0]);
+            if (simple.Children.Count > 1) {
+                this.EmitFactors(simple.Children[1]);
             }
         }
 
         // DanyaDone
-        private void EmitFactors(JsonEntity declaration)
+        private void EmitFactors(JsonEntity factors)
         {
-            this.EmitFactor(declaration.Children[0]);
-            if (declaration.Children.Count > 1) {
-                this.EmitFactors(declaration.Children[1]);
-                var operation = declaration.Children[1].Children[0].Value; // operation = declaration->factors->sign
+            this.EmitFactor(factors.Children[1]);
+            if (factors.Children.Count > 2)
+            {
+                this.EmitFactors(factors.Children[2]);
+            }
 
-                var ip = this.bootstrap.Body.GetILProcessor();
-                ip.Emit(OpCodes.Ldarg_0);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-                ip.Emit(OpCodes.Ldarg_1);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
+            var ip = this.bootstrap.Body.GetILProcessor();
+            var op = factors.Children[0].Value;
 
-                if (operation == "*") {                        
-                    ip.Emit(OpCodes.Mul);
-                }
-                else if (operation == "/") {
-                    ip.Emit(OpCodes.Div);
-                }
-                else if (operation == "%") {
-                    ip.Emit(OpCodes.Rem);
-                }   
+            if (op == "*")
+            {
+                ip.Emit(OpCodes.Mul);
+            }
+            else if (op == "/")
+            {
+                ip.Emit(OpCodes.Div);
+            }
+            else if (op == "%")
+            {
+                ip.Emit(OpCodes.Rem);
             }
         }
 
         // DanyaDone
-        private void EmitFactor(JsonEntity declaration)
+        private void EmitFactor(JsonEntity factor)
         {
-            this.EmitSummand(declaration.Children[0]);
-            if (declaration.Children.Count > 1) {
-                var sign = declaration.Children[1].Children[0].Value; // sign = summands->summands->sign
-                this.EmitSummands(declaration.Children[1]);
-                var ip = this.bootstrap.Body.GetILProcessor();
-
-                // lhs.value
-                ip.Emit(OpCodes.Ldarg_0);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-                // rhs.value
-                ip.Emit(OpCodes.Ldarg_1);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-
-                if (sign == "+") {
-                    ip.Emit(OpCodes.Add);
-                }
-                else if (sign == "-") {
-                    ip.Emit(OpCodes.Sub);
-                }
+            this.EmitSummand(factor.Children[0]);
+            if (factor.Children.Count > 1) {
+                this.EmitSummands(factor.Children[1]);
             }
         }
         
         // DanyaDone
-        private void EmitSummands(JsonEntity declaration)
+        private void EmitSummands(JsonEntity summands)
         {
-            this.EmitSummand(declaration.Children[1]);
-            if (declaration.Children.Count > 2) {
-                var sign = declaration.Children[2].Children[0].Value; // sign = summands->summands->sign
-                this.EmitSummands(declaration.Children[2]);
-                var ip = this.bootstrap.Body.GetILProcessor();
-                // lhs.value
-                ip.Emit(OpCodes.Ldarg_0);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-                // rhs.value
-                ip.Emit(OpCodes.Ldarg_1);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
+            this.EmitSummand(summands.Children[1]);
+            if (summands.Children.Count > 2) {
+                this.EmitSummands(summands.Children[2]);
+            }
 
-                if (sign == "+") {
-                    ip.Emit(OpCodes.Add);
-                }
-                else if (sign == "-") {
-                    ip.Emit(OpCodes.Sub);
-                }
+            var ip = this.bootstrap.Body.GetILProcessor();
+            var sign = summands.Children[0].Value;
+
+            if (sign == "+")
+            {
+                ip.Emit(OpCodes.Add);
+            }
+            else if (sign == "-")
+            {
+                ip.Emit(OpCodes.Sub);
             }
         }
 
         // DanyaDone
-        private void EmitSummand(JsonEntity declaration)
+        private void EmitSummand(JsonEntity summand)
         {
-            if (declaration.Children[0].Type == "Primary")
-                this.EmitPrimary(declaration.Children[0]);
-            else if (declaration.Children[0].Type == "Expression")
-                this.EmitExpression(declaration.Children[1]);
+            var subSummand = summand.Children[0];
+            switch (subSummand.Type)
+            {
+                case "Primary":
+                    this.EmitPrimary(subSummand);
+                    break;
+                case "Expression":
+                    this.EmitExpression(subSummand);
+                    break;
+                default:
+                    throw new Exception("Summand error");
+            }
         }
 
-        // DanyaDone
-        private void EmitPrimary(JsonEntity declaration)
+        private void EmitPrimary(JsonEntity primary)
         {
-            Console.Write("Storing this onto the stack: ");
-            Console.WriteLine(declaration.Value);
-            if (CurrentMethod != null)
+            var ip = this.bootstrap.Body.GetILProcessor();
+            switch(primary.Name)
             {
-                this.CurrentMethod.Body.GetILProcessor().Emit(
-                    OpCodes.Ldc_R4, float.Parse(declaration.Value)); //Store value of type float32 into memory at address
+                case "integer":
+                    ip.Emit(OpCodes.Ldc_I4, (Int32)Convert.ToDouble(primary.Value));
+                    break;
+                case "real":
+                    ip.Emit(OpCodes.Ldc_R4, (float)Convert.ToDouble(primary.Value));
+                    break;
+                case "boolean":
+                    ip.Emit(OpCodes.Ldc_I4, (Int32)Convert.ToDouble(primary.Value));
+                    break;
+                default:
+                    throw new Exception("Primary error");
             }
-            else
-            {
-                this.bootstrap.Body.GetILProcessor().Emit(
-                    OpCodes.Ldc_R4, float.Parse(declaration.Value)); //Store value of type float32 into memory at address
-            }
-           
         }
     }
 }

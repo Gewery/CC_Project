@@ -1,7 +1,1 @@
-var b : Integer is 6
-routine main() is
-    var c : Real is 8.7
-    if (b < c) then
-        b := 10
-    end
-end
+var b : integer is 7+2+5+9
