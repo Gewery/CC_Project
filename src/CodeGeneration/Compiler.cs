@@ -468,28 +468,28 @@ namespace CodeGeneration
         }
 
         // DanyaDone
-        private void EmitFactors(JsonEntity declaration)
+        private void EmitFactors(JsonEntity factors)
         {
-            this.EmitFactor(declaration.Children[0]);
-            if (declaration.Children.Count > 1) {
-                this.EmitFactors(declaration.Children[1]);
-                var operation = declaration.Children[1].Children[0].Value; // operation = declaration->factors->sign
+            this.EmitSummand(factors.Children[1]);
+            if (factors.Children.Count > 2)
+            {
+                this.EmitSummands(factors.Children[2]);
+            }
 
-                var ip = this.bootstrap.Body.GetILProcessor();
-                ip.Emit(OpCodes.Ldarg_0);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
-                ip.Emit(OpCodes.Ldarg_1);
-                ip.Emit(OpCodes.Ldfld, declaration.Value);
+            var ip = this.bootstrap.Body.GetILProcessor();
+            var op = factors.Children[0].Value;
 
-                if (operation == "*") {                        
-                    ip.Emit(OpCodes.Mul);
-                }
-                else if (operation == "/") {
-                    ip.Emit(OpCodes.Div);
-                }
-                else if (operation == "%") {
-                    ip.Emit(OpCodes.Rem);
-                }   
+            if (op == "*")
+            {
+                ip.Emit(OpCodes.Mul);
+            }
+            else if (op == "/")
+            {
+                ip.Emit(OpCodes.Div);
+            }
+            else if (op == "%")
+            {
+                ip.Emit(OpCodes.Rem);
             }
         }
 
@@ -499,22 +499,6 @@ namespace CodeGeneration
             this.EmitSummand(factor.Children[0]);
             if (factor.Children.Count > 1) {
                 this.EmitSummands(factor.Children[1]);
-                //var sign = factor.Children[1].Children[0].Value; // sign = summands->summands->sign
-                //var ip = this.bootstrap.Body.GetILProcessor();
-
-                //// lhs.value
-                //ip.Emit(OpCodes.Ldarg_0);
-                //ip.Emit(OpCodes.Ldfld, factor.Value);
-                //// rhs.value
-                //ip.Emit(OpCodes.Ldarg_1);
-                //ip.Emit(OpCodes.Ldfld, factor.Value);
-
-                //if (sign == "+") {
-                //    ip.Emit(OpCodes.Add);
-                //}
-                //else if (sign == "-") {
-                //    ip.Emit(OpCodes.Sub);
-                //}
             }
         }
         
@@ -527,7 +511,7 @@ namespace CodeGeneration
             }
 
             var ip = this.bootstrap.Body.GetILProcessor();
-            var sign = summands.Children[0].Value; // sign = summands->summands->sign
+            var sign = summands.Children[0].Value;
 
             if (sign == "+")
             {
