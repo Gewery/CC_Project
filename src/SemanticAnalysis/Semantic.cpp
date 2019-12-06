@@ -420,7 +420,7 @@ map<string, Identifier* > check_RoutineDeclaration(RoutineDeclaration *routinede
     }
     else {
         if (routinedeclaration->bodyinroutinedeclaration && routinedeclaration->bodyinroutinedeclaration->returnInRoutine) {
-            cout << "\n\nFunction " << function_name << "must not return a value!\n";
+            cout << "\n\nFunction " << function_name << " must not return a value!\n";
             exit(EXIT_FAILURE);
         }
     }
@@ -557,7 +557,7 @@ string check_InitialValue(InitialValue *initialvalue, map<string, Identifier* > 
 map<string, Identifier*> check_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, Identifier *parent /*= nullptr*/) {
     // firstly, checking whether variable was already declared
     if (declared_identifiers[variabledeclaration->name] && !declared_identifiers[variabledeclaration->name]->can_redeclare) {
-        cout << "\n\nVariable " << variabledeclaration->name << " already declared!\n";
+        cout << "\n\nVariable " << variabledeclaration->name << " is already declared!\n";
         exit(EXIT_FAILURE);
     }
 

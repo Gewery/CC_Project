@@ -13,7 +13,7 @@ namespace CodeGeneration
         {
             TextReader inputStream = new StreamReader(
                     new BufferedStream(
-                        new FileStream("../../tree.json", FileMode.Open, FileAccess.Read, FileShare.Read)));
+                        new FileStream("../../tree_ru.json", FileMode.Open, FileAccess.Read, FileShare.Read)));
 
             JsonEntity ir;
 
@@ -28,7 +28,7 @@ namespace CodeGeneration
             
             var compiler = new Compiler();
             compiler.EmitRoot(ir);
-//            Console.ReadLine();
+            Console.ReadLine();
         }
     }
 }

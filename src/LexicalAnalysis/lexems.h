@@ -1,11 +1,11 @@
 using namespace std;
 
 enum TokenTypes {
-    UNDEFINED = -1,
+    UNDEFINED = 0,
     DECLARATION_SEPARATORS, KEYWORDS, BOOLEAN_LITERALS, OPERATORS,
     PUNCTUATORS, IDENTIFIERS, FLOATING_LITERALS, INTEGER_LITERALS
 };
-static constexpr const char *TokenTypeNames[] = {"declaration separator", "keyword", "boolean literal", "operator",
+static constexpr const char *TokenTypeNames[] = {"<MYSTERY LEXEM>", "declaration separator", "keyword", "boolean literal", "operator",
                                                  "punctuator", "identifier", "floating literal", "integer literal"};
 
 struct Lexems {

@@ -58,6 +58,9 @@ void read_file() {
     regex_tokens.push_back(make_pair(
             TokenTypes::INTEGER_LITERALS,
             regex("^\\s*([0-9]+)(?![a-zA-Z0-9_\\.])([\\s\\S]*)")));
+    regex_tokens.push_back(make_pair(
+            TokenTypes::UNDEFINED,
+            regex("^\\s*(\\S*)([\\s\\S]*)")));
 }
 
 pair <string, pair<string, int>> find_next_token(string input_string) {
@@ -76,8 +79,12 @@ extern int yylex(void) {
     read_file();
     if (!yyin)
         yyin = stdin;
-    if (seeneof)
+
+    regex rr = regex("^\\s*");
+    smatch match;
+    if (regex_match(source, match, rr)) {
         return 0;
+    }
 
     auto res = find_next_token(source);
     source = res.first;
@@ -85,11 +92,7 @@ extern int yylex(void) {
     int token_type = res.second.second;
 
     //TOKENS
-    if (lexem.size() == 0) {
-    	seeneof = 1;
-    	return 0;
-    }
-    else if (token_type == TokenTypes::DECLARATION_SEPARATORS) {
+    if (token_type == TokenTypes::DECLARATION_SEPARATORS) {
         return DECLARATION_SEPARATOR;
     }
     else if (token_type == TokenTypes::KEYWORDS) {
@@ -177,9 +180,11 @@ extern int yylex(void) {
         }
         yyextra_floats.push_back(yyextra_float);
         return REAL_LITERAL;
+    } else if (token_type == TokenTypes::UNDEFINED) {
+        cout << "\n!! Lexical analyzer detected undefined token !!\n\n";
+        exit(0);
     }
-    if (lexem != "\0") yyerror("Mystery character\n");
-    return 0;
+    exit(0);
 }
 
 void yyerror(char const *s){

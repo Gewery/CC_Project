@@ -1,0 +1,2 @@
+type irek is integer
+type kek is lol
