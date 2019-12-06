@@ -6,6 +6,7 @@
     #include <fstream>
     #include "../SemanticAnalysis/SymbolTable.h"
     #include "../LexicalAnalysis/lexems.h"
+    #include "../ILCodeGenerator/SymbolTableIL.h"
 
     int yylex();
     extern void yyerror(const char *);

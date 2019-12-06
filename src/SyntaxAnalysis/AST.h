@@ -1,3 +1,6 @@
+#ifndef AST_HPP_
+#define AST_HPP_
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -7,6 +10,18 @@
 using namespace std;
 using json = nlohmann::json;
 
+
+struct Identifier {
+    string identifier_type; // "Variable", "Function" or "Type"
+    string value_type;
+    bool global;
+    bool read_only;
+    int var_number;
+    bool can_redeclare;
+    map<string, Identifier*> subidentifiers;
+    Identifier(string identifier_type, string value_type, bool read_only = false): identifier_type(identifier_type), value_type(value_type), read_only(read_only), can_redeclare(false) {}
+    Identifier(int gg, string identifier_type, string value_type, bool global=false, int var_number = 0, bool read_only = false): identifier_type(identifier_type), value_type(value_type), global(global), var_number(var_number), read_only(read_only), can_redeclare(false) {}
+ };
 
 struct Program {
     struct Declaration *declaration;
@@ -499,3 +514,5 @@ json to_json_Primary(Primary *primary);
 json to_json_Sign(Sign *sign);
 json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary);
 json to_json_Identifiers(Identifiers *identifiers);
+
+#endif
