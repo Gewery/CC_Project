@@ -537,7 +537,3 @@ Frontend - C++, Backend - C#
       ]
     }
     ```
-    
-#### ARCHITECTURE
-
-<img src="./src/ThirdParty/architecture.jpg" width="500">
