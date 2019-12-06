@@ -1,4 +1,4 @@
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -90,9 +90,9 @@
     <None Include="src\CodeGeneration\.gitignore" />
     <None Include="src\CodeGeneration\bin\Debug\netcoreapp3.0\CodeGeneration.deps.json" />
     <None Include="src\CodeGeneration\CodeGeneration.csproj" />
-    <None Include="src\CodeGeneration\CodeGeneration.runtimeconfig.json" />
-    <None Include="src\CodeGeneration\create_dll.sh" />
-    <None Include="src\CodeGeneration\create_exe.bat" />
+    <None Include="src\CodeGeneration1\CodeGeneration.runtimeconfig.json" />
+    <None Include="src\CodeGeneration1\create_dll.sh" />
+    <None Include="src\CodeGeneration1\create_exe.bat" />
     <None Include="src\SyntaxAnalysis\yacc.y" />
     <None Include="tree.json" />
   </ItemGroup>
@@ -121,10 +121,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\CodeGeneration\AstEntities\VariableDeclaration.cs" />
-    <Compile Include="src\CodeGeneration\Compiler.cs" />
-    <Compile Include="src\CodeGeneration\Context.cs" />
+    <Compile Include="src\CodeGeneration1\Compiler.cs" />
+    <Compile Include="src\CodeGeneration1\Context.cs" />
     <Compile Include="src\CodeGeneration\Parser\JsonEntity.cs" />
-    <Compile Include="src\CodeGeneration\Program.cs" />
+    <Compile Include="src\CodeGeneration1\Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".git\objects\info\" />
@@ -135,4 +135,4 @@
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
-</Project> 
+</Project>

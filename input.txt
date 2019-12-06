@@ -1,1 +1,1 @@
-var b : integer is 7+2+5+9
+var b : real is 2.09+(5.778*2.65)-(9.65/2.89)
