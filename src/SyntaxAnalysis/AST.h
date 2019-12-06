@@ -4,11 +4,11 @@
 #include <string>
 #include <vector>
 #include <iostream>
-// #include "../ThirdParty/json.hpp"
+#include "../ThirdParty/json.hpp"
 
 
 using namespace std;
-// using json = nlohmann::json;
+using json = nlohmann::json;
 
 
 struct Identifier {
@@ -467,52 +467,52 @@ void print_Sign(string prefix, Sign *sign, bool isLast);
 void print_ModifiablePrimary(string prefix, ModifiablePrimary *modifiableprimary, bool isLast);
 void print_Identifiers(string prefix, Identifiers *identifiers, bool isLast);
 
-// string serialize_Tree(Program *program);
-// json to_json_Program(Program *program);
-// json to_json_Declaration(Declaration *declaration);
-// json to_json_SimpleDeclaration(SimpleDeclaration *simpledeclaration);
-// json to_json_VariableDeclaration(VariableDeclaration *variabledeclaration);
-// json to_json_InitialValue(InitialValue *initialvalue);
-// json to_json_TypeDeclaration(TypeDeclaration *typedeclaration);
-// json to_json_Type(Type *type);
-// json to_json_PrimitiveType(PrimitiveType *primitivetype);
-// json to_json_ArrayType(ArrayType *arraytype);
-// json to_json_RecordType(RecordType *recordtype);
-// json to_json_VariableDeclarations(VariableDeclarations *variabledeclarations);
-// json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration);
-// json to_json_ReturnInRoutine(ReturnInRoutine *returnInRoutine);
-// json to_json_Parameters(Parameters *parameters);
-// json to_json_ParameterDeclaration(ParameterDeclaration *parameterdeclaration);
-// json to_json_ParametersDeclaration(ParametersDeclaration *parametersdeclaration);
-// json to_json_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration);
-// json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration);
-// json to_json_Body(Body *body);
-// json to_json_Statement(Statement *statement);
-// json to_json_Assignment(Assignment *assignment);
-// json to_json_RoutineCall(RoutineCall *routinecall);
-// json to_json_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall);
-// json to_json_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall);
-// json to_json_WhileLoop(WhileLoop *whileloop);
-// json to_json_ForLoop(ForLoop *forloop);
-// json to_json_Range(Range *range);
-// json to_json_Reverse(Reverse *reverse);
-// json to_json_IfStatement(IfStatement *ifstatement);
-// json to_json_ElseInIfStatement(ElseInIfStatement *elseinifstatement);
-// json to_json_Expression(Expression *expression);
-// json to_json_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression);
-// json to_json_LogicalOperator(LogicalOperator *logicaloperator);
-// json to_json_Relation(Relation *relation);
-// json to_json_ComparisonInRelation(ComparisonInRelation *comparisoninrelation);
-// json to_json_ComparisonOperator(ComparisonOperator *comparisonoperator);
-// json to_json_Simple(Simple *simple);
-// json to_json_Factors(Factors *factors);
-// json to_json_SimpleOperator(SimpleOperator *simpleoperator);
-// json to_json_Factor(Factor *factor);
-// json to_json_Summands(Summands *summands);
-// json to_json_Summand(Summand *summand);
-// json to_json_Primary(Primary *primary);
-// json to_json_Sign(Sign *sign);
-// json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary);
-// json to_json_Identifiers(Identifiers *identifiers);
+string serialize_Tree(Program *program);
+json to_json_Program(Program *program);
+json to_json_Declaration(Declaration *declaration);
+json to_json_SimpleDeclaration(SimpleDeclaration *simpledeclaration);
+json to_json_VariableDeclaration(VariableDeclaration *variabledeclaration);
+json to_json_InitialValue(InitialValue *initialvalue);
+json to_json_TypeDeclaration(TypeDeclaration *typedeclaration);
+json to_json_Type(Type *type);
+json to_json_PrimitiveType(PrimitiveType *primitivetype);
+json to_json_ArrayType(ArrayType *arraytype);
+json to_json_RecordType(RecordType *recordtype);
+json to_json_VariableDeclarations(VariableDeclarations *variabledeclarations);
+json to_json_RoutineDeclaration(RoutineDeclaration *routinedeclaration);
+json to_json_ReturnInRoutine(ReturnInRoutine *returnInRoutine);
+json to_json_Parameters(Parameters *parameters);
+json to_json_ParameterDeclaration(ParameterDeclaration *parameterdeclaration);
+json to_json_ParametersDeclaration(ParametersDeclaration *parametersdeclaration);
+json to_json_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration);
+json to_json_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration);
+json to_json_Body(Body *body);
+json to_json_Statement(Statement *statement);
+json to_json_Assignment(Assignment *assignment);
+json to_json_RoutineCall(RoutineCall *routinecall);
+json to_json_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall);
+json to_json_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinroutinecall);
+json to_json_WhileLoop(WhileLoop *whileloop);
+json to_json_ForLoop(ForLoop *forloop);
+json to_json_Range(Range *range);
+json to_json_Reverse(Reverse *reverse);
+json to_json_IfStatement(IfStatement *ifstatement);
+json to_json_ElseInIfStatement(ElseInIfStatement *elseinifstatement);
+json to_json_Expression(Expression *expression);
+json to_json_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression);
+json to_json_LogicalOperator(LogicalOperator *logicaloperator);
+json to_json_Relation(Relation *relation);
+json to_json_ComparisonInRelation(ComparisonInRelation *comparisoninrelation);
+json to_json_ComparisonOperator(ComparisonOperator *comparisonoperator);
+json to_json_Simple(Simple *simple);
+json to_json_Factors(Factors *factors);
+json to_json_SimpleOperator(SimpleOperator *simpleoperator);
+json to_json_Factor(Factor *factor);
+json to_json_Summands(Summands *summands);
+json to_json_Summand(Summand *summand);
+json to_json_Primary(Primary *primary);
+json to_json_Sign(Sign *sign);
+json to_json_ModifiablePrimary(ModifiablePrimary *modifiableprimary);
+json to_json_Identifiers(Identifiers *identifiers);
 
 #endif
