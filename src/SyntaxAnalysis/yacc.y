@@ -6,6 +6,7 @@
     #include <fstream>
     #include "../SemanticAnalysis/SymbolTable.h"
     #include "../LexicalAnalysis/lexems.h"
+    #include "../ILCodeGenerator/SymbolTableIL.h"
 
     int yylex();
     extern void yyerror(const char *);
@@ -408,6 +409,9 @@ int main(int argc, char **argv){
     cout << "\n\nSemantic Analyzer\n======###========\n\n";
     if (run_Semantic_Analyzer(root))
         cout << "Everything is correct\n";
+
+    if (run_IL_Code_Generator(root))
+        cout << "IL Code successfully generated\n";
 
     cout << "\n\nAST JSON\n======###========\n\n";
     string serialized_json = serialize_Tree(root);
