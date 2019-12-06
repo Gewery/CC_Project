@@ -625,7 +625,7 @@ map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routin
     map<string, Identifier*> declared_identifiers_in_function = gen_allow_redeclaration(declared_identifiers);
 
     function_name = routinedeclaration->name;
-    cout << " .method private hidebysig static void\n" << function_name << "(\n";
+    cout << ".method private hidebysig static void\n" << function_name << "(\n";
     if (entrypoint) {
         cout << "string[] args\n";
     }
@@ -639,7 +639,7 @@ map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routin
     if (entrypoint)
         cout << ".entrypoint\n";
     
-    cout << ".maxstack 100";
+    cout << ".maxstack 100\n\n";
 
     if (routinedeclaration->typeinroutinedeclaration) { // ???
         // return_type = generate_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
@@ -654,6 +654,8 @@ map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routin
     declared_identifiers_in_function[function_name] = function_name_identifier;
 
     string actual_type = generate_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, declared_identifiers_in_function);
+
+    cout << IL_number(880) << ": call   void [System.Console]System.Console::WriteLine(int32)\n";
 
     cout << IL_number(900) << ": ret";
     cout << "\n}\n";
@@ -904,7 +906,7 @@ vector<string> generate_Program(Program *program, map<string, Identifier*> decla
 bool run_IL_Code_Generator(Program *program) {
     freopen("generated.il", "w", stdout);
 
-    cout << ".assembly rabotai{}\n.assembly extern System.Console{}\n.assembly extern System.Runtime{}\n\n";
+    cout << ".assembly rabotai{}\n.assembly extern System.Console{}\n.assembly extern System.Runtime{}\n.assembly extern mscorlib{}\n\n";
     cout << ".class private auto ansi beforefieldinit ConsoleApp1.Program extends [System.Runtime]System.Object\n{\n";
 
     map<string, Identifier*> declared_identifiers;

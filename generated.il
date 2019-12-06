@@ -1,6 +1,7 @@
 .assembly rabotai{}
 .assembly extern System.Console{}
 .assembly extern System.Runtime{}
+.assembly extern mscorlib{}
 
 .class private auto ansi beforefieldinit ConsoleApp1.Program extends [System.Runtime]System.Object
 {
@@ -11,11 +12,18 @@ string[] args
 ) cil managed
 {
 .entrypoint
-.maxstack 100.locals init(
+.maxstack 100
+
+.locals init(
 [0] int32 a
 )
 IL_0000: ldc.i4.5
-IL_0010: stloc.0
+IL_0010: ldc.i4.6
+IL_0020: ldc.i4.1
+IL_0030: sub
+IL_0040: add
+IL_0050: stloc.0
+IL_0880: call   void [System.Console]System.Console::WriteLine(int32)
 IL_0900: ret
 }
 

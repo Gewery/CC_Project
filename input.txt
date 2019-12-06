@@ -1,5 +1,5 @@
 var b : Integer is (5+6)*(7-2)
 
 routine main() is
-var a : Integer is 5
+var a : Integer is 5+6-1
 end
