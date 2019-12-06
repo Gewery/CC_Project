@@ -1,5 +1,8 @@
-var b : Integer is (5+6)*(7-2)
+var b : Integer is (5+2)*(7-2)
 
 routine main() is
 var a : Integer is 5+6-1
+if true then
+var c : Integer is 1
+end
 end

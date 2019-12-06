@@ -387,15 +387,23 @@ void generate_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string
 }
 
 // DanyaDone
-void generate_IfStatement(IfStatement *ifstatement, map<string, Identifier*> declared_identifiers) {
-    if (ifstatement->expression)
-        generate_Expression(ifstatement->expression, declared_identifiers);
+vector<string> generate_IfStatement(IfStatement *ifstatement, map<string, Identifier*> declared_identifiers) {
+    vector<string> commands;
+    if (ifstatement->expression) {
+        Value_Commands* cms = generate_Expression(ifstatement->expression, declared_identifiers);
+        commands = cms->commands;
+    }
 
-    if (ifstatement->body)
-        generate_Body(ifstatement->body, gen_allow_redeclaration(declared_identifiers));
+    vector<string> BodyCommands;
+    if (ifstatement->body) {
+        BodyCommands = generate_Body(ifstatement->body, gen_allow_redeclaration(declared_identifiers)).second;
+        commands.push_back("brfalse.s " + IL_number(10*BodyCommands.size()));
+        commands.insert(commands.end(), BodyCommands.begin(), BodyCommands.end());
+    }
 
     if (ifstatement->elseinifstatement)
         generate_ElseInIfStatement(ifstatement->elseinifstatement, declared_identifiers);
+    return commands;
 }
 
 // DanyaDone
@@ -494,7 +502,7 @@ void generate_Assignment(Assignment *assignment, map<string, Identifier*> declar
 }
 
 // DanyaDone
-void generate_Statement(Statement *statement, map<string, Identifier* > declared_identifiers) {
+vector<string> generate_Statement(Statement *statement, map<string, Identifier* > declared_identifiers) {
     if (statement->assignment) {
         generate_Assignment(statement->assignment, declared_identifiers);
     }
@@ -508,8 +516,10 @@ void generate_Statement(Statement *statement, map<string, Identifier* > declared
         generate_ForLoop(statement->forloop, declared_identifiers);
     }
     else if (statement->ifstatement) {
-        generate_IfStatement(statement->ifstatement, declared_identifiers);
+        return generate_IfStatement(statement->ifstatement, declared_identifiers);
     }
+    vector<string> emp;
+    return emp;
 }
 
 // DanyaDone
@@ -525,8 +535,10 @@ pair<map<string, Identifier*>, vector<string>> generate_Body(Body *body, map<str
         declared_identifiers = res.first;
     }
 
-    if (body->statement)
-        generate_Statement(body->statement, declared_identifiers);
+    if (body->statement) {
+        vector<string> tmp = generate_Statement(body->statement, declared_identifiers);
+        commands.insert(commands.end(), tmp.begin(), tmp.end());
+    }
 
     if (body->body) {
         auto res = generate_Body(body->body, declared_identifiers, var_number);

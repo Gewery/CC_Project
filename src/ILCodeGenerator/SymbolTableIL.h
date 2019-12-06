@@ -33,7 +33,7 @@ map<string, Identifier* > generate_ParametersDeclaration(ParametersDeclaration *
 string generate_TypeInRoutineDeclaration(TypeInRoutineDeclaration *typeinroutinedeclaration, map<string, Identifier*> declared_identifiers);
 string generate_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Identifier*> declared_identifiers);
 pair<map<string, Identifier*>, vector<string>> generate_Body(Body *body, map<string, Identifier*> declared_identifiers, int var_number = 0);
-void generate_Statement(Statement *statement, map<string, Identifier* > declared_identifiers);
+vector<string> generate_Statement(Statement *statement, map<string, Identifier* > declared_identifiers);
 void generate_Assignment(Assignment *assignment, map<string, Identifier*> declared_identifiers);
 void generate_RoutineCall(RoutineCall *routinecall, map<string, Identifier*> declared_identifiers);
 void generate_ExpressionInRoutineCall(ExpressionInRoutineCall *expressioninroutinecall, map<string, Identifier*> declared_identifiers);
@@ -41,7 +41,7 @@ void generate_ExpressionsInRoutineCall(ExpressionsInRoutineCall *expressionsinro
 void generate_WhileLoop(WhileLoop *whileloop, map<string, Identifier*> declared_identifiers);
 void generate_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers);
 void generate_Range(Range *range, map<string, Identifier*> declared_identifiers);
-void generate_IfStatement(IfStatement *ifstatement, map<string, Identifier*> declared_identifiers);
+vector<string> generate_IfStatement(IfStatement *ifstatement, map<string, Identifier*> declared_identifiers);
 void generate_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string, Identifier*> declared_identifiers);
 Value_Commands* generate_Expression(Expression *expression, map<string, Identifier*> declared_identifiers);
 Value_Commands* generate_MultipleRelationsInExpression(MultipleRelationsInExpression *multiplerelationsinexpression, map<string, Identifier*> declared_identifiers);
