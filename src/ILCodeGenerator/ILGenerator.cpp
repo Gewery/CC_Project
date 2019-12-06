@@ -127,7 +127,12 @@ Value_Commands* generate_ModifiablePrimary(ModifiablePrimary *modifiableprimary,
 Value_Commands* generate_Primary(Primary *primary, map<string, Identifier*> declared_identifiers) {
     if (primary->type != "") {
         Value_Commands* res = new Value_Commands(primary->type, stof(primary->value));
-        res->commands.push_back("ldc.i4." + to_string((int)(res->value)));
+        if (primary->type == REAL) {
+            res->commands.push_back("ldc.r8 " + to_string((float)((int)(100 * res->value)) / 100));
+        }
+        else {
+            res->commands.push_back("ldc.i4." + to_string((int)(res->value)));
+        }
         return res;
     }
     else
@@ -508,23 +513,47 @@ void generate_Statement(Statement *statement, map<string, Identifier* > declared
 }
 
 // DanyaDone
-map<string, Identifier*> generate_Body(Body *body, map<string, Identifier*> declared_identifiers) {
-    if (body->simpledeclaration)
-        declared_identifiers = generate_SimpleDeclaration(body->simpledeclaration, declared_identifiers, 0).first;
+pair<map<string, Identifier*>, vector<string>> generate_Body(Body *body, map<string, Identifier*> declared_identifiers, int var_number) {
+    vector<string> commands;
+
+    if (body->simpledeclaration) {
+        auto res = generate_SimpleDeclaration(body->simpledeclaration, declared_identifiers, 0, var_number);
+        
+        var_number++;
+
+        commands.insert(commands.end(), res.second->commands.begin(), res.second->commands.end());
+        declared_identifiers = res.first;
+    }
 
     if (body->statement)
         generate_Statement(body->statement, declared_identifiers);
 
-    if (body->body)
-        declared_identifiers = generate_Body(body->body, declared_identifiers);
+    if (body->body) {
+        auto res = generate_Body(body->body, declared_identifiers, var_number);
+        declared_identifiers = res.first;
+        commands.insert(commands.end(), res.second.begin(), res.second.end());
+    }
 
-    return declared_identifiers;
+    return {declared_identifiers, commands};
 }
 
 // DanyaDone
 string generate_BodyInRoutineDeclaration(BodyInRoutineDeclaration *bodyinroutinedeclaration, map<string, Identifier*> declared_identifiers) {
-    if (bodyinroutinedeclaration->body)
-        declared_identifiers = generate_Body(bodyinroutinedeclaration->body, declared_identifiers);
+    if (bodyinroutinedeclaration->body) {
+        cout << ".locals init(\n";
+        auto res = generate_Body(bodyinroutinedeclaration->body, declared_identifiers);
+        int var_num = 0;
+        for (auto elem : res.first) {
+            if (!declared_identifiers[elem.first]) {
+                cout << "[" << elem.second->var_number << "] " << format_type(elem.second->value_type) << " " << elem.first << "\n";
+            }
+        }
+
+        cout << ")\n";
+
+        for (int i = 0; i < res.second.size(); i++)
+            cout << IL_number(10*i) << ": " << res.second[i] << "\n";
+    }
     
     if (bodyinroutinedeclaration->returnInRoutine) {
         string actual_type = generate_ReturnInRoutine(bodyinroutinedeclaration->returnInRoutine, declared_identifiers);
@@ -589,28 +618,35 @@ string generate_ReturnInRoutine(ReturnInRoutine *returnInRoutine, map<string, Id
 };
 
 // DanyaDone
-map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Identifier* > declared_identifiers) {
+map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routinedeclaration, map<string, Identifier* > declared_identifiers, bool entrypoint) {
     string function_name;
     string return_type;
 
     map<string, Identifier*> declared_identifiers_in_function = gen_allow_redeclaration(declared_identifiers);
 
     function_name = routinedeclaration->name;
-    if (routinedeclaration->parameters) {
-        declared_identifiers_in_function = generate_Parameters(routinedeclaration->parameters, declared_identifiers_in_function); // we can use this inside body
-    }
-    if (routinedeclaration->typeinroutinedeclaration) {
-        return_type = generate_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
-        if (routinedeclaration->bodyinroutinedeclaration && !routinedeclaration->bodyinroutinedeclaration->returnInRoutine) {
-            cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
-            exit(EXIT_FAILURE);
-        }
+    cout << " .method private hidebysig static void\n" << function_name << "(\n";
+    if (entrypoint) {
+        cout << "string[] args\n";
     }
     else {
-        if (routinedeclaration->bodyinroutinedeclaration && routinedeclaration->bodyinroutinedeclaration->returnInRoutine) {
-            cout << "\n\nFunction " << function_name << "must not return a value!\n";
-            exit(EXIT_FAILURE);
+        if (routinedeclaration->parameters) {
+            //declared_identifiers_in_function = generate_Parameters(routinedeclaration->parameters, declared_identifiers_in_function); // we can use this inside body
         }
+    }
+    cout << ") cil managed\n";
+    cout << "{\n";
+    if (entrypoint)
+        cout << ".entrypoint\n";
+    
+    cout << ".maxstack 100";
+
+    if (routinedeclaration->typeinroutinedeclaration) { // ???
+        // return_type = generate_TypeInRoutineDeclaration(routinedeclaration->typeinroutinedeclaration, declared_identifiers); // Because we have type declarations
+        // if (routinedeclaration->bodyinroutinedeclaration && !routinedeclaration->bodyinroutinedeclaration->returnInRoutine) {
+        //     cout << "\n\nFunction " << function_name << " doesn't return a type!\n";
+        //     exit(EXIT_FAILURE);
+        // }
     }
 
     Identifier *function_name_identifier =  new Identifier(8, FUNCTION, return_type); 
@@ -619,10 +655,8 @@ map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routin
 
     string actual_type = generate_BodyInRoutineDeclaration(routinedeclaration->bodyinroutinedeclaration, declared_identifiers_in_function);
 
-    if (actual_type != "" && return_type != actual_type) {
-        cout << "\n\n" << function_name << "function must return " << return_type << " but return " << actual_type << " found" << "\n";
-        exit(EXIT_FAILURE);
-    }
+    cout << IL_number(900) << ": ret";
+    cout << "\n}\n";
 
     return declared_identifiers;
 }
@@ -742,10 +776,10 @@ Value_Commands* generate_InitialValue(InitialValue *initialvalue, map<string, Id
 }
 
 // DanyaDone
-pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, bool global_declaration/*=false*/, Identifier *parent /*= nullptr*/) {
+pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, bool global_declaration/*=false*/, int var_number/*=0*/, Identifier *parent /*= nullptr*/) {
     string user_type;
 
-    Identifier *new_identifier =  new Identifier(8, VARIABLE, user_type, global_declaration);
+    Identifier *new_identifier =  new Identifier(8, VARIABLE, user_type, global_declaration, var_number);
 
     //getting var type
     if (variabledeclaration->type) {
@@ -756,13 +790,14 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
     else if (variabledeclaration->expression) { // var b is 5
         Value_Commands* expression = generate_Expression(variabledeclaration->expression, declared_identifiers);
         user_type = expression->type;
-        declared_identifiers[variabledeclaration->name] =  new Identifier(8, VARIABLE, user_type, global_declaration);
+        declared_identifiers[variabledeclaration->name] = new Identifier(8, VARIABLE, user_type, global_declaration, var_number);
 
         if (global_declaration) {
             cout << ".field public static " << format_type(new_identifier->value_type) << " " << variabledeclaration->name << "\n";
             expression->commands.push_back("stsfld " + format_type(new_identifier->value_type) + " ConsoleApp1.Program::" + variabledeclaration->name);
         }
         else {
+            expression->commands.push_back("stloc." + to_string(declared_identifiers[variabledeclaration->name]->var_number));
 
         }
 
@@ -791,7 +826,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
                     initialvalue->commands.push_back("stsfld " + format_type(new_identifier->value_type) + " ConsoleApp1.Program::" + variabledeclaration->name);
                 }
                 else {
-
+                    initialvalue->commands.push_back("stloc." + to_string(new_identifier->var_number));
                 }
                 declared_identifiers[variabledeclaration->name] = new_identifier;
             }
@@ -803,7 +838,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
                 cout << ".field public static " << format_type(new_identifier->value_type) << " " << variabledeclaration->name << "\n";
             }
             else {
-
+                initialvalue->commands.push_back("stloc." + to_string(new_identifier->var_number));
             }
         }
         return make_pair(declared_identifiers, initialvalue);
@@ -817,7 +852,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
                 cout << ".field public static " << format_type(new_identifier->value_type) << " " << variabledeclaration->name << "\n";
             }
             else {
-
+                initialvalue->commands.push_back("stloc." + new_identifier->var_number);
             }
             declared_identifiers[variabledeclaration->name] = new_identifier;
         }
@@ -826,9 +861,9 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
 }
 
 // DanyaDone
-pair<map<string, Identifier*>, Value_Commands*> generate_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Identifier*> declared_identifiers, bool global_declaration) {
+pair<map<string, Identifier*>, Value_Commands*> generate_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Identifier*> declared_identifiers, bool global_declaration, int var_number) {
     if (simpleDeclaration->variabledeclaration) {
-        return generate_VariableDeclaration(simpleDeclaration->variabledeclaration, declared_identifiers, global_declaration);
+        return generate_VariableDeclaration(simpleDeclaration->variabledeclaration, declared_identifiers, global_declaration, var_number);
     }
     if (simpleDeclaration->typedeclaration) {
         declared_identifiers = generate_TypeDeclaration(simpleDeclaration->typedeclaration, declared_identifiers, global_declaration);
@@ -843,7 +878,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_Declaration(Declaration
         return generate_SimpleDeclaration(declaration->simpledeclaration, declared_identifiers, 1);
     }
     if (declaration->routinedeclaration){
-        declared_identifiers = generate_RoutineDeclaration(declaration->routinedeclaration, declared_identifiers);
+        declared_identifiers = generate_RoutineDeclaration(declaration->routinedeclaration, declared_identifiers, 1);
         return {declared_identifiers, nullptr};
     }
     return {declared_identifiers, nullptr};
@@ -853,7 +888,9 @@ pair<map<string, Identifier*>, Value_Commands*> generate_Declaration(Declaration
 vector<string> generate_Program(Program *program, map<string, Identifier*> declared_identifiers) {
     vector<string> commands;
     if (program->declaration) {
-        commands = generate_Declaration(program->declaration, declared_identifiers).second->commands;
+        auto res = generate_Declaration(program->declaration, declared_identifiers).second;
+        if (res)
+            commands = res->commands;
     }
 
     if (program->program) {
@@ -877,11 +914,12 @@ bool run_IL_Code_Generator(Program *program) {
     vector<string> init_commands = generate_Program(program, declared_identifiers);
 
     cout << "\n.method private hidebysig static specialname rtspecialname void .cctor() cil managed\n{\n";
-    cout << ".maxstack 8\n\n";
+    cout << ".maxstack 100\n\n";
     for (int i = 0; i < init_commands.size(); i++)
-        cout << IL_number(i) << ": " << init_commands[i] << "\n";
+        cout << IL_number(10*i) << ": " << init_commands[i] << "\n";
 
     cout << "\n";
+    cout << IL_number(900) << ": ret";
     cout << "\n}\n";
 
     cout << "}";

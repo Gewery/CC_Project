@@ -413,18 +413,18 @@ int main(int argc, char **argv){
     if (run_IL_Code_Generator(root))
         cout << "IL Code successfully generated\n";
 
-    cout << "\n\nAST JSON\n======###========\n\n";
-    string serialized_json = serialize_Tree(root);
-    std::cout << serialized_json << std::endl;
+    // cout << "\n\nAST JSON\n======###========\n\n";
+    // string serialized_json = serialize_Tree(root);
+    // std::cout << serialized_json << std::endl;
 
-    ofstream file("tree.json");
-    file << serialized_json;
-    file.close();
+    // ofstream file("tree.json");
+    // file << serialized_json;
+    // file.close();
 
-    file.open("tree_ru.json");
-    std::replace(serialized_json.begin(), serialized_json.end(), '.', ',');
-    file << serialized_json;
-    file.close();
+    // file.open("tree_ru.json");
+    // std::replace(serialized_json.begin(), serialized_json.end(), '.', ',');
+    // file << serialized_json;
+    // file.close();
 
     return 0;
 }

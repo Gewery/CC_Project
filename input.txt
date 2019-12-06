@@ -1,3 +1,5 @@
-var b : Integer is (5+6)*(7-123)
-var c : Boolean is false
-var g : Real is 5.4
+var b : Integer is (5+6)*(7-2)
+
+routine main() is
+var a : Integer is 5
+end
