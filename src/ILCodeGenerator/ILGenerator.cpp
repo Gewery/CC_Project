@@ -49,7 +49,7 @@ string format_type(string st) {
 string IL_number(int n) {
     string res = "";
     while (n / 10 != 0) res.push_back(n % 10);
-    while (res.size() != 4) res.push_back("0");
+    while (res.size() != 4) res.push_back('0');
     reverse(res.begin(), res.end());
     return "IL_" + res;
 }
@@ -142,7 +142,7 @@ Value_Commands* generate_Summands(Summands *summands, map<string, Identifier*> d
 
     if (summands->summands) {
         res2 = generate_Summands(summands->summands, declared_identifiers);
-        string op = summands->summands->sign;
+        string op = summands->summands->sign->op;
         if (res1->commands.size() == 0 && res2->commands.size() == 0) {
             if (op == "+") total->value = (int)(res1->value) + (int)(res2->value);
             else if (op == "-") total->value = (int)(res1->value) - (int)(res2->value);
@@ -386,7 +386,7 @@ void generate_Range(Range *range, map<string, Identifier*> declared_identifiers)
 void generate_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers) {
     map<string, Identifier*> redeclaration_allowed = allow_redeclaration(declared_identifiers);
     if (!(forloop->name).empty()) {
-        redeclaration_allowed[forloop->name] = new Identifier(VARIABLE, "integer", 1);
+        redeclaration_allowed[forloop->name] =  IdentifierIL(VARIABLE, "integer", 1);
     }
     if (forloop->range) {
         generate_Range(forloop->range, redeclaration_allowed);
@@ -539,7 +539,7 @@ map<string, Identifier* > generate_ParameterDeclaration(ParameterDeclaration *pa
     if (parameterdeclaration->type) {
         type = generate_Type(parameterdeclaration->type, declared_identifiers, nullptr, true);
     }
-    declared_identifiers[name] = new Identifier(VARIABLE, type);
+    declared_identifiers[name] =  IdentifierIL(VARIABLE, type);
     return declared_identifiers;
 }
 
@@ -588,7 +588,7 @@ map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routin
         }
     }
 
-    Identifier *function_name_identifier = new Identifier(FUNCTION, return_type); 
+    Identifier *function_name_identifier =  IdentifierIL(FUNCTION, return_type); 
     declared_identifiers[function_name] = function_name_identifier;
     declared_identifiers_in_function[function_name] = function_name_identifier;
 
@@ -703,7 +703,7 @@ map<string, Identifier*> generate_TypeDeclaration(TypeDeclaration *typedeclarati
     // check actual type and get its string representation
     string type = generate_Type(typedeclaration->type, declared_identifiers);
 
-    declared_identifiers[name] = new Identifier(TYPE, type);
+    declared_identifiers[name] =  IdentifierIL(TYPE, type);
 
     return declared_identifiers;
 }
@@ -720,7 +720,7 @@ Value_Commands* generate_InitialValue(InitialValue *initialvalue, map<string, Id
 pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, bool global_declaration/*=false*/, Identifier *parent /*= nullptr*/) {
     string user_type;
 
-    Identifier *new_identifier = new Identifier(VARIABLE, user_type, global_declaration);
+    Identifier *new_identifier =  IdentifierIL(VARIABLE, user_type, global_declaration);
 
     //getting var type
     if (variabledeclaration->type) {
@@ -731,7 +731,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
     else if (variabledeclaration->expression) { // var b is 5
         Value_Commands* expression = generate_Expression(variabledeclaration->expression, declared_identifiers).first;
         user_type = expression->type;
-        declared_identifiers[variabledeclaration->name] = new Identifier(VARIABLE, user_type, global_declaration);
+        declared_identifiers[variabledeclaration->name] =  IdentifierIL(VARIABLE, user_type, global_declaration);
 
         if (global_declaration) {
             cout << ".field public static " << format_type(new_identifier->value_type) << " " << variabledeclaration->name << "\n";
@@ -840,9 +840,9 @@ bool run_IL_Code_Generator(Program *program) {
     cout << ".class private auto ansi beforefieldinit ConsoleApp1.Program extends [System.Runtime]System.Object\n{\n";
 
     map<string, Identifier*> declared_identifiers;
-    declared_identifiers["integer"] = new Identifier("Type", "integer");
-    declared_identifiers["real"] = new Identifier("Type", "real");
-    declared_identifiers["boolean"] = new Identifier("Type", "boolean");
+    declared_identifiers["integer"] =  IdentifierIL("Type", "integer");
+    declared_identifiers["real"] =  IdentifierIL("Type", "real");
+    declared_identifiers["boolean"] =  IdentifierIL("Type", "boolean");
     vector<string> init_commands = generate_Program(program, declared_identifiers);
 
     cout << "  .method private hidebysig static specialname rtspecialname void .cctor() cil managed\n{\n";

@@ -5,14 +5,6 @@
 #include "../SyntaxAnalysis/AST.h"
 using namespace std;
 
-struct Identifier {
-    string identifier_type; // "Variable", "Function" or "Type"
-    string value_type;
-    bool read_only;
-    bool can_redeclare;
-    map<string, Identifier*> subidentifiers;
-    Identifier(string identifier_type, string value_type, bool read_only = false): identifier_type(identifier_type), value_type(value_type), read_only(read_only), can_redeclare(false) {}
-};
 
 bool run_Semantic_Analyzer(Program *program);
 void check_Program(Program *program, map<string, Identifier*> declared_identifiers);
