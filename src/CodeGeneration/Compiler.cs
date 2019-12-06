@@ -445,35 +445,18 @@ namespace CodeGeneration
         private void EmitSimple(JsonEntity simple)
         {
             this.EmitFactor(simple.Children[0]);
-            //if (simple.Children.Count > 1) {
-            //    this.EmitFactors(simple.Children[1]);
-            //    var operation = simple.Children[1].Children[0].Value; // operation = declaration->factors->sign
-
-            //    var ip = this.bootstrap.Body.GetILProcessor();
-            //    ip.Emit(OpCodes.Ldarg_0);
-            //    ip.Emit(OpCodes.Ldfld, simple.Value);
-            //    ip.Emit(OpCodes.Ldarg_1);
-            //    ip.Emit(OpCodes.Ldfld, simple.Value);
-
-            //    if (operation == "*") {
-            //        ip.Emit(OpCodes.Mul);
-            //    }
-            //    else if (operation == "/") {
-            //        ip.Emit(OpCodes.Div);
-            //    }
-            //    else if (operation == "%") {
-            //        ip.Emit(OpCodes.Rem);
-            //    }  
-            //}
+            if (simple.Children.Count > 1) {
+                this.EmitFactors(simple.Children[1]);
+            }
         }
 
         // DanyaDone
         private void EmitFactors(JsonEntity factors)
         {
-            this.EmitSummand(factors.Children[1]);
+            this.EmitFactor(factors.Children[1]);
             if (factors.Children.Count > 2)
             {
-                this.EmitSummands(factors.Children[2]);
+                this.EmitFactors(factors.Children[2]);
             }
 
             var ip = this.bootstrap.Body.GetILProcessor();
