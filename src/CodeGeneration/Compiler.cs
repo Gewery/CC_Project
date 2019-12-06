@@ -11,8 +11,8 @@ namespace CodeGeneration
     public class Compiler
     {
         public Dictionary<string, MethodDefinition> Methods = new Dictionary<string, MethodDefinition>();
-        public Dictionary<string, FieldDefinition> Variables = new Dictionary<string, FieldDefinition>();
-        public Dictionary<string, TypeReference> Types = new Dictionary<string, TypeReference>();
+        public Dictionary<string, Type> Variables = new Dictionary<string, Type>();
+        public Dictionary<string, Type> Types = new Dictionary<string, Type>();
 
         private MethodDefinition bootstrap = null;
 
@@ -23,14 +23,14 @@ namespace CodeGeneration
             var asm = AssemblyDefinition.CreateAssembly(nameDef, "result.exe", ModuleKind.Console);
 
             // import necessary types to the library
-            this.Types.Add("Integer", asm.MainModule.ImportReference(typeof(Int32)));
-            this.Types.Add("Real", asm.MainModule.ImportReference(typeof(Double)));
-            this.Types.Add("Boolean", asm.MainModule.ImportReference(typeof(Boolean)));
-            this.Types.Add("Void", asm.MainModule.ImportReference(typeof(void)));
+            this.Types.Add("integer", typeof(Int32));
+            this.Types.Add("real", typeof(Double));
+            this.Types.Add("boolean", typeof(Boolean));
+            this.Types.Add("void", typeof(void));
 
             // void create static private void Main method
             bootstrap = new MethodDefinition("Main",
-                MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
+                MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, asm.MainModule.ImportReference(typeof(void)));
             
             // go through the JSON calculating values and putting the results onto the stack
             foreach (JsonEntity declaration in el.Children)
@@ -42,14 +42,13 @@ namespace CodeGeneration
             var ip = this.bootstrap.Body.GetILProcessor();
 
             // write final result to program output, wait until any input is received
-            ip.Emit(OpCodes.Call, asm.MainModule.ImportReference(typeof(Console).GetMethod("WriteLine", new Type[] { typeof(Int32) })));
+            ip.Emit(OpCodes.Call, asm.MainModule.ImportReference(typeof(Console).GetMethod("WriteLine", new Type[] { this.Variables["b"] })));
             ip.Emit(OpCodes.Call, asm.MainModule.ImportReference(typeof(Console).GetMethod("ReadLine", new Type[] { })));
             ip.Emit(OpCodes.Pop);
             ip.Emit(OpCodes.Ret);
 
             // register a type which method will be connected to
             var type = new TypeDefinition("CodeGenerationResult", "Program", TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit, asm.MainModule.ImportReference(typeof(object)));
-            type = this.ImportStuffIntoModule(type);
 
             // add type to build
             asm.MainModule.Types.Add(type);
@@ -62,16 +61,6 @@ namespace CodeGeneration
 
             // save the build 
             asm.Write("./result.exe");
-        }
-
-        private TypeDefinition ImportStuffIntoModule(TypeDefinition typeDefinition)
-        {
-            foreach (var variable in this.Variables)
-            {
-                typeDefinition.Fields.Add(variable.Value);
-            }
-
-            return typeDefinition;
         }
 
         public void EmitDeclaration(JsonEntity declaration)
@@ -315,17 +304,18 @@ namespace CodeGeneration
             //if (variableDeclaration.Children.Count > 1)
             //{
             var subVariableDeclaration = variableDeclaration.Children[1];
-                switch (subVariableDeclaration.Type)
-                {
-                    case "InitialValue":
-                        this.EmitInitialValue(subVariableDeclaration);
-                        break;
-                    case "Expression":      // if type is not specified
-                        // this.EmitExpression(ivasiq);
-                        break;
-                    default:
-                        throw new Exception("Error");
-                }
+            switch (subVariableDeclaration.Type)
+            {
+                case "InitialValue":
+                    this.EmitInitialValue(subVariableDeclaration);
+                    this.Variables.Add(variableDeclaration.Name, this.Types[variableDeclaration.Children[0].Children[0].Name]);
+                    break;
+                case "Expression":      // if type is not specified
+                    // this.EmitExpression(ivasiq);
+                    break;
+                default:
+                    throw new Exception("Error");
+            }
             //}
         }
 
@@ -552,6 +542,7 @@ namespace CodeGeneration
             }
 
             var ip = this.bootstrap.Body.GetILProcessor();
+
             ip.Emit(OpCodes.Add);
         }
 
@@ -575,7 +566,20 @@ namespace CodeGeneration
         private void EmitPrimary(JsonEntity primary)
         {
             var ip = this.bootstrap.Body.GetILProcessor();
-            ip.Emit(OpCodes.Ldc_I4, (Int32)Convert.ToDouble(primary.Value));
+            switch(primary.Name)
+            {
+                case "integer":
+                    ip.Emit(OpCodes.Ldc_I4, (Int32)Convert.ToDouble(primary.Value));
+                    break;
+                case "real":
+                    ip.Emit(OpCodes.Ldc_R4, (float)Convert.ToDouble(primary.Value));
+                    break;
+                case "boolean":
+                    ip.Emit(OpCodes.Ldc_I4, (Int32)Convert.ToDouble(primary.Value));
+                    break;
+                default:
+                    throw new Exception("Primary error");
+            }
         }
     }
 }

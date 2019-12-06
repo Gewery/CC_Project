@@ -768,7 +768,7 @@ json to_json_PrimitiveType(PrimitiveType *primitivetype) {
 
     std::vector<json> children;
     return json{{TYPE,     "PrimitiveType"},
-                {NAME,     primitivetype->isint ? "int" : primitivetype->isreal ? "real" : "bool"},
+                {NAME,     primitivetype->isint ? "integer" : primitivetype->isreal ? "real" : "boolean"},
                 {VALUE,    nullptr},
                 {CHILDREN, json(children)}};
 //    return {
