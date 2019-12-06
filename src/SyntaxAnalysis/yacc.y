@@ -411,6 +411,10 @@ int main(int argc, char **argv){
         if (run_Semantic_Analyzer(root))
             cout << "Everything is correct\n";
 
+        cout << "\n\nCode Generation\n======###========\n\n";
+        if (run_IL_Code_Generator(root))
+            cout << "IL Code successfullty generated\n";
+
         cout << "\n\nAST JSON\n======###========\n\n";
         string serialized_json = serialize_Tree(root);
         std::cout << serialized_json << std::endl;
