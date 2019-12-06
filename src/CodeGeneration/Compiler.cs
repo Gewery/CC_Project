@@ -90,8 +90,8 @@ namespace CodeGeneration
             Console.WriteLine(functionName);
             if (functionName == "main")
             {
-                CurrentMethod = new MethodDefinition(routineDeclaration.Name,
-                    MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
+                //CurrentMethod = new MethodDefinition(routineDeclaration.Name,
+                //  MethodAttributes.Static | MethodAttributes.Private | MethodAttributes.HideBySig, this.Types["Void"]);
                 if (ivasiq.Type == "BodyInRoutineDeclaration")
                 {
                     this.EmitBodyInRoutineDeclaration(ivasiq);
