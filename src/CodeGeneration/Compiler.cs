@@ -519,31 +519,24 @@ namespace CodeGeneration
         }
         
         // DanyaDone
-        private void EmitSummands(JsonEntity declaration)
+        private void EmitSummands(JsonEntity summands)
         {
-            this.EmitSummand(declaration.Children[1]);
-            if (declaration.Children.Count > 2) {
-                this.EmitSummands(declaration.Children[2]);
-                //var sign = declaration.Children[2].Children[0].Value; // sign = summands->summands->sign
-                //var ip = this.bootstrap.Body.GetILProcessor();
-                //// lhs.value
-                //ip.Emit(OpCodes.Ldarg_0);
-                //ip.Emit(OpCodes.Ldfld, declaration.Value);
-                //// rhs.value
-                //ip.Emit(OpCodes.Ldarg_1);
-                //ip.Emit(OpCodes.Ldfld, declaration.Value);
-
-                //if (sign == "+") {
-                //    ip.Emit(OpCodes.Add);
-                //}
-                //else if (sign == "-") {
-                //    ip.Emit(OpCodes.Sub);
-                //}
+            this.EmitSummand(summands.Children[1]);
+            if (summands.Children.Count > 2) {
+                this.EmitSummands(summands.Children[2]);
             }
 
             var ip = this.bootstrap.Body.GetILProcessor();
+            var sign = summands.Children[0].Value; // sign = summands->summands->sign
 
-            ip.Emit(OpCodes.Add);
+            if (sign == "+")
+            {
+                ip.Emit(OpCodes.Add);
+            }
+            else if (sign == "-")
+            {
+                ip.Emit(OpCodes.Sub);
+            }
         }
 
         // DanyaDone
