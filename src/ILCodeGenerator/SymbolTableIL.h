@@ -20,7 +20,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_Declaration(Declaration
 pair<map<string, Identifier*>, Value_Commands*> generate_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Identifier*> declared_identifiers, bool global_declaration);
 pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, bool global_declaration=false, Identifier *parent = nullptr);
 Value_Commands* generate_InitialValue(InitialValue *initialvalue, map<string, Identifier* > declared_identifiers);
-map<string, Identifier*> generate_TypeDeclaration(TypeDeclaration *typedeclaration, map<string, Identifier*> declared_identifiers);
+map<string, Identifier*> generate_TypeDeclaration(TypeDeclaration *typedeclaration, map<string, Identifier*> declared_identifiers, bool global_declaration);
 string generate_Type(Type *type, map<string, Identifier*> declared_identifiers, Identifier* ident = nullptr, bool is_param=false);
 string generate_ArrayType(ArrayType *arraytype, map<string, Identifier*> declared_identifiers, bool is_param);
 string generate_RecordType(RecordType *recordtype, map<string, Identifier*> declared_identifiers, Identifier *ident);

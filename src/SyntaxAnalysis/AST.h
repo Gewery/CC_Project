@@ -20,10 +20,8 @@ struct Identifier {
     bool can_redeclare;
     map<string, Identifier*> subidentifiers;
     Identifier(string identifier_type, string value_type, bool read_only = false): identifier_type(identifier_type), value_type(value_type), read_only(read_only), can_redeclare(false) {}
-    Identifier(string identifier_type, string value_type, bool global, int var_number, bool read_only): identifier_type(identifier_type), value_type(value_type), global(global), var_number(var_number), read_only(read_only), can_redeclare(false) {}
-    static Identifier IdentifierIL(string identifier_type, string value_type, bool global, int var_number = 0, bool read_only = false) { return Identifier(identifier_type, value_type, global, var_number, read_only); }
+    Identifier(int gg, string identifier_type, string value_type, bool global=false, int var_number = 0, bool read_only = false): identifier_type(identifier_type), value_type(value_type), global(global), var_number(var_number), read_only(read_only), can_redeclare(false) {}
  };
-
 
 struct Program {
     struct Declaration *declaration;

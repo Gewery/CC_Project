@@ -24,7 +24,7 @@ using namespace std;
  * @param type2  Type of the second primary
  * @return       String indicating the output dominant type
  */
-string cast_types(string type1, string type2) {
+string gen_cast_types(string type1, string type2) {
     if (type1 == "real" || type2 == "real")
         return "real";
     else if (type1 == "integer" || type2 == "integer")
@@ -44,17 +44,21 @@ string format_type(string st) {
         return "float64";
     else if (st == "boolean")
         return "bool";
+    return "???";
 }
 
 string IL_number(int n) {
     string res = "";
-    while (n / 10 != 0) res.push_back(n % 10);
+    while (n != 0)  {
+        res.push_back((n % 10) + '0');
+        n /= 10;
+    }
     while (res.size() != 4) res.push_back('0');
     reverse(res.begin(), res.end());
     return "IL_" + res;
 }
 
-map<string, Identifier*> allow_redeclaration(map<string, Identifier*> declared_identifiers) {
+map<string, Identifier*> gen_allow_redeclaration(map<string, Identifier*> declared_identifiers) {
     for (auto elem : declared_identifiers)
         elem.second->can_redeclare = true;
     return declared_identifiers;
@@ -121,8 +125,11 @@ Value_Commands* generate_ModifiablePrimary(ModifiablePrimary *modifiableprimary,
 
 // DanyaDone
 Value_Commands* generate_Primary(Primary *primary, map<string, Identifier*> declared_identifiers) {
-    if (primary->type != "")
-        return new Value_Commands(primary->type, primary->value);
+    if (primary->type != "") {
+        Value_Commands* res = new Value_Commands(primary->type, stof(primary->value));
+        res->commands.push_back("ldc.i4." + to_string((int)(res->value)));
+        return res;
+    }
     else
         return generate_ModifiablePrimary(primary->modifiablePrimary, declared_identifiers);
 }
@@ -146,11 +153,14 @@ Value_Commands* generate_Summands(Summands *summands, map<string, Identifier*> d
         if (res1->commands.size() == 0 && res2->commands.size() == 0) {
             if (op == "+") total->value = (int)(res1->value) + (int)(res2->value);
             else if (op == "-") total->value = (int)(res1->value) - (int)(res2->value);
+        }
         else {
+            total->commands = res1->commands;
+            total->commands.insert(total->commands.end(), res2->commands.begin(), res2->commands.end());
             if (op == "+") total->commands.push_back("add");
             else if (op == "-") total->commands.push_back("sub");
         }
-        total->type = cast_types(res1->type, res2->type);
+        total->type = gen_cast_types(res1->type, res2->type);
         return total;
     }
     else
@@ -164,15 +174,18 @@ Value_Commands* generate_Factor(Factor *factor, map<string, Identifier*> declare
 
     if (factor->summands) {
         res2 = generate_Summands(factor->summands, declared_identifiers);
-        string op = factor->summands->sign;
+        string op = factor->summands->sign->op;
         if (res1->commands.size() == 0 && res2->commands.size() == 0) {
             if (op == "+") total->value = (int)(res1->value) + (int)(res2->value);
             else if (op == "-") total->value = (int)(res1->value) - (int)(res2->value);
+        }
         else {
+            total->commands = res1->commands;
+            total->commands.insert(total->commands.end(), res2->commands.begin(), res2->commands.end());
             if (op == "+") total->commands.push_back("add");
             else if (op == "-") total->commands.push_back("sub");
         }
-        total->type = cast_types(res1->type, res2->type);
+        total->type = gen_cast_types(res1->type, res2->type);
         return total;
     }
     else
@@ -186,17 +199,20 @@ Value_Commands* generate_Factors(Factors *factors, map<string, Identifier*> decl
 
     if (factors->factors) {
         res2 = generate_Factors(factors->factors, declared_identifiers);
-        string op = factors->factors->simpleOperator;
+        string op = factors->factors->simpleOperator->op;
         if (res1->commands.size() == 0 && res2->commands.size() == 0) {
             if (op == "*") total->value = (int)(res1->value) * (int)(res2->value);
             else if (op == "/") total->value = (int)(res1->value) / (int)(res2->value);
             else if (op == "%") total->value = (int)(res1->value) % (int)(res2->value);
+        }
         else {
+            total->commands = res1->commands;
+            total->commands.insert(total->commands.end(), res2->commands.begin(), res2->commands.end());
             if (op == "*") total->commands.push_back("mul");
             else if (op == "/") total->commands.push_back("div");
             else if (op == "%")  total->commands.push_back("rem");
         }
-        total->type = cast_types(res1->type, res2->type);
+        total->type = gen_cast_types(res1->type, res2->type);
         return total;
     }
     else
@@ -210,17 +226,20 @@ Value_Commands* generate_Simple(Simple *simple, map<string, Identifier*> declare
 
     if (simple->factors) {
         res2 = generate_Factors(simple->factors, declared_identifiers);
-        string op = simple->factors->simpleOperator;
+        string op = simple->factors->simpleOperator->op;
         if (res1->commands.size() == 0 && res2->commands.size() == 0) {
             if (op == "*") total->value = (int)(res1->value) * (int)(res2->value);
             else if (op == "/") total->value = (int)(res1->value) / (int)(res2->value);
             else if (op == "%") total->value = (int)(res1->value) % (int)(res2->value);
+        }
         else {
+            total->commands = res1->commands;
+            total->commands.insert(total->commands.end(), res2->commands.begin(), res2->commands.end());
             if (op == "*") total->commands.push_back("mul");
             else if (op == "/") total->commands.push_back("div");
             else if (op == "%")  total->commands.push_back("rem");
         }
-        total->type = cast_types(res1->type, res2->type);
+        total->type = gen_cast_types(res1->type, res2->type);
         return total;
     }
     else
@@ -231,6 +250,7 @@ Value_Commands* generate_Simple(Simple *simple, map<string, Identifier*> declare
 Value_Commands* generate_ComparisonInRelation(ComparisonInRelation *comparisoninrelation, map<string, Identifier*> declared_identifiers) {
     if (comparisoninrelation->simple)
         return generate_Simple(comparisoninrelation->simple, declared_identifiers);
+    else return nullptr;
 }
 
 // DanyaDone
@@ -242,7 +262,7 @@ Value_Commands* generate_Relation(Relation *relation, map<string, Identifier*> d
         res1 = generate_Simple(relation->simple, declared_identifiers);
     
     if (res2) {
-        string op = relation->comparisoninrelation->comparisonoperator;
+        string op = relation->comparisoninrelation->comparisonoperator->op;
         if (res1->commands.size() == 0 && res2->commands.size() == 0) {
             if (op == "<") total->value = (int)(res1->value) < (int)(res2->value);
             else if (op == ">") total->value = (int)(res1->value) > (int)(res2->value);
@@ -253,7 +273,7 @@ Value_Commands* generate_Relation(Relation *relation, map<string, Identifier*> d
         }
         else {
             total->commands = res1->commands;
-            total->commands.insert(total->commands, res2->commands.begin(), res2->commands.end());
+            total->commands.insert(total->commands.end(), res2->commands.begin(), res2->commands.end());
             
             if (op == "<") total->commands.push_back("clt");
             else if (op == ">") total->commands.push_back("cgt");
@@ -290,13 +310,15 @@ Value_Commands* generate_MultipleRelationsInExpression(MultipleRelationsInExpres
     if (multiplerelationsinexpression->multiplerelationsinexpression)
         res2 = generate_MultipleRelationsInExpression(multiplerelationsinexpression->multiplerelationsinexpression, declared_identifiers);
     if (res2) {
-        string lop = expression->multiplerelationsinexpression->logicaloperator;
+        string lop = multiplerelationsinexpression->multiplerelationsinexpression->logicaloperator->op;
         if (res1->commands.size() == 0 && res2->commands.size() == 0) {
             if (lop == "and") total->value = (int)(res1->value) && (int)(res2->value);
             else if (lop == "or") total->value = (int)(res1->value) || (int)(res2->value);
             else if (lop == "xor") total->value = (int)(res1->value) != (int)(res2->value);
         }
         else {
+            total->commands = res1->commands;
+            total->commands.insert(total->commands.end(), res2->commands.begin(), res2->commands.end());
             if (lop == "and") {
 
             }
@@ -319,18 +341,20 @@ Value_Commands* generate_MultipleRelationsInExpression(MultipleRelationsInExpres
 Value_Commands* generate_Expression(Expression *expression, map<string, Identifier*> declared_identifiers) {
     Value_Commands* res1, *res2 = nullptr, *total = new Value_Commands();
     if (expression->multiplerelationsinexpression) {
-        res2 = generate_MultipleRelationsInExpression(expression->multiplerelationsinexpression, declared_identifiers).second;
+        res2 = generate_MultipleRelationsInExpression(expression->multiplerelationsinexpression, declared_identifiers);
     }
     else {
-        res1 = generate_Relation(expression->relation, declared_identifiers).second;
+        res1 = generate_Relation(expression->relation, declared_identifiers);
         if (res2) {
-            string lop = expression->multiplerelationsinexpression->logicaloperator;
+            string lop = expression->multiplerelationsinexpression->logicaloperator->op;
             if (res1->commands.size() == 0 && res2->commands.size() == 0) {
                 if (lop == "and") total->value = (int)(res1->value) && (int)(res2->value);
                 else if (lop == "or") total->value = (int)(res1->value) || (int)(res2->value);
                 else if (lop == "xor") total->value = (int)(res1->value) != (int)(res2->value);
             }
             else {
+                total->commands = res1->commands;
+                total->commands.insert(total->commands.end(), res2->commands.begin(), res2->commands.end());
                 if (lop == "and") {
 
                 }
@@ -348,12 +372,13 @@ Value_Commands* generate_Expression(Expression *expression, map<string, Identifi
             return res1;
         }
     }
+    return nullptr;
 }
 
 // DanyaDone
 void generate_ElseInIfStatement(ElseInIfStatement *elseinifstatement, map<string, Identifier*> declared_identifiers) {
     if (elseinifstatement->body)
-        generate_Body(elseinifstatement->body, allow_redeclaration(declared_identifiers));
+        generate_Body(elseinifstatement->body, gen_allow_redeclaration(declared_identifiers));
 }
 
 // DanyaDone
@@ -362,7 +387,7 @@ void generate_IfStatement(IfStatement *ifstatement, map<string, Identifier*> dec
         generate_Expression(ifstatement->expression, declared_identifiers);
 
     if (ifstatement->body)
-        generate_Body(ifstatement->body, allow_redeclaration(declared_identifiers));
+        generate_Body(ifstatement->body, gen_allow_redeclaration(declared_identifiers));
 
     if (ifstatement->elseinifstatement)
         generate_ElseInIfStatement(ifstatement->elseinifstatement, declared_identifiers);
@@ -384,9 +409,9 @@ void generate_Range(Range *range, map<string, Identifier*> declared_identifiers)
 
 // DanyaDone
 void generate_ForLoop(ForLoop *forloop, map<string, Identifier*> declared_identifiers) {
-    map<string, Identifier*> redeclaration_allowed = allow_redeclaration(declared_identifiers);
+    map<string, Identifier*> redeclaration_allowed = gen_allow_redeclaration(declared_identifiers);
     if (!(forloop->name).empty()) {
-        redeclaration_allowed[forloop->name] =  IdentifierIL(VARIABLE, "integer", 1);
+        redeclaration_allowed[forloop->name] = new Identifier(8, VARIABLE, "integer", 1);
     }
     if (forloop->range) {
         generate_Range(forloop->range, redeclaration_allowed);
@@ -402,7 +427,7 @@ void generate_WhileLoop(WhileLoop *whileloop, map<string, Identifier*> declared_
         generate_Expression(whileloop->expression, declared_identifiers);
 
     if (whileloop->body)
-        generate_Body(whileloop->body, allow_redeclaration(declared_identifiers));
+        generate_Body(whileloop->body, gen_allow_redeclaration(declared_identifiers));
 }
 
 // DanyaDone
@@ -437,7 +462,7 @@ void generate_Assignment(Assignment *assignment, map<string, Identifier*> declar
     string left_part_type, right_part_type;
 
     if (assignment->modifiableprimary)
-        left_part_type = generate_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers, true);
+        left_part_type = generate_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers, true)->type;
     
     if (assignment->expression)
         right_part_type = generate_Expression(assignment->expression, declared_identifiers)->type;
@@ -453,7 +478,7 @@ void generate_Assignment(Assignment *assignment, map<string, Identifier*> declar
 
     // To change type of left part if needed
     if (assignment->modifiableprimary && left_part_type.substr(0, 5) == "array" && right_part_type.substr(0, 5) == "array") {
-        left_part_type = generate_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers, true, right_part_type);
+        left_part_type = generate_ModifiablePrimary(assignment->modifiableprimary, declared_identifiers, true, right_part_type)->type;
     }
 
     if ((left_part_type.substr(0, 5) == "array") != (right_part_type.substr(0, 5) == "array")) {
@@ -539,7 +564,7 @@ map<string, Identifier* > generate_ParameterDeclaration(ParameterDeclaration *pa
     if (parameterdeclaration->type) {
         type = generate_Type(parameterdeclaration->type, declared_identifiers, nullptr, true);
     }
-    declared_identifiers[name] =  IdentifierIL(VARIABLE, type);
+    declared_identifiers[name] =  new Identifier(8, VARIABLE, type);
     return declared_identifiers;
 }
 
@@ -568,7 +593,7 @@ map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routin
     string function_name;
     string return_type;
 
-    map<string, Identifier*> declared_identifiers_in_function = allow_redeclaration(declared_identifiers);
+    map<string, Identifier*> declared_identifiers_in_function = gen_allow_redeclaration(declared_identifiers);
 
     function_name = routinedeclaration->name;
     if (routinedeclaration->parameters) {
@@ -588,7 +613,7 @@ map<string, Identifier* > generate_RoutineDeclaration(RoutineDeclaration *routin
         }
     }
 
-    Identifier *function_name_identifier =  IdentifierIL(FUNCTION, return_type); 
+    Identifier *function_name_identifier =  new Identifier(8, FUNCTION, return_type); 
     declared_identifiers[function_name] = function_name_identifier;
     declared_identifiers_in_function[function_name] = function_name_identifier;
 
@@ -690,7 +715,7 @@ string generate_Type(Type *type, map<string, Identifier*> declared_identifiers, 
  * @param typedeclaration  Structure containing new type data
  * DanyaDone
  */
-map<string, Identifier*> generate_TypeDeclaration(TypeDeclaration *typedeclaration, map<string, Identifier*> declared_identifiers) {
+map<string, Identifier*> generate_TypeDeclaration(TypeDeclaration *typedeclaration, map<string, Identifier*> declared_identifiers, bool global_declaration) {
     string name = typedeclaration->name;
     transform(name.begin(), name.end(), name.begin(), ::tolower);
 
@@ -703,7 +728,7 @@ map<string, Identifier*> generate_TypeDeclaration(TypeDeclaration *typedeclarati
     // check actual type and get its string representation
     string type = generate_Type(typedeclaration->type, declared_identifiers);
 
-    declared_identifiers[name] =  IdentifierIL(TYPE, type);
+    declared_identifiers[name] =  new Identifier(8, TYPE, type);
 
     return declared_identifiers;
 }
@@ -720,7 +745,7 @@ Value_Commands* generate_InitialValue(InitialValue *initialvalue, map<string, Id
 pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(VariableDeclaration *variabledeclaration, map<string, Identifier* > declared_identifiers, bool global_declaration/*=false*/, Identifier *parent /*= nullptr*/) {
     string user_type;
 
-    Identifier *new_identifier =  IdentifierIL(VARIABLE, user_type, global_declaration);
+    Identifier *new_identifier =  new Identifier(8, VARIABLE, user_type, global_declaration);
 
     //getting var type
     if (variabledeclaration->type) {
@@ -729,12 +754,13 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
     }
     // type is setting by the value of expression
     else if (variabledeclaration->expression) { // var b is 5
-        Value_Commands* expression = generate_Expression(variabledeclaration->expression, declared_identifiers).first;
+        Value_Commands* expression = generate_Expression(variabledeclaration->expression, declared_identifiers);
         user_type = expression->type;
-        declared_identifiers[variabledeclaration->name] =  IdentifierIL(VARIABLE, user_type, global_declaration);
+        declared_identifiers[variabledeclaration->name] =  new Identifier(8, VARIABLE, user_type, global_declaration);
 
         if (global_declaration) {
             cout << ".field public static " << format_type(new_identifier->value_type) << " " << variabledeclaration->name << "\n";
+            expression->commands.push_back("stsfld " + format_type(new_identifier->value_type) + " ConsoleApp1.Program::" + variabledeclaration->name);
         }
         else {
 
@@ -749,6 +775,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
 
     // getting initial value
     
+    Value_Commands* initialvalue = nullptr;
     if (variabledeclaration->initialvalue) { // var b: Integer is 5
         Value_Commands* initialvalue = generate_InitialValue(variabledeclaration->initialvalue, declared_identifiers);
         string actual_type = initialvalue->type;
@@ -761,6 +788,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
             else {
                 if (global_declaration) {
                     cout << ".field public static " << format_type(new_identifier->value_type) << " " << variabledeclaration->name << "\n";
+                    initialvalue->commands.push_back("stsfld " + format_type(new_identifier->value_type) + " ConsoleApp1.Program::" + variabledeclaration->name);
                 }
                 else {
 
@@ -778,7 +806,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
 
             }
         }
-        return {declared_identifiers, initialValue};
+        return make_pair(declared_identifiers, initialvalue);
     }
     else { // case of initialization without initial value:  var b : Integer
         if (parent) {// Only in case of record declaration
@@ -787,6 +815,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
         else {
             if (global_declaration) {
                 cout << ".field public static " << format_type(new_identifier->value_type) << " " << variabledeclaration->name << "\n";
+            }
             else {
 
             }
@@ -799,12 +828,13 @@ pair<map<string, Identifier*>, Value_Commands*> generate_VariableDeclaration(Var
 // DanyaDone
 pair<map<string, Identifier*>, Value_Commands*> generate_SimpleDeclaration(SimpleDeclaration *simpleDeclaration, map<string, Identifier*> declared_identifiers, bool global_declaration) {
     if (simpleDeclaration->variabledeclaration) {
-        return generate_VariableDeclaration(simpleDeclaration->variabledeclaration, declared_identifiers, global_declaration)
+        return generate_VariableDeclaration(simpleDeclaration->variabledeclaration, declared_identifiers, global_declaration);
     }
     if (simpleDeclaration->typedeclaration) {
         declared_identifiers = generate_TypeDeclaration(simpleDeclaration->typedeclaration, declared_identifiers, global_declaration);
         return {declared_identifiers, nullptr};
     }
+    return {declared_identifiers, nullptr};
 }
 
 // DanyaDone
@@ -816,6 +846,7 @@ pair<map<string, Identifier*>, Value_Commands*> generate_Declaration(Declaration
         declared_identifiers = generate_RoutineDeclaration(declaration->routinedeclaration, declared_identifiers);
         return {declared_identifiers, nullptr};
     }
+    return {declared_identifiers, nullptr};
 }
 
 // DanyaDone
@@ -840,20 +871,20 @@ bool run_IL_Code_Generator(Program *program) {
     cout << ".class private auto ansi beforefieldinit ConsoleApp1.Program extends [System.Runtime]System.Object\n{\n";
 
     map<string, Identifier*> declared_identifiers;
-    declared_identifiers["integer"] =  IdentifierIL("Type", "integer");
-    declared_identifiers["real"] =  IdentifierIL("Type", "real");
-    declared_identifiers["boolean"] =  IdentifierIL("Type", "boolean");
+    declared_identifiers["integer"] =  new Identifier(8, "Type", "integer", 1);
+    declared_identifiers["real"] =  new Identifier(8, "Type", "real", 1);
+    declared_identifiers["boolean"] =  new Identifier(8, "Type", "boolean", 1);
     vector<string> init_commands = generate_Program(program, declared_identifiers);
 
-    cout << "  .method private hidebysig static specialname rtspecialname void .cctor() cil managed\n{\n";
-    cout << ".maxstack 8\n";
-    int k = 0;
+    cout << "\n.method private hidebysig static specialname rtspecialname void .cctor() cil managed\n{\n";
+    cout << ".maxstack 8\n\n";
     for (int i = 0; i < init_commands.size(); i++)
-        cout << IL_number(k++) << ": " << init_commands[i] << "\n";
+        cout << IL_number(i) << ": " << init_commands[i] << "\n";
 
     cout << "\n";
     cout << "\n}\n";
 
     cout << "}";
+    freopen("CON", "w", stdout);
     return true;
 }
